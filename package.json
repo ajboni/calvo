@@ -1,0 +1,21 @@
+{
+  "name": "mod-ui-cli",
+  "version": "1.0.0",
+  "description": "A CLI mod host client to load and stack LV2 plugins.",
+  "main": "index.js",
+  "scripts": {
+    "start": "node app.js",
+    "run dev": "nodemon app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "AGPL-3.0-or-later",
+  "devDependencies": {
+    "nodemon": "^2.0.4",
+    "prettier": "^2.0.5"
+  },
+  "dependencies": {
+    "blessed": "^0.1.81",
+    "blessed-contrib": "^4.8.20"
+  }
+}
