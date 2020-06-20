@@ -1,8 +1,10 @@
 const Layout = require("./layout");
+const App = require("./app");
+const { wlog } = require("./layout");
 
 function registerKeyboardShortcuts(screen, mainGrid) {
   screen.key(["escape", "q", "C-c"], function (ch, key) {
-    return process.exit(0);
+    App.exit();
   });
 
   screen.key(["tab"], function (ch, key) {
