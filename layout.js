@@ -49,6 +49,7 @@ function setUpLayout(screen) {
 
   logWidget = grid.set(10, 8, 2, 4, contrib.log, {
     label: "Logs",
+    tags: true,
   });
 
   modHostStatusWidget.focusabe = false;
@@ -69,6 +70,7 @@ function updateLayoutData() {
   `;
 
   modHostStatusWidget.content = `
+  mod-host Status: ${modHostProcess.STATUS}
   mod-host PID: ${modHostProcess.PID}
   mod-host Port: ${modHostProcess.PORT}
   mod-host FB Port: ${modHostProcess.FEEDBACK_PORT}
@@ -104,8 +106,13 @@ function wlog(msg) {
   logWidget.log(msg);
 }
 
+function wlogError(msg) {
+  logWidget.log(`{red-fg}${msg}{/}`);
+}
+
 exports.setUpLayout = setUpLayout;
 exports.focusPrev = focusPrev;
 exports.focusNext = focusNext;
 exports.updateLayoutData = updateLayoutData;
 exports.wlog = wlog;
+exports.wlogError = wlogError;
