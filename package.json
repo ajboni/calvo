@@ -18,6 +18,8 @@
     "blessed": "^0.1.81",
     "blessed-contrib": "^4.8.20",
     "get-port": "^5.1.1",
+    "node-cache": "^5.1.1",
+    "python-shell": "^2.0.1",
     "shelljs": "^0.8.4"
   }
 }

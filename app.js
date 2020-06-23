@@ -5,9 +5,10 @@ const Keyboard = require("./keyboard");
 const Jack = require("./jack_client");
 const ModHost = require("./modhost_client");
 const { settings } = require("./settings");
+const LV2 = require("./lv2");
+const { lv2ls, pluginInfo, grep, listAllPlugins } = require("./lv2");
+const { pluginsUriByName } = require("./store");
 
-// const welcomeScreen = blessed.screen({});
-// welcomeScreen.render();
 const program = blessed.program();
 
 // Create a screen object.
@@ -18,6 +19,9 @@ const screen = blessed.screen({
 try {
   const mainGrid = Layout.setUpLayout(screen);
   Keyboard.registerKeyboardShortcuts(screen, mainGrid);
+  LV2.init();
+  console.log(pluginsUriByName.keys());
+
   Jack.init();
   ModHost.init();
 } catch (error) {

@@ -2,7 +2,7 @@ const blessed = require("blessed");
 const contrib = require("blessed-contrib");
 const Jack = require("./jack_client");
 const { settings } = require("./settings");
-const { modHostProcess } = require("./modhost_client");
+const { jack, modHost, modHostStatusEnum } = require("./store");
 
 const defaultWidgetStyle = {
   focus: {
@@ -13,7 +13,7 @@ const defaultWidgetStyle = {
 
 let focusIndex = 0;
 var mainScreen;
-var jackStatusWidget, modHostStatusWidget;
+var jackStatusWidget, modHostStatusWidget, logWidget;
 
 function setUpLayout(screen) {
   var grid = new contrib.grid({ rows: 12, cols: 12, screen: screen });
@@ -61,19 +61,17 @@ function setUpLayout(screen) {
 }
 
 function updateLayoutData() {
-  //   statusSampleRateWidget.content = Jack.status.SAMPLE_RATE;
-
   jackStatusWidget.content = `
-  JACK Status: ${Jack.status.JACK_STATUS}
-  Sample Rate: ${Jack.status.SAMPLE_RATE}
-  DSP Load: ${Jack.status.DSP_LOAD} %
+  JACK Status: ${jack.JACK_STATUS}
+  Sample Rate: ${jack.SAMPLE_RATE}
+  DSP Load: ${jack.DSP_LOAD} %
   `;
 
   modHostStatusWidget.content = `
-  mod-host Status: ${modHostProcess.STATUS}
-  mod-host PID: ${modHostProcess.PID}
-  mod-host Port: ${modHostProcess.PORT}
-  mod-host FB Port: ${modHostProcess.FEEDBACK_PORT}
+  mod-host Status: ${modHost.STATUS}
+  mod-host PID: ${modHost.PID}
+  mod-host Port: ${modHost.PORT}
+  mod-host FB Port: ${modHost.FEEDBACK_PORT}
   `;
 }
 
@@ -95,6 +93,7 @@ function focusPrev() {
   }
   focus();
   mainScreen.children[focusIndex].focusable === false ? focusPrev() : focus();
+  logWidget.log(msg);
 }
 
 function focus() {
@@ -103,11 +102,19 @@ function focus() {
 }
 
 function wlog(msg) {
-  logWidget.log(msg);
+  if (logWidget) {
+    logWidget.log(msg);
+  } else {
+    console.log(msg);
+  }
 }
 
 function wlogError(msg) {
-  logWidget.log(`{red-fg}${msg}{/}`);
+  if (logWidget) {
+    logWidget.log(`{red-fg}${msg}{/}`);
+  } else {
+    console.log(msg);
+  }
 }
 
 exports.setUpLayout = setUpLayout;
