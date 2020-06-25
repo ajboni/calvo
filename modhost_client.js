@@ -1,10 +1,11 @@
-const shell = require("shelljs");
 const { wlog, wlogError } = require("./layout");
 const { removeNewLines } = require("./string_utils");
 const getPort = require("get-port");
 const { settings } = require("./settings");
-var net = require("net");
 const { modHost, modHostStatusEnum } = require("./store");
+
+var net = require("net");
+var client = new net.Socket();
 
 /** Exec mod-host, get the PID and the ephemeral ports. */
 async function init() {
@@ -26,10 +27,14 @@ async function init() {
 
 /** Kill modhost process. */
 function destroy() {
-  shell.exec(`kill ${modHost.PID}`);
+  const cp = require("child_process");
+  cp.execSync(`kill ${modHost.PID}`);
 }
 
-// Spawn a mod-host process
+/**
+ * Spawn a mod-host process
+ * @param {*} port Port that the mod-host server is listening for connections.
+ */
 async function spawn(port) {
   const { spawn } = require("child_process");
   const { wlog } = require("./layout");
@@ -56,13 +61,13 @@ async function spawn(port) {
 
 /**
  * Connects to modhost server.
- *
+ * @param {*} [server=settings.MOD_HOST_SERVER] Ip Address of the server
+ * @param {*} [port=modHost.PORT] Port that mod-host server is listening
  */
-async function connect() {
+async function connect(server = settings.MOD_HOST_SERVER, port = modHost.PORT) {
   const { wlog } = require("./layout");
   var elapsedTime = 0;
 
-  var client = new net.Socket();
   // Try timeout times, wait 1 second between each try.
   while (
     modHost.STATUS !== modHostStatusEnum.StartedDisconnected &&
@@ -73,8 +78,8 @@ async function connect() {
   }
 
   client.connect({
-    port: modHost.PORT,
-    host: settings.MOD_HOST_SERVER,
+    port: port,
+    host: server,
   });
 
   //   client.setTimeout(5e3, () => client.destroy());
@@ -83,11 +88,14 @@ async function connect() {
     wlog("[MH] Connected to mod-host.");
     modHost.STATUS = modHostStatusEnum.Connected;
     client.setTimeout(0);
+    client.write("help");
   });
 
   client.on("data", function (data) {
-    wlog("Received: " + data);
+    wlog(`[MH] ${data}`);
+    console.log(data);
   });
+
   client.on("error", function (data) {
     wlogError("[MH] Cannot connect to Mod-Host: " + data);
   });

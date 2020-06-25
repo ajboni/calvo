@@ -2,12 +2,21 @@ const blessed = require("blessed");
 const contrib = require("blessed-contrib");
 const Jack = require("./jack_client");
 const { settings } = require("./settings");
-const { jack, modHost, modHostStatusEnum } = require("./store");
+const { jack, modHost, modHostStatusEnum, app } = require("./store");
 
-const defaultWidgetStyle = {
-  focus: {
-    border: { fg: "red" },
-    enabled: false,
+const defaultWidgetProps = {
+  alwaysScroll: true,
+  interactive: true,
+  scrollbar: {
+    ch: " ",
+    inverse: true,
+  },
+  mouse: true,
+  style: {
+    focus: {
+      border: { fg: "red" },
+      enabled: false,
+    },
   },
 };
 
@@ -15,45 +24,56 @@ let focusIndex = 0;
 var mainScreen;
 var jackStatusWidget, modHostStatusWidget, logWidget;
 
+// a.sette
 function setUpLayout(screen) {
   var grid = new contrib.grid({ rows: 12, cols: 12, screen: screen });
   //grid.set(row, col, rowSpan, colSpan, obj, opts)
   var categoryWidget = grid.set(0, 0, 6, 2, blessed.box, {
     label: "Categories",
-    style: Object.create(defaultWidgetStyle),
+    ...JSON.parse(JSON.stringify(defaultWidgetProps)),
   });
-  var fxChainWidget = grid.set(6, 0, 4, 2, blessed.box, {
+  var fxChainWidget = grid.set(3, 2, 3, 2, blessed.box, {
     label: "Fx Chain",
-    style: Object.create(defaultWidgetStyle),
+    ...JSON.parse(JSON.stringify(defaultWidgetProps)),
   });
-  var fxListWidget = grid.set(0, 1, 5, 1, blessed.box, {
+  var fxListWidget = grid.set(0, 2, 3, 2, blessed.box, {
     label: "Fx List",
-    style: Object.create(defaultWidgetStyle),
+    ...JSON.parse(JSON.stringify(defaultWidgetProps)),
   });
 
-  var fxParametersWidget = grid.set(0, 2, 5, 4, blessed.box, {
+  var fxParametersWidget = grid.set(0, 4, 5, 4, blessed.box, {
     label: "Parameters",
-    style: Object.create(defaultWidgetStyle),
+    ...JSON.parse(JSON.stringify(defaultWidgetProps)),
   });
   var fxVolumeWidget = grid.set(5, 4, 1, 2, blessed.box, {
     label: "Mix",
-    style: Object.create(defaultWidgetStyle),
+    ...JSON.parse(JSON.stringify(defaultWidgetProps)),
   });
 
   jackStatusWidget = grid.set(10, 0, 2, 2, blessed.box, {
     label: "JACK Status",
+    ...JSON.parse(JSON.stringify(defaultWidgetProps)),
   });
   modHostStatusWidget = grid.set(10, 2, 2, 2, blessed.box, {
     label: "Mod-Host Status",
+    ...JSON.parse(JSON.stringify(defaultWidgetProps)),
   });
 
-  logWidget = grid.set(10, 8, 2, 4, contrib.log, {
+  // LOG
+  logWidget = grid.set(6, 0, 4, 4, blessed.log, {
     label: "Logs",
     tags: true,
+    ...JSON.parse(JSON.stringify(defaultWidgetProps)),
   });
 
+  logWidget.enableInput();
+  logWidget.on("click", function (data) {
+    screen.copyToClipboard("ssss");
+    wlog("Log copied to clipboard.");
+  });
+  //   logWidget.focusable = false;
+
   modHostStatusWidget.focusabe = false;
-  logWidget.focusable = false;
   jackStatusWidget.focusable = false;
   mainScreen = screen;
   focus();
@@ -62,9 +82,16 @@ function setUpLayout(screen) {
 
 function updateLayoutData() {
   jackStatusWidget.content = `
-  JACK Status: ${jack.JACK_STATUS}
-  Sample Rate: ${jack.SAMPLE_RATE}
-  DSP Load: ${jack.DSP_LOAD} %
+  JACK Status: ${jack.JACK_STATUS.status} ${
+    jack.JACK_STATUS.realtime ? "(RT)" : ""
+  }
+  Sample Rate: ${jack.JACK_STATUS.sample_rate} 
+  Buffer: ${jack.JACK_STATUS.block_size}
+  DSP Load: ${jack.JACK_STATUS.cpu_load.toFixed(2)} %
+  Transport: ${jack.TRANSPORT_STATUS.state}
+  Time: ${jack.TRANSPORT_STATUS.beats_per_bar}/${
+    jack.TRANSPORT_STATUS.beat_type
+  } @ ${jack.TRANSPORT_STATUS.beats_per_minute} bpm
   `;
 
   modHostStatusWidget.content = `
@@ -102,8 +129,12 @@ function focus() {
 }
 
 function wlog(msg) {
-  if (logWidget) {
+  if (logWidget && app.INITIALIZED) {
     logWidget.log(msg);
+
+    //  msg.split("\n").forEach((line) => {
+    //    logWidget.log(line);
+    //  });
   } else {
     console.log(msg);
   }

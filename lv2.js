@@ -1,70 +1,36 @@
 const { tabbedTreeToJSON, stringToTrimmedArray } = require("./string_utils");
 const { wlogError, wlog } = require("./layout");
-const { pluginsUriByName, saveCache, loadCache } = require("./store");
+const { pluginsCatalog, saveCache, loadCache } = require("./store");
 const { settings } = require("./settings");
+const { fstat, existsSync } = require("fs");
 
 /**
  * Initialize: Scan for plugins and setup store (cache)
  *
  */
 function init() {
-  if (!settings.SCAN_PLUGINS) {
-    console.log("Loading plugins cache...");
-    loadCache(pluginsUriByName, "pluginsUriByName");
-    return;
-  }
-
-  console.log("Building plugins cache, please wait...");
-  try {
-    const names = lv2ls(true);
-    const uris = lv2ls(false);
-    names.forEach((name, index) => {
-      pluginsUriByName.set(name, uris[index]);
-    });
-    saveCache(pluginsUriByName, "pluginsUriByName");
-  } catch (error) {
-    wlog(error);
+  if (existsSync("./pluginsCatalog.json") && !settings.SCAN_PLUGINS) {
+    wlog("Loading plugins cache...");
+    loadCache(pluginsCatalog, "pluginsCatalog");
+  } else {
+    buildPluginCache();
   }
 }
 
 /**
- * Gets all plugins Names AND Uris
- *
- * @returns An array of objects with name, uris as properties.
+ * Scans the system for installed plugins, and save a database in memory and disk.
  */
-function listAllPlugins() {
-  let arr = [];
+function buildPluginCache() {
+  wlog("Building plugins cache, this might take a while, please wait...");
   try {
-    const names = lv2ls(true);
-    const uris = lv2ls(false);
-
-    names.forEach((name, index) => {
-      let obj = {};
-      obj.name = name;
-      obj.uri = uris[index];
-      arr.push(obj);
+    //  const names = lv2ls(true);
+    const plugins = grep();
+    plugins.forEach((plugin, index) => {
+      pluginsCatalog.set(plugin.name, plugin);
     });
-    return arr;
+    saveCache(pluginsCatalog, "pluginsCatalog");
   } catch (error) {
     wlog(error);
-    return error;
-  }
-}
-
-/**
- * List all lv2 plugins available on the system.
- * @param {boolean} [names=false] Show names instead of URIS
- * @returns Returns an array with all plugins URIs/Names available on the system
- */
-function lv2ls(names = false) {
-  const cp = require("child_process");
-  const param = names ? "-n" : "";
-  try {
-    const result = cp.execSync(`lv2ls ${param}`, { encoding: "utf8" });
-    return stringToTrimmedArray(result);
-  } catch (error) {
-    wlog(error);
-    return error;
   }
 }
 
@@ -78,13 +44,12 @@ function grep(regex = ".") {
   const cp = require("child_process");
   try {
     const result = cp.execSync(
-      `python3 -m jackaudiotools.lv2.lv2_grep ${regex}`,
+      `python3 ./py/jack-audio-tools/lv2/grep.py -c --json ${regex}`,
       {
-        cwd: "./py",
         encoding: "utf8",
       }
     );
-    return stringToTrimmedArray(result);
+    return JSON.parse(result);
   } catch (error) {
     wlog(error);
     return error;
@@ -114,8 +79,6 @@ function pluginInfo(uri) {
   }
 }
 
-exports.lv2ls = lv2ls;
 exports.grep = grep;
 exports.pluginInfo = pluginInfo;
-exports.listAllPlugins = listAllPlugins;
 exports.init = init;

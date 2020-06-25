@@ -7,23 +7,20 @@ const ModHost = require("./modhost_client");
 const { settings } = require("./settings");
 const LV2 = require("./lv2");
 const { lv2ls, pluginInfo, grep, listAllPlugins } = require("./lv2");
-const { pluginsUriByName } = require("./store");
-
+const { pluginsCatalog, app } = require("./store");
 const program = blessed.program();
-
-// Create a screen object.
 const screen = blessed.screen({
   smartCSR: true,
 });
 
 try {
-  const mainGrid = Layout.setUpLayout(screen);
-  Keyboard.registerKeyboardShortcuts(screen, mainGrid);
   LV2.init();
-  console.log(pluginsUriByName.keys());
-
   Jack.init();
   ModHost.init();
+
+  // Create a screen object.
+  const mainGrid = Layout.setUpLayout(screen);
+  Keyboard.registerKeyboardShortcuts(screen, mainGrid);
 } catch (error) {
   console.log("ERROR: " + error);
   console.log("Aborting...");
@@ -32,7 +29,11 @@ try {
 
 Layout.updateLayoutData();
 screen.render();
+program.enableMouse();
 
+app.INITIALIZED = true;
+Jack.poll();
+// Set up polling
 let jackPoll = setInterval(() => {
   Jack.poll();
 }, settings.JACK_POLLING_RATE);
