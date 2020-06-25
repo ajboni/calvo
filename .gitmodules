@@ -1,0 +1,3 @@
+[submodule "py/jack-audio-tools"]
+	path = py/jack-audio-tools
+	url = git@github.com:ajboni/jack-audio-tools.git
