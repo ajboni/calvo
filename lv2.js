@@ -1,6 +1,11 @@
 const { tabbedTreeToJSON, stringToTrimmedArray } = require("./string_utils");
 const { wlogError, wlog } = require("./layout");
-const { pluginsCatalog, saveCache, loadCache } = require("./store");
+const {
+  pluginsCatalog,
+  saveCache,
+  loadCache,
+  pluginsCategories,
+} = require("./store");
 const { settings } = require("./settings");
 const { fstat, existsSync } = require("fs");
 
@@ -27,6 +32,11 @@ function buildPluginCache() {
     const plugins = grep();
     plugins.forEach((plugin, index) => {
       pluginsCatalog.set(plugin.name, plugin);
+      plugin.categories.forEach((cat) => {
+        if (!pluginsCategories.includes(cat)) {
+          pluginsCategories.push(cat);
+        }
+      });
     });
     saveCache(pluginsCatalog, "pluginsCatalog");
   } catch (error) {

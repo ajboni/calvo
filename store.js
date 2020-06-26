@@ -11,6 +11,8 @@ const modHostStatusEnum = Object.freeze({
 
 const pluginsCatalog = new NodeCache();
 
+const pluginsCategories = [];
+
 const app = {
   INITIALIZED: false,
 };
@@ -50,17 +52,40 @@ const jack = {
 function saveCache(cache, name, directoryPath = __dirname) {
   Layout.wlog("Saving cache...");
   try {
+    if (fs.existsSync(path.join(directoryPath, `${name}.json`))) {
+      fs.unlinkSync(path.join(directoryPath, `${name}.json`));
+    }
+    if (fs.existsSync(path.join(directoryPath, `${name}.json`))) {
+      fs.unlinkSync(path.join(directoryPath, `${name}_categories.json`));
+    }
+
     const keys = cache.keys();
     const cacheData = cache.mget(keys);
     const stringifiedData = JSON.stringify(cacheData);
     fs.writeFileSync(path.join(directoryPath, `${name}.json`), stringifiedData);
+    const categories = [];
+
+    var result = Object.keys(cacheData).map(function (key) {
+      const cats = cacheData[key].categories;
+      cats.forEach((cat) => {
+        if (!categories.includes(cat)) {
+          categories.push(cat);
+        }
+      });
+    });
+
+    fs.writeFileSync(
+      path.join(directoryPath, `${name}_categories.json`),
+      JSON.stringify(categories.sort())
+    );
+
     Layout.wlog("Cache Saved.");
   } catch (error) {
     Layout.wlog(error);
   }
 }
 
-const loadCache = (cache, name, directoryPath = __dirname) => {
+function loadCache(cache, name, directoryPath = __dirname) {
   const filePath = path.join(directoryPath, `${name}.json`);
   if (fs.existsSync(filePath)) {
     const jsonData = fs.readFileSync(filePath, "utf8");
@@ -71,7 +96,7 @@ const loadCache = (cache, name, directoryPath = __dirname) => {
       }
     }
   }
-};
+}
 
 exports.pluginsCatalog = pluginsCatalog;
 exports.jack = jack;
@@ -79,4 +104,5 @@ exports.modHost = modHost;
 exports.modHostStatusEnum = modHostStatusEnum;
 exports.saveCache = saveCache;
 exports.loadCache = loadCache;
+exports.pluginsCategories = pluginsCategories;
 exports.app = app;
