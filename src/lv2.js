@@ -6,15 +6,19 @@ const {
   loadCache,
   pluginsCategories,
 } = require("./store");
-const { settings } = require("./settings");
-const { fstat, existsSync } = require("fs");
+const { settings } = require("../settings");
+const { existsSync } = require("fs");
+const path = require("path");
 
 /**
  * Initialize: Scan for plugins and setup store (cache)
  *
  */
 function init() {
-  if (existsSync("./pluginsCatalog.json") && !settings.SCAN_PLUGINS) {
+  if (
+    existsSync(path.join(__dirname, "pluginsCatalog.json")) &&
+    !settings.SCAN_PLUGINS
+  ) {
     wlog("Loading plugins cache...");
     loadCache(pluginsCatalog, "pluginsCatalog");
   } else {

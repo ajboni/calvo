@@ -1,7 +1,7 @@
 const { wlog, wlogError } = require("./layout");
 const { removeNewLines } = require("./string_utils");
 const getPort = require("get-port");
-const { settings } = require("./settings");
+const { settings } = require("../settings");
 const { modHost, modHostStatusEnum } = require("./store");
 
 var net = require("net");

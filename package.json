@@ -4,7 +4,7 @@
   "description": "A CLI mod host client to load and stack LV2 plugins.",
   "main": "index.js",
   "scripts": {
-    "start": "node app.js",
+    "start": "node src/app.js",
     "dev": "nodemon --no-stdin app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

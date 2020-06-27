@@ -1,7 +1,7 @@
 const blessed = require("blessed");
 const contrib = require("blessed-contrib");
 const Jack = require("./jack_client");
-const { settings } = require("./settings");
+const { settings } = require("../settings");
 const { jack, modHost, modHostStatusEnum, app } = require("./store");
 
 const defaultWidgetProps = {
@@ -28,7 +28,7 @@ var jackStatusWidget, modHostStatusWidget, logWidget;
 function setUpLayout(screen) {
   var grid = new contrib.grid({ rows: 12, cols: 12, screen: screen });
   //grid.set(row, col, rowSpan, colSpan, obj, opts)
-  var categoryWidget = grid.set(0, 0, 6, 2, blessed.box, {
+  var categoryWidget = grid.set(0, 0, 6, 2, blessed.list, {
     label: "Categories",
     ...JSON.parse(JSON.stringify(defaultWidgetProps)),
   });
