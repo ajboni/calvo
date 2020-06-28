@@ -2,9 +2,11 @@ const { tabbedTreeToJSON, stringToTrimmedArray } = require("./string_utils");
 const { wlogError, wlog } = require("./layout");
 const {
   pluginsCatalog,
+  pluginCatalog,
   saveCache,
   loadCache,
   pluginsCategories,
+  setCategoryFilter,
 } = require("./store");
 const { settings } = require("../settings");
 const { existsSync } = require("fs");
@@ -24,6 +26,8 @@ function init() {
   } else {
     buildPluginCache();
   }
+
+  setCategoryFilter("");
 }
 
 /**
@@ -34,8 +38,10 @@ function buildPluginCache() {
   try {
     //  const names = lv2ls(true);
     const plugins = grep();
+    pluginCatalog.length = 0;
+    pluginCatalog.push(...plugins);
     plugins.forEach((plugin, index) => {
-      pluginsCatalog.set(plugin.name, plugin);
+      // pluginsCatalog.set(plugin.name, plugin);
       plugin.categories.forEach((cat) => {
         if (!pluginsCategories.includes(cat)) {
           pluginsCategories.push(cat);

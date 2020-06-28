@@ -2,7 +2,15 @@ const blessed = require("blessed");
 const contrib = require("blessed-contrib");
 const Jack = require("./jack_client");
 const { settings } = require("../settings");
-const { jack, modHost, modHostStatusEnum, app } = require("./store");
+const {
+  jack,
+  modHost,
+  modHostStatusEnum,
+  app,
+  pluginsCategories,
+} = require("./store");
+const CategoriesWidget = require("./widgets/categories");
+const PluginListWidget = require("./widgets/pluginList");
 
 const defaultWidgetProps = {
   alwaysScroll: true,
@@ -22,33 +30,29 @@ const defaultWidgetProps = {
 
 let focusIndex = 0;
 var mainScreen;
-var jackStatusWidget, modHostStatusWidget, logWidget;
+var jackStatusWidget,
+  modHostStatusWidget,
+  logWidget,
+  categoryWidget,
+  pluginListWidget;
 
 // a.sette
 function setUpLayout(screen) {
   var grid = new contrib.grid({ rows: 12, cols: 12, screen: screen });
-  //grid.set(row, col, rowSpan, colSpan, obj, opts)
-  var categoryWidget = grid.set(0, 0, 6, 2, blessed.list, {
-    label: "Categories",
-    ...JSON.parse(JSON.stringify(defaultWidgetProps)),
-  });
-  var fxChainWidget = grid.set(3, 2, 3, 2, blessed.box, {
-    label: "Fx Chain",
-    ...JSON.parse(JSON.stringify(defaultWidgetProps)),
-  });
-  var fxListWidget = grid.set(0, 2, 3, 2, blessed.box, {
-    label: "Fx List",
-    ...JSON.parse(JSON.stringify(defaultWidgetProps)),
-  });
+  categoryWidget = CategoriesWidget.make(grid, 0, 0, 1, 6);
+  pluginListWidget = PluginListWidget.make(grid, 1, 0, 1, 6);
+  //   var fxChainWidget = grid.set(3, 2, 3, 2, blessed.box, {
+  //     label: "Fx Chain",
+  //     ...JSON.parse(JSON.stringify(defaultWidgetProps)),
 
-  var fxParametersWidget = grid.set(0, 4, 5, 4, blessed.box, {
-    label: "Parameters",
-    ...JSON.parse(JSON.stringify(defaultWidgetProps)),
-  });
-  var fxVolumeWidget = grid.set(5, 4, 1, 2, blessed.box, {
-    label: "Mix",
-    ...JSON.parse(JSON.stringify(defaultWidgetProps)),
-  });
+  //   var fxParametersWidget = grid.set(0, 4, 5, 4, blessed.box, {
+  //     label: "Parameters",
+  //     ...JSON.parse(JSON.stringify(defaultWidgetProps)),
+  //   });
+  //   var fxVolumeWidget = grid.set(5, 4, 1, 2, blessed.box, {
+  //     label: "Mix",
+  //     ...JSON.parse(JSON.stringify(defaultWidgetProps)),
+  //   });
 
   jackStatusWidget = grid.set(10, 0, 2, 2, blessed.box, {
     label: "JACK Status",
@@ -95,11 +99,12 @@ function updateLayoutData() {
   `;
 
   modHostStatusWidget.content = `
-  mod-host Status: ${modHost.STATUS}
-  mod-host PID: ${modHost.PID}
-  mod-host Port: ${modHost.PORT}
-  mod-host FB Port: ${modHost.FEEDBACK_PORT}
+  Status: ${modHost.STATUS}
+  PID: ${modHost.PID}
+  Port: ${modHost.PORT}
   `;
+
+  const { pluginsCategories } = require("./store");
 }
 
 function focusNext() {
@@ -120,7 +125,6 @@ function focusPrev() {
   }
   focus();
   mainScreen.children[focusIndex].focusable === false ? focusPrev() : focus();
-  logWidget.log(msg);
 }
 
 function focus() {

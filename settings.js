@@ -7,6 +7,7 @@ const settings = {
   DEFAULT_TIMEOUT: 10000, // Max ms to wait for connection/initial setup
   LV2_PLUGINS_FOLDERl: "/user/lib/lv2",
   SCAN_PLUGINS: false, // If false, it will not scan for plugins on startup (use with caution).
+  SCROLL_AMMOUNT: 10, // Ammount to scroll when using page up or page dow keys.
 };
 
 exports.settings = settings;

@@ -10,8 +10,9 @@ const modHostStatusEnum = Object.freeze({
 });
 
 const pluginsCatalog = new NodeCache();
-
-const pluginsCategories = [];
+const pluginCatalog = [];
+const filteredPluginCatalog = [];
+const pluginsCategories = ["(All)"];
 
 const app = {
   INITIALIZED: false,
@@ -49,6 +50,26 @@ const jack = {
   },
 };
 
+function setCategoryFilter(filter = "") {
+  const keys = pluginsCatalog.keys();
+  const cacheData = pluginsCatalog.mget(keys);
+  console.log(cacheData);
+
+  if (pluginsCategories.includes(filter) && filter !== "(All)") {
+    console.log("object");
+  } else {
+    filteredPluginCatalog.length = 0;
+    filteredPluginCatalog.push(...cacheData);
+    console.log(filteredPluginCatalog);
+  }
+}
+
+function getFilteredPluginCatalog(filter) {
+  const keys = pluginsCatalog.keys();
+  const cacheData = pluginsCatalog.mget(keys);
+  console.log(cacheData);
+}
+
 function saveCache(cache, name, directoryPath = __dirname) {
   Layout.wlog("Saving cache...");
   try {
@@ -61,6 +82,7 @@ function saveCache(cache, name, directoryPath = __dirname) {
 
     const keys = cache.keys();
     const cacheData = cache.mget(keys);
+
     const stringifiedData = JSON.stringify(cacheData);
     fs.writeFileSync(path.join(directoryPath, `${name}.json`), stringifiedData);
     const categories = [];
@@ -96,9 +118,17 @@ function loadCache(cache, name, directoryPath = __dirname) {
       }
     }
   }
+
+  const catPath = path.join(directoryPath, `${name}_categories.json`);
+  if (fs.existsSync(catPath)) {
+    const catData = fs.readFileSync(catPath, "utf8");
+    pluginsCategories.push(...JSON.parse(catData));
+  }
 }
 
 exports.pluginsCatalog = pluginsCatalog;
+exports.pluginCatalog = pluginCatalog;
+
 exports.jack = jack;
 exports.modHost = modHost;
 exports.modHostStatusEnum = modHostStatusEnum;
@@ -106,3 +136,5 @@ exports.saveCache = saveCache;
 exports.loadCache = loadCache;
 exports.pluginsCategories = pluginsCategories;
 exports.app = app;
+exports.setCategoryFilter = setCategoryFilter;
+exports.filteredPluginCatalog = filteredPluginCatalog;
