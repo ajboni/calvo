@@ -6,9 +6,8 @@ const { wlogError } = require("../layout");
 let pluginListWidget = {};
 
 function make(grid, x, y, xSpan, ySpan) {
-  console.log(store.filteredPluginCatalog);
   pluginListWidget = grid.set(y, x, ySpan, xSpan, blessed.list, {
-    label: "Categories",
+    label: "Available Plugins",
     mouse: true,
     scrollbar: {
       // ch: " ",
@@ -19,15 +18,19 @@ function make(grid, x, y, xSpan, ySpan) {
     keys: true,
     padding: { left: 1, right: 1 },
     style: {
-      // ...defaultWidgetProps.style.focus,
       selected: {
-        bg: "#689d6a",
+        bg: "#4d5e4d",
         fg: "#FFFFFF",
         bold: true,
       },
       focus: {
         border: { fg: "red" },
         enabled: false,
+        selected: {
+          bg: "#689d6a",
+          fg: "#FFFFFF",
+          bold: true,
+        },
       },
     },
   });

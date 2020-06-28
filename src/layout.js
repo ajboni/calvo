@@ -1,6 +1,5 @@
 const blessed = require("blessed");
 const contrib = require("blessed-contrib");
-const Jack = require("./jack_client");
 const { settings } = require("../settings");
 const {
   jack,
@@ -12,125 +11,47 @@ const {
 } = require("./store");
 const CategoriesWidget = require("./widgets/categories");
 const PluginListWidget = require("./widgets/pluginList");
-
-const defaultWidgetProps = {
-  alwaysScroll: true,
-  interactive: true,
-  scrollbar: {
-    ch: " ",
-    inverse: true,
-  },
-  mouse: true,
-  style: {
-    focus: {
-      border: { fg: "red" },
-      enabled: false,
-    },
-  },
-};
+const ModHostStatusWidget = require("./widgets/modHostStatus");
+const StatusWidget = require("./widgets/status");
+const LogWidget = require("./widgets/log");
+const PluginInfoWidget = require("./widgets/pluginInfo");
 
 let focusIndex = 0;
 var mainScreen;
-var jackStatusWidget,
-  modHostStatusWidget,
-  logWidget,
-  categoryWidget,
-  pluginListWidget;
+var statusWidget, logWidget, categoryWidget, pluginListWidget, pluginInfoWidget;
 
 // a.sette
 function setUpLayout(screen) {
   var grid = new contrib.grid({ rows: 12, cols: 12, screen: screen });
-  categoryWidget = CategoriesWidget.make(grid, 0, 0, 1, 6);
-  pluginListWidget = PluginListWidget.make(grid, 1, 0, 4, 6);
-  //   var fxChainWidget = grid.set(3, 2, 3, 2, blessed.box, {
-  //     label: "Fx Chain",
-  //     ...JSON.parse(JSON.stringify(defaultWidgetProps)),
+  categoryWidget = CategoriesWidget.make(grid, 0, 0, 1, 8);
+  pluginListWidget = PluginListWidget.make(grid, 1, 0, 3, 8);
 
-  //   var fxParametersWidget = grid.set(0, 4, 5, 4, blessed.box, {
-  //     label: "Parameters",
-  //     ...JSON.parse(JSON.stringify(defaultWidgetProps)),
-  //   });
-  //   var fxVolumeWidget = grid.set(5, 4, 1, 2, blessed.box, {
-  //     label: "Mix",
-  //     ...JSON.parse(JSON.stringify(defaultWidgetProps)),
-  //   });
+  logWidget = LogWidget.make(grid, 0, 8, 4, 4);
+  statusWidget = StatusWidget.make(grid, 4, 8, 2, 4);
+  pluginInfoWidget = PluginInfoWidget.make(grid, 4, 0, 3, 4);
 
-  jackStatusWidget = grid.set(10, 0, 2, 2, blessed.box, {
-    label: "JACK Status",
-    ...JSON.parse(JSON.stringify(defaultWidgetProps)),
-  });
-  modHostStatusWidget = grid.set(10, 2, 2, 2, blessed.box, {
-    label: "Mod-Host Status",
-    ...JSON.parse(JSON.stringify(defaultWidgetProps)),
-  });
-
-  // LOG
-  logWidget = grid.set(6, 0, 4, 4, blessed.log, {
-    label: "Logs",
-    tags: true,
-    ...JSON.parse(JSON.stringify(defaultWidgetProps)),
-  });
-
-  logWidget.enableInput();
-  logWidget.on("click", function (data) {
-    screen.copyToClipboard("ssss");
-    wlog("Log copied to clipboard.");
-  });
-  //   logWidget.focusable = false;
-
-  modHostStatusWidget.focusabe = false;
-  jackStatusWidget.focusable = false;
   mainScreen = screen;
+  mainScreen.focusPush(categoryWidget);
+  mainScreen.focusPush(pluginListWidget);
   focus();
   return grid;
 }
 
 function updateLayoutData() {
-  jackStatusWidget.content = `
-  JACK Status: ${jack.JACK_STATUS.status} ${
-    jack.JACK_STATUS.realtime ? "(RT)" : ""
-  }
-  Sample Rate: ${jack.JACK_STATUS.sample_rate} 
-  Buffer: ${jack.JACK_STATUS.block_size}
-  DSP Load: ${jack.JACK_STATUS.cpu_load.toFixed(2)} %
-  Transport: ${jack.TRANSPORT_STATUS.state}
-  Time: ${jack.TRANSPORT_STATUS.beats_per_bar}/${
-    jack.TRANSPORT_STATUS.beat_type
-  } @ ${jack.TRANSPORT_STATUS.beats_per_minute} bpm
-  `;
-
-  modHostStatusWidget.content = `
-  Status: ${modHost.STATUS}
-  PID: ${modHost.PID}
-  Port: ${modHost.PORT}
-  `;
-
-  //   mainScreen.render();
+  StatusWidget.update();
 }
 
 function focusNext() {
-  if (focusIndex >= mainScreen.children.length - 1) {
-    focusIndex = 0;
-  } else {
-    focusIndex++;
-  }
-
-  mainScreen.children[focusIndex].focusable === false ? focusNext() : focus();
+  mainScreen.focusNext();
 }
 
 function focusPrev() {
-  if (focusIndex <= 0) {
-    focusIndex = mainScreen.children.length - 1;
-  } else {
-    focusIndex--;
-  }
-  focus();
-  mainScreen.children[focusIndex].focusable === false ? focusPrev() : focus();
+  mainScreen.focusPrevious();
 }
 
 function focus() {
-  mainScreen.children[focusIndex].focus();
-  mainScreen.render();
+  mainScreen.focusNext();
+  //   mainScreen.render();
 }
 
 function wlog(msg) {

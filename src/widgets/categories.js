@@ -1,5 +1,6 @@
 const blessed = require("blessed");
 const contrib = require("blessed-contrib");
+const Layout = require("../layout");
 const {
   pluginCategories,
   setCategoryFilter,
@@ -21,15 +22,20 @@ function make(grid, x, y, xSpan, ySpan) {
     keys: true,
     padding: { left: 1, right: 1 },
     style: {
-      // ...defaultWidgetProps.style.focus,
       selected: {
-        bg: "#689d6a",
+        bg: "#4d5e4d",
         fg: "#FFFFFF",
         bold: true,
       },
       focus: {
         border: { fg: "red" },
         enabled: false,
+        selected: {
+          bg: "#689d6a",
+          fg: "#FFFFFF",
+
+          bold: true,
+        },
       },
     },
   });
@@ -51,6 +57,7 @@ function make(grid, x, y, xSpan, ySpan) {
 
   categoryWidget.on("select", function (cat, index) {
     setCategoryFilter(cat.content);
+    Layout.focusNext();
   });
 
   return categoryWidget;
