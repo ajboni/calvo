@@ -1,7 +1,7 @@
-const NodeCache = require("node-cache");
 const fs = require("fs");
 const path = require("path");
 const Layout = require("./layout");
+const PluginListWidget = require("./widgets/pluginList");
 
 const modHostStatusEnum = Object.freeze({
   Stopped: "Stopped",
@@ -9,10 +9,9 @@ const modHostStatusEnum = Object.freeze({
   Connected: "Connected",
 });
 
-const pluginsCatalog = new NodeCache();
 const pluginCatalog = [];
 const filteredPluginCatalog = [];
-const pluginsCategories = ["(All)"];
+const pluginCategories = ["(All)"];
 
 const app = {
   INITIALIZED: false,
@@ -51,44 +50,43 @@ const jack = {
 };
 
 function setCategoryFilter(filter = "") {
-  const keys = pluginsCatalog.keys();
-  const cacheData = pluginsCatalog.mget(keys);
-  console.log(cacheData);
-
-  if (pluginsCategories.includes(filter) && filter !== "(All)") {
-    console.log("object");
+  if (pluginCategories.includes(filter) && filter !== "(All)") {
+    filteredPluginCatalog.length = 0;
+    const filteredData = pluginCatalog.filter((plugin) =>
+      plugin.categories.includes(filter)
+    );
+    filteredPluginCatalog.length = 0;
+    filteredPluginCatalog.push(...filteredData);
+    Layout.renderScreen();
   } else {
     filteredPluginCatalog.length = 0;
-    filteredPluginCatalog.push(...cacheData);
-    console.log(filteredPluginCatalog);
+    filteredPluginCatalog.push(...pluginCatalog);
+    Layout.renderScreen();
+  }
+
+  if (app.INITIALIZED) {
+    PluginListWidget.update();
   }
 }
 
-function getFilteredPluginCatalog(filter) {
-  const keys = pluginsCatalog.keys();
-  const cacheData = pluginsCatalog.mget(keys);
-  console.log(cacheData);
-}
-
-function saveCache(cache, name, directoryPath = __dirname) {
+function saveCache(directoryPath = __dirname) {
   Layout.wlog("Saving cache...");
   try {
-    if (fs.existsSync(path.join(directoryPath, `${name}.json`))) {
-      fs.unlinkSync(path.join(directoryPath, `${name}.json`));
+    if (fs.existsSync(path.join(directoryPath, `pluginCatalog.json`))) {
+      fs.unlinkSync(path.join(directoryPath, `pluginCatalog.json`));
     }
-    if (fs.existsSync(path.join(directoryPath, `${name}.json`))) {
-      fs.unlinkSync(path.join(directoryPath, `${name}_categories.json`));
+    if (fs.existsSync(path.join(directoryPath, `pluginCatalog.json`))) {
+      fs.unlinkSync(path.join(directoryPath, `pluginCategories.json`));
     }
 
-    const keys = cache.keys();
-    const cacheData = cache.mget(keys);
-
-    const stringifiedData = JSON.stringify(cacheData);
-    fs.writeFileSync(path.join(directoryPath, `${name}.json`), stringifiedData);
-    const categories = [];
-
-    var result = Object.keys(cacheData).map(function (key) {
-      const cats = cacheData[key].categories;
+    const stringifiedData = JSON.stringify(pluginCatalog);
+    fs.writeFileSync(
+      path.join(directoryPath, `pluginCatalog.json`),
+      stringifiedData
+    );
+    const categories = ["(All)"];
+    pluginCatalog.map((item) => {
+      const cats = item.categories;
       cats.forEach((cat) => {
         if (!categories.includes(cat)) {
           categories.push(cat);
@@ -96,8 +94,11 @@ function saveCache(cache, name, directoryPath = __dirname) {
       });
     });
 
+    pluginCategories.length = 0;
+    pluginCategories.push(...categories);
+
     fs.writeFileSync(
-      path.join(directoryPath, `${name}_categories.json`),
+      path.join(directoryPath, `pluginCategories.json`),
       JSON.stringify(categories.sort())
     );
 
@@ -107,34 +108,30 @@ function saveCache(cache, name, directoryPath = __dirname) {
   }
 }
 
-function loadCache(cache, name, directoryPath = __dirname) {
-  const filePath = path.join(directoryPath, `${name}.json`);
+function loadCache(directoryPath = __dirname) {
+  const filePath = path.join(directoryPath, `pluginCatalog.json`);
   if (fs.existsSync(filePath)) {
     const jsonData = fs.readFileSync(filePath, "utf8");
     const data = JSON.parse(jsonData);
-    for (const [key, val] of Object.entries(data)) {
-      if (data.hasOwnProperty(key)) {
-        cache.set(key, val);
-      }
-    }
+    pluginCatalog.length = 0;
+    pluginCatalog.push(...data);
   }
 
-  const catPath = path.join(directoryPath, `${name}_categories.json`);
+  const catPath = path.join(directoryPath, `pluginCategories.json`);
   if (fs.existsSync(catPath)) {
     const catData = fs.readFileSync(catPath, "utf8");
-    pluginsCategories.push(...JSON.parse(catData));
+    pluginCategories.length = 0;
+    pluginCategories.push(...JSON.parse(catData));
   }
 }
 
-exports.pluginsCatalog = pluginsCatalog;
 exports.pluginCatalog = pluginCatalog;
-
+exports.pluginCategories = pluginCategories;
 exports.jack = jack;
 exports.modHost = modHost;
 exports.modHostStatusEnum = modHostStatusEnum;
 exports.saveCache = saveCache;
 exports.loadCache = loadCache;
-exports.pluginsCategories = pluginsCategories;
 exports.app = app;
 exports.setCategoryFilter = setCategoryFilter;
 exports.filteredPluginCatalog = filteredPluginCatalog;

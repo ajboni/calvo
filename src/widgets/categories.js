@@ -1,7 +1,7 @@
 const blessed = require("blessed");
 const contrib = require("blessed-contrib");
 const {
-  pluginsCategories,
+  pluginCategories,
   setCategoryFilter,
   filteredPluginCatalog,
 } = require("../store");
@@ -16,7 +16,7 @@ function make(grid, x, y, xSpan, ySpan) {
       // ch: " ",
       // inverse: true,
     },
-    items: pluginsCategories,
+    items: pluginCategories,
     interactive: true,
     keys: true,
     padding: { left: 1, right: 1 },

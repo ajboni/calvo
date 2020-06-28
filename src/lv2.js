@@ -1,12 +1,12 @@
 const { tabbedTreeToJSON, stringToTrimmedArray } = require("./string_utils");
 const { wlogError, wlog } = require("./layout");
 const {
-  pluginsCatalog,
   pluginCatalog,
   saveCache,
   loadCache,
-  pluginsCategories,
+  pluginCategories,
   setCategoryFilter,
+  filteredPluginCatalog,
 } = require("./store");
 const { settings } = require("../settings");
 const { existsSync } = require("fs");
@@ -18,11 +18,11 @@ const path = require("path");
  */
 function init() {
   if (
-    existsSync(path.join(__dirname, "pluginsCatalog.json")) &&
+    existsSync(path.join(__dirname, "pluginCatalog.json")) &&
     !settings.SCAN_PLUGINS
   ) {
-    wlog("Loading plugins cache...");
-    loadCache(pluginsCatalog, "pluginsCatalog");
+    console.log("Loading plugins cache...");
+    loadCache();
   } else {
     buildPluginCache();
   }
@@ -34,6 +34,8 @@ function init() {
  * Scans the system for installed plugins, and save a database in memory and disk.
  */
 function buildPluginCache() {
+  const { wlogError, wlog } = require("./layout");
+
   wlog("Building plugins cache, this might take a while, please wait...");
   try {
     //  const names = lv2ls(true);
@@ -41,14 +43,13 @@ function buildPluginCache() {
     pluginCatalog.length = 0;
     pluginCatalog.push(...plugins);
     plugins.forEach((plugin, index) => {
-      // pluginsCatalog.set(plugin.name, plugin);
       plugin.categories.forEach((cat) => {
-        if (!pluginsCategories.includes(cat)) {
-          pluginsCategories.push(cat);
+        if (!pluginCategories.includes(cat)) {
+          pluginCategories.push(cat);
         }
       });
     });
-    saveCache(pluginsCatalog, "pluginsCatalog");
+    saveCache();
   } catch (error) {
     wlog(error);
   }

@@ -7,7 +7,8 @@ const {
   modHost,
   modHostStatusEnum,
   app,
-  pluginsCategories,
+  filteredPluginCatalog,
+  pluginCatalog,
 } = require("./store");
 const CategoriesWidget = require("./widgets/categories");
 const PluginListWidget = require("./widgets/pluginList");
@@ -40,7 +41,7 @@ var jackStatusWidget,
 function setUpLayout(screen) {
   var grid = new contrib.grid({ rows: 12, cols: 12, screen: screen });
   categoryWidget = CategoriesWidget.make(grid, 0, 0, 1, 6);
-  pluginListWidget = PluginListWidget.make(grid, 1, 0, 1, 6);
+  pluginListWidget = PluginListWidget.make(grid, 1, 0, 4, 6);
   //   var fxChainWidget = grid.set(3, 2, 3, 2, blessed.box, {
   //     label: "Fx Chain",
   //     ...JSON.parse(JSON.stringify(defaultWidgetProps)),
@@ -104,7 +105,7 @@ function updateLayoutData() {
   Port: ${modHost.PORT}
   `;
 
-  const { pluginsCategories } = require("./store");
+  //   mainScreen.render();
 }
 
 function focusNext() {
@@ -152,9 +153,16 @@ function wlogError(msg) {
   }
 }
 
+function renderScreen() {
+  if (mainScreen) {
+    mainScreen.render();
+  }
+}
+
 exports.setUpLayout = setUpLayout;
 exports.focusPrev = focusPrev;
 exports.focusNext = focusNext;
 exports.updateLayoutData = updateLayoutData;
 exports.wlog = wlog;
 exports.wlogError = wlogError;
+exports.renderScreen = renderScreen;

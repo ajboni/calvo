@@ -7,7 +7,7 @@ const ModHost = require("./modhost_client");
 const { settings } = require("../settings");
 const LV2 = require("./lv2");
 const { lv2ls, pluginInfo, grep, listAllPlugins } = require("./lv2");
-const { pluginsCatalog, app } = require("./store");
+const { app } = require("./store");
 const program = blessed.program();
 const screen = blessed.screen({
   smartCSR: true,
@@ -22,7 +22,7 @@ try {
   const mainGrid = Layout.setUpLayout(screen);
   Keyboard.registerKeyboardShortcuts(screen, mainGrid);
 } catch (error) {
-  console.log("ERROR: " + error);
+  console.trace("ERROR: " + error);
   console.log("Aborting...");
   process.exit(0);
 }
