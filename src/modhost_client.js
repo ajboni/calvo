@@ -153,9 +153,34 @@ function bypassPlugin(instanceNumber, value) {
   const resp = client.write(`remove ${instanceNumber} ${value}`, "utf8");
 }
 
+/**
+ * connect <origin_port> <destination_port>
+ * connect two effect audio ports
+ * e.g.: connect system:capture_1 effect_0:in
+ * @param {*} src
+ * @param {*} dst
+ */
+function connectPorts(src, dst) {
+  client.write(`connect ${src} ${dst}`, "utf8");
+}
+
+/**
+ * disconnect <origin_port> <destination_port>
+ * * disconnect two effect audio ports
+ *  e.g.: disconnect system:capture_1 effect_0:in
+ *
+ * @param {*} src
+ * @param {*} dst
+ */
+function disconnectPorts(src, dst) {
+  client.write(`diconnect ${src} ${dst}`, "utf8");
+}
+
 exports.connect = connect;
 exports.init = init;
 exports.destroy = destroy;
 exports.addPlugin = addPlugin;
 exports.removePlugin = removePlugin;
 exports.bypassPlugin = bypassPlugin;
+exports.connectPorts = connectPorts;
+exports.disconnectPorts = disconnectPorts;

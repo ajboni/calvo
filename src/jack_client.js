@@ -28,7 +28,7 @@ function updateStatus() {
 function queryJack() {
   const cp = require("child_process");
   const status = cp.execSync(
-    "python3 ./py/jack-audio-tools/transport/client.py -c mod-host-cli-poll query",
+    "python3 ./py/jack-audio-tools/jack/client.py -c mod-host-cli-poll query",
     { encoding: "utf8" }
   );
   return JSON.parse(status);
@@ -38,7 +38,7 @@ function queryTransport() {
   const cp = require("child_process");
   const { wlog } = require("./layout");
   const status = cp.execSync(
-    `python3 ./py/jack-audio-tools/transport/transporter.py -c mod-host-cli-poll query`,
+    `python3 ./py/jack-audio-tools/jack/transporter.py -c mod-host-cli-poll query`,
     { encoding: "utf8" }
   );
   //   wlog(status);

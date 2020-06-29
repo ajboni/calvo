@@ -62,6 +62,26 @@ function removePluginAt(index) {
  */
 function setSelectedPluginIndex(pluginName) {}
 
+/**
+ * This function will process
+ *
+ */
+function processConnections() {}
+
+/**
+ * This function will force connection between 2 plugins. If one of them is mono, adjust as necesary
+ *
+ * @param {*} src
+ * @param {*} dst
+ */
+function connectPlugins(src, dst) {}
+
+/**
+ * Connect ONLY last plugin to master output(s). If one of them is mono, adjust as necesary.
+ *
+ */
+function connectLastToMasterOutputs() {}
+
 const app = {
   INITIALIZED: false,
 };
