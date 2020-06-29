@@ -1,17 +1,66 @@
 const fs = require("fs");
 const path = require("path");
 const Layout = require("./layout");
+const Lv2 = require("./lv2");
 const PluginListWidget = require("./widgets/pluginList");
+const PluginInfoWidget = require("./widgets/pluginInfo");
+const RackWidget = require("./widgets/rack");
+const ModHostClient = require("./modhost_client");
+const { getPluginByName, pluginInfo } = require("./lv2");
 
 const modHostStatusEnum = Object.freeze({
   Stopped: "Stopped",
-  StartedDisconnected: "Started (Disconnected)",
+  StartedDisconnected: "Disconnected",
   Connected: "Connected",
 });
 
 const pluginCatalog = [];
 const filteredPluginCatalog = [];
 const pluginCategories = ["(All)"];
+const rack = [];
+var selectedPlugin = {};
+let instanceNumber = 0;
+
+function addPluginToRack(pluginName) {
+  try {
+    const p = Lv2.getPluginByName(pluginName);
+    const plugin = pluginInfo(p.uri);
+    ModHostClient.addPlugin(p.uri, instanceNumber);
+    plugin.info = {
+      instanceNumber: instanceNumber,
+      bypass: false,
+    };
+
+    // TODO: Connect to previous, disconnect previous from master.
+    instanceNumber++;
+    rack.push(plugin);
+    RackWidget.update();
+    Layout.wlog(`Added ${plugin.name} to rack. (#${rack.length - 1})`);
+  } catch (error) {
+    Layout.wlogError(`Error adding plugin to rack: ${error}`);
+  }
+}
+
+/**
+ * Removes a plugin according to the index on the rack.
+ *
+ * @param {*} index Rack Index
+ */
+function removePluginAt(index) {
+  const plugin = rack[index];
+  rack.splice(index, 1);
+  Layout.wlog(`Remove plugin #${index} - ${plugin.name}`);
+  ModHostClient.removePlugin(plugin.info.instanceNumber);
+  RackWidget.update();
+  // TODO: Disconnect.
+}
+
+/**
+ * Sets the plugin that will be focused to edit.
+ *
+ * @param {*} pluginName
+ */
+function setSelectedPluginIndex(pluginName) {}
 
 const app = {
   INITIALIZED: false,
@@ -135,3 +184,7 @@ exports.loadCache = loadCache;
 exports.app = app;
 exports.setCategoryFilter = setCategoryFilter;
 exports.filteredPluginCatalog = filteredPluginCatalog;
+exports.setSelectedPluginIndex = setSelectedPluginIndex;
+exports.addPluginToRack = addPluginToRack;
+exports.rack = rack;
+exports.removePluginAt = removePluginAt;

@@ -1,16 +1,10 @@
 const { tabbedTreeToJSON, stringToTrimmedArray } = require("./string_utils");
-const { wlogError, wlog } = require("./layout");
-const {
-  pluginCatalog,
-  saveCache,
-  loadCache,
-  pluginCategories,
-  setCategoryFilter,
-  filteredPluginCatalog,
-} = require("./store");
+const { pluginCategories, filteredPluginCatalog } = require("./store");
 const { settings } = require("../settings");
 const { existsSync } = require("fs");
+const store = require("./store");
 const path = require("path");
+const Layout = require("./layout");
 
 /**
  * Initialize: Scan for plugins and setup store (cache)
@@ -22,36 +16,34 @@ function init() {
     !settings.SCAN_PLUGINS
   ) {
     console.log("Loading plugins cache...");
-    loadCache();
+    store.loadCache();
   } else {
     buildPluginCache();
   }
 
-  setCategoryFilter("");
+  store.setCategoryFilter("");
 }
 
 /**
  * Scans the system for installed plugins, and save a database in memory and disk.
  */
 function buildPluginCache() {
-  const { wlogError, wlog } = require("./layout");
-
   wlog("Building plugins cache, this might take a while, please wait...");
   try {
     //  const names = lv2ls(true);
     const plugins = grep();
-    pluginCatalog.length = 0;
-    pluginCatalog.push(...plugins);
+    store.pluginCatalog.length = 0;
+    store.pluginCatalog.push(...plugins);
     plugins.forEach((plugin, index) => {
       plugin.categories.forEach((cat) => {
-        if (!pluginCategories.includes(cat)) {
-          pluginCategories.push(cat);
+        if (!store.pluginCategories.includes(cat)) {
+          store.pluginCategories.push(cat);
         }
       });
     });
-    saveCache();
+    store.saveCache();
   } catch (error) {
-    wlog(error);
+    Layout.wlog(error);
   }
 }
 
@@ -72,9 +64,22 @@ function grep(regex = ".") {
     );
     return JSON.parse(result);
   } catch (error) {
-    wlog(error);
+    Layout.wlog(error);
     return error;
   }
+}
+
+/**
+ * Find a plugin by its name on the catalog.
+ *
+ * @param {*} pluginName The name to search for.
+ */
+function getPluginByName(pluginName) {
+  const result = store.pluginCatalog.filter(
+    (plugin) => plugin.name === pluginName
+  );
+
+  return result ? result[0] : null;
 }
 
 /**
@@ -95,11 +100,12 @@ function pluginInfo(uri) {
     );
     return JSON.parse(result);
   } catch (error) {
-    wlogError(`Plugin ${uri} could not be loaded.`);
-    return error;
+    Layout.wlogError(`Plugin ${uri} could not be loaded.`);
+    throw error;
   }
 }
 
 exports.grep = grep;
 exports.pluginInfo = pluginInfo;
 exports.init = init;
+exports.getPluginByName = getPluginByName;

@@ -1,24 +1,23 @@
 const blessed = require("blessed");
 const contrib = require("blessed-contrib");
 const { settings } = require("../settings");
-const {
-  jack,
-  modHost,
-  modHostStatusEnum,
-  app,
-  filteredPluginCatalog,
-  pluginCatalog,
-} = require("./store");
+const { app } = require("./store");
 const CategoriesWidget = require("./widgets/categories");
 const PluginListWidget = require("./widgets/pluginList");
 const ModHostStatusWidget = require("./widgets/modHostStatus");
 const StatusWidget = require("./widgets/status");
 const LogWidget = require("./widgets/log");
 const PluginInfoWidget = require("./widgets/pluginInfo");
+const RackWidget = require("./widgets/rack");
 
 let focusIndex = 0;
 var mainScreen;
-var statusWidget, logWidget, categoryWidget, pluginListWidget, pluginInfoWidget;
+var statusWidget,
+  logWidget,
+  categoryWidget,
+  pluginListWidget,
+  pluginInfoWidget,
+  rackWidget;
 
 // a.sette
 function setUpLayout(screen) {
@@ -29,6 +28,7 @@ function setUpLayout(screen) {
   logWidget = LogWidget.make(grid, 0, 8, 4, 4);
   statusWidget = StatusWidget.make(grid, 4, 8, 2, 4);
   pluginInfoWidget = PluginInfoWidget.make(grid, 4, 0, 3, 4);
+  rackWidget = RackWidget.make(grid, 4, 4, 4, 4);
 
   mainScreen = screen;
   mainScreen.focusPush(categoryWidget);

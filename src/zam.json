@@ -1,0 +1,161 @@
+{
+  "author": {
+    "email": null,
+    "homepage": "http://www.zamaudio.com",
+    "name": "Damien Zammit"
+  },
+  "binary": "/usr/lib/lv2/ZamVerb.lv2/ZamVerb_dsp.so",
+  "brand": "ZamAudio",
+  "bundles": ["/usr/lib/lv2/ZamVerb.lv2"],
+  "category": ["Reverb"],
+  "comment": "Convolution Reverb effect",
+  "errors": [],
+  "label": "ZamVerb",
+  "license": "GPL v2+",
+  "microVersion": 12,
+  "minorVersion": 2,
+  "name": "ZamVerb",
+  "ports": {
+    "atom": {
+      "input": [
+        {
+          "comment": null,
+          "designation": null,
+          "index": 4,
+          "name": "Events Input",
+          "properties": [],
+          "rangeSteps": null,
+          "ranges": {},
+          "scalePoints": [],
+          "shortName": "Events Input",
+          "symbol": "lv2_events_in",
+          "units": {}
+        }
+      ],
+      "output": [
+        {
+          "comment": null,
+          "designation": null,
+          "index": 5,
+          "name": "Events Output",
+          "properties": [],
+          "rangeSteps": null,
+          "ranges": {},
+          "scalePoints": [],
+          "shortName": "Events Output",
+          "symbol": "lv2_events_out",
+          "units": {}
+        }
+      ]
+    },
+    "audio": {
+      "input": [
+        {
+          "comment": null,
+          "designation": null,
+          "index": 0,
+          "name": "Audio Input 1",
+          "properties": [],
+          "rangeSteps": null,
+          "ranges": {},
+          "scalePoints": [],
+          "shortName": "Audio Input 1",
+          "symbol": "lv2_audio_in_1",
+          "units": {}
+        },
+        {
+          "comment": null,
+          "designation": null,
+          "index": 1,
+          "name": "Audio Input 2",
+          "properties": [],
+          "rangeSteps": null,
+          "ranges": {},
+          "scalePoints": [],
+          "shortName": "Audio Input 2",
+          "symbol": "lv2_audio_in_2",
+          "units": {}
+        }
+      ],
+      "output": [
+        {
+          "comment": null,
+          "designation": null,
+          "index": 2,
+          "name": "Audio Output 1",
+          "properties": [],
+          "rangeSteps": null,
+          "ranges": {},
+          "scalePoints": [],
+          "shortName": "Audio Output 1",
+          "symbol": "lv2_audio_out_1",
+          "units": {}
+        },
+        {
+          "comment": null,
+          "designation": null,
+          "index": 3,
+          "name": "Audio Output 2",
+          "properties": [],
+          "rangeSteps": null,
+          "ranges": {},
+          "scalePoints": [],
+          "shortName": "Audio Output 2",
+          "symbol": "lv2_audio_out_2",
+          "units": {}
+        }
+      ]
+    },
+    "control": {
+      "input": [
+        {
+          "comment": null,
+          "designation": null,
+          "index": 6,
+          "name": "Master level",
+          "properties": [],
+          "rangeSteps": null,
+          "ranges": { "default": 0.0, "maximum": 30.0, "minimum": -30.0 },
+          "scalePoints": [],
+          "shortName": "Master level",
+          "symbol": "master",
+          "units": { "label": "decibels", "render": "%f dB", "symbol": "dB" }
+        },
+        {
+          "comment": null,
+          "designation": null,
+          "index": 7,
+          "name": "Wet / Dry",
+          "properties": [],
+          "rangeSteps": null,
+          "ranges": { "default": 50.0, "maximum": 100.0, "minimum": 0.0 },
+          "scalePoints": [],
+          "shortName": "Wet / Dry",
+          "symbol": "wetdry",
+          "units": { "label": "percent", "render": "%f%%", "symbol": "%" }
+        },
+        {
+          "comment": null,
+          "designation": null,
+          "index": 8,
+          "name": "Room",
+          "properties": ["integer"],
+          "rangeSteps": null,
+          "ranges": { "default": 0, "maximum": 6, "minimum": 0 },
+          "scalePoints": [],
+          "shortName": "Room",
+          "symbol": "room",
+          "units": { "label": " ", "render": "%f  ", "symbol": " " }
+        }
+      ],
+      "output": []
+    },
+    "midi": { "input": [], "output": [] }
+  },
+  "presets": [{ "label": "Default", "uri": "urn:zamaudio:ZamVerb#preset001" }],
+  "properties": {},
+  "stability": "stable",
+  "uri": "urn:zamaudio:ZamVerb",
+  "version": "2.12",
+  "warnings": []
+}

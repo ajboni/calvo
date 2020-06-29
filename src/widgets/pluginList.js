@@ -3,6 +3,7 @@ const contrib = require("blessed-contrib");
 const store = require("../store");
 const { settings } = require("../../settings");
 const { wlogError } = require("../layout");
+const { getPluginByName } = require("../lv2");
 let pluginListWidget = {};
 
 function make(grid, x, y, xSpan, ySpan) {
@@ -46,7 +47,12 @@ function make(grid, x, y, xSpan, ySpan) {
   pluginListWidget.key("pagedown", function (ch, key) {
     pluginListWidget.move(settings.SCROLL_AMMOUNT);
   });
-  pluginListWidget.on("select", function (category, index) {});
+  pluginListWidget.on("select", function (e, index) {
+    store.addPluginToRack(e.content);
+    //  store.setSelectedPlugin(
+    //    pluginListWidget.getItem(pluginListWidget.selected).content
+    //  );
+  });
   return pluginListWidget;
 }
 

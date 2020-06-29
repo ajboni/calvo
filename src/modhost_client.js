@@ -2,7 +2,7 @@ const { wlog, wlogError } = require("./layout");
 const { removeNewLines } = require("./string_utils");
 const getPort = require("get-port");
 const { settings } = require("../settings");
-const { modHost, modHostStatusEnum } = require("./store");
+const store = require("./store");
 
 var net = require("net");
 var client = new net.Socket();
@@ -16,8 +16,8 @@ async function init() {
     ),
   });
 
-  modHost.PORT = port;
-  modHost.FEEDBACK_PORT = port + 1;
+  store.modHost.PORT = port;
+  store.modHost.FEEDBACK_PORT = port + 1;
 
   // In the future we might want to start a docker container, or reach a host on the network.
   // For now we just spaqn a child process.
@@ -27,8 +27,9 @@ async function init() {
 
 /** Kill modhost process. */
 function destroy() {
-  const cp = require("child_process");
-  cp.execSync(`kill ${modHost.PID}`);
+  //   const cp = require("child_process");
+  //   cp.execSync(`kill ${store.modHost.PID}`);
+  client.write("quit", "utf8");
 }
 
 /**
@@ -41,12 +42,12 @@ async function spawn(port) {
 
   const mh = await spawn("mod-host", ["-n", `-p ${port}`]);
 
-  modHost.PID = mh.pid;
+  store.modHost.PID = mh.pid;
 
   mh.stdout.on("data", (data) => {
     wlog(`[MH] ${data}`);
     if (data.includes("mod-host ready!")) {
-      modHost.STATUS = modHostStatusEnum.StartedDisconnected;
+      store.modHost.STATUS = store.modHostStatusEnum.StartedDisconnected;
     }
   });
 
@@ -62,15 +63,18 @@ async function spawn(port) {
 /**
  * Connects to modhost server.
  * @param {*} [server=settings.MOD_HOST_SERVER] Ip Address of the server
- * @param {*} [port=modHost.PORT] Port that mod-host server is listening
+ * @param {*} [port=store.modHost.PORT] Port that mod-host server is listening
  */
-async function connect(server = settings.MOD_HOST_SERVER, port = modHost.PORT) {
+async function connect(
+  server = settings.MOD_HOST_SERVER,
+  port = store.modHost.PORT
+) {
   const { wlog } = require("./layout");
   var elapsedTime = 0;
 
   // Try timeout times, wait 1 second between each try.
   while (
-    modHost.STATUS !== modHostStatusEnum.StartedDisconnected &&
+    store.modHost.STATUS !== store.modHostStatusEnum.StartedDisconnected &&
     elapsedTime <= settings.DEFAULT_TIMEOUT
   ) {
     await sleep(1000);
@@ -86,14 +90,14 @@ async function connect(server = settings.MOD_HOST_SERVER, port = modHost.PORT) {
 
   client.once("connect", (data) => {
     wlog("[MH] Connected to mod-host.");
-    modHost.STATUS = modHostStatusEnum.Connected;
+    store.modHost.STATUS = store.modHostStatusEnum.Connected;
     client.setTimeout(0);
-    client.write("help");
+    //  client.write("help");
   });
 
   client.on("data", function (data) {
     wlog(`[MH] ${data}`);
-    console.log(data);
+    //  console.log(data);
   });
 
   client.on("error", function (data) {
@@ -114,6 +118,44 @@ function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+/**
+ * add an LV2 plugin encapsulated as a jack client
+ * e.g.: add http://lv2plug.in/plugins/eg-amp 0
+ * instance_number must be any value between 0 ~ 9999, inclusively
+ *
+ * @param {*} uri
+ * @param {*} instanceNumber
+ */
+function addPlugin(uri, instanceNumber) {
+  const plugin = client.write(`add ${uri} ${instanceNumber}`, "utf8");
+}
+
+/**
+ * remove <instance_number>
+ * * remove an LV2 plugin instance (and also the jack client)
+ * e.g.: remove 0
+
+ */
+function removePlugin(instanceNumber) {
+  const resp = client.write(`remove ${instanceNumber}`, "utf8");
+}
+
+/**
+ *bypass <instance_number> <bypass_value>
+ * toggle effect processing
+ * e.g.: bypass 0 1
+ * if bypass_value = 1 bypass effect
+ * if bypass_value = 0 process effect *
+ * @param {*} instanceNumber
+ * @param {*} value
+ */
+function bypassPlugin(instanceNumber, value) {
+  const resp = client.write(`remove ${instanceNumber} ${value}`, "utf8");
+}
+
 exports.connect = connect;
 exports.init = init;
 exports.destroy = destroy;
+exports.addPlugin = addPlugin;
+exports.removePlugin = removePlugin;
+exports.bypassPlugin = bypassPlugin;

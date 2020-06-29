@@ -8,6 +8,8 @@ const settings = {
   LV2_PLUGINS_FOLDERl: "/user/lib/lv2",
   SCAN_PLUGINS: false, // If false, it will not scan for plugins on startup (use with caution).
   SCROLL_AMMOUNT: 10, // Ammount to scroll when using page up or page dow keys.
+  MASTER_OUTPUT_L: "playback_1", // Left Channel for the master output. Last plugin will connect to this.
+  MASTER_OUTPUT_R: "playback_2", // Right Channel for the master output. Last plugin will connect to this.
 };
 
 exports.settings = settings;

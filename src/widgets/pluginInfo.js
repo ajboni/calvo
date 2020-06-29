@@ -1,7 +1,7 @@
 const blessed = require("blessed");
 const contrib = require("blessed-contrib");
 const Layout = require("../layout");
-const { pluginCategories, setCategoryFilter, modHost } = require("../store");
+const store = require("../store");
 const { settings } = require("../../settings");
 const { wlogError, wlog } = require("../layout");
 
@@ -36,7 +36,17 @@ Convolution Reverb effect
   return pluginInfo;
 }
 
-function update() {}
+function setText(plugin) {
+  pluginInfo.setMarkdown(`
+# ${plugin.name}
+	`);
+}
+
+function update() {
+  //   const selectedPluginIndex = store.selectedPluginIndex;
+  //   console.log(store.rack[selectedPluginIndex]);
+  //   setText(store.rack[selectedPluginIndex]);
+}
 
 exports.make = make;
 exports.update = update;
