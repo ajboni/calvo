@@ -4,7 +4,7 @@ const Layout = require("../layout");
 const store = require("../store");
 const { settings } = require("../../settings");
 const { wlogError, wlog } = require("../layout");
-
+var emoji = require("node-emoji");
 var pluginInfo = {};
 
 function make(grid, x, y, xSpan, ySpan) {
@@ -27,23 +27,34 @@ function make(grid, x, y, xSpan, ySpan) {
 
   pluginInfo.setMarkdown(`
 # Plugin Title
-Convolution Reverb effect
-
-- Author: Someone
-- Contact: mail@asda.com
-  
   `);
   return pluginInfo;
 }
 
 function setText(plugin) {
-  pluginInfo.setMarkdown(`
-# ${plugin.name}
-	`);
+  pluginInfo.setMarkdown(``);
 }
 
 function update() {
-  //   const selectedPluginIndex = store.selectedPluginIndex;
+  const plugin = store.getSelectedPlugin();
+  if (!plugin) {
+    pluginInfo.label = "Plugin Info";
+    pluginInfo.setMarkdown(" ");
+  } else {
+    pluginInfo.setLabel(plugin.name);
+
+    pluginInfo.setMarkdown(`
+\`by ${plugin.author.name}\`
+${plugin.comment ? plugin.comment : ""}  
+
+__AUDIO__ : ${plugin.ports.audio.input.length} in / ${
+      plugin.ports.audio.output.length
+    } out
+__MIDI__  : ${plugin.ports.midi.input.length} in / ${
+      plugin.ports.midi.output.length
+    } out
+`);
+  }
   //   console.log(store.rack[selectedPluginIndex]);
   //   setText(store.rack[selectedPluginIndex]);
 }

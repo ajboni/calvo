@@ -25,8 +25,9 @@ function make(grid, x, y, xSpan, ySpan) {
 
 function update() {
   status.setMarkdown(`
-## JACK
-\`${jack.JACK_STATUS.status} ${jack.JACK_STATUS.realtime ? "(RT)" : ""}\`
+__JACK__: \`${jack.JACK_STATUS.status} ${
+    jack.JACK_STATUS.realtime ? "(RT)" : ""
+  }\`
 __Sample Rate:__ ${jack.JACK_STATUS.sample_rate} 
 __Buffer:__ ${jack.JACK_STATUS.block_size}
 __DSP Load:__ ${jack.JACK_STATUS.cpu_load.toFixed(2)} %
@@ -34,8 +35,8 @@ __Transport__: ${jack.TRANSPORT_STATUS.state}
 __Time__: ${jack.TRANSPORT_STATUS.beats_per_bar}/${
     jack.TRANSPORT_STATUS.beat_type
   } @ ${jack.TRANSPORT_STATUS.beats_per_minute} bpm
-## MOD HOST
-__Status:__ ${modHost.STATUS}
+
+__MOD-HOST:__ ${modHost.STATUS}
 __PID:__ ${modHost.PID}
 __Port:__ ${modHost.PORT}
 

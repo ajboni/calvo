@@ -18,8 +18,12 @@ const pluginCatalog = [];
 const filteredPluginCatalog = [];
 const pluginCategories = ["(All)"];
 const rack = [];
-var selectedPlugin = {};
+let selectedPlugin = {};
 let instanceNumber = 0;
+
+function getSelectedPlugin() {
+  return selectedPlugin;
+}
 
 function addPluginToRack(pluginName) {
   try {
@@ -60,7 +64,10 @@ function removePluginAt(index) {
  *
  * @param {*} pluginName
  */
-function setSelectedPluginIndex(pluginName) {}
+function setSelectedPluginIndex(pluginName, index) {
+  selectedPlugin = rack[index];
+  PluginInfoWidget.update();
+}
 
 /**
  * This function will process
@@ -115,6 +122,17 @@ const jack = {
     tick: 1014,
     ticks_per_beat: 1920.0,
     usecs: 15881132220,
+  },
+  PORTS: {
+    all: [],
+    audio: {
+      playback: [],
+      capture: [],
+    },
+    midi: {
+      playback: [],
+      capture: [],
+    },
   },
 };
 
@@ -208,3 +226,4 @@ exports.setSelectedPluginIndex = setSelectedPluginIndex;
 exports.addPluginToRack = addPluginToRack;
 exports.rack = rack;
 exports.removePluginAt = removePluginAt;
+exports.getSelectedPlugin = getSelectedPlugin;

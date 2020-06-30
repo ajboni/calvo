@@ -1,6 +1,5 @@
-var { removeNewLines } = require("./string_utils");
-let { jack } = require("./store");
-const { wlog } = require("./layout");
+let store = require("./store");
+const Layout = require("./layout");
 
 function init() {
   queryJack();
@@ -9,7 +8,7 @@ function init() {
 }
 
 function poll() {
-  if (jack.JACK_STATUS.status === "running") {
+  if (store.jack.JACK_STATUS.status === "running") {
     updateStatus();
   } else {
     throw "JACK IS NOT RUNNING";
@@ -17,8 +16,9 @@ function poll() {
 }
 
 function updateStatus() {
-  jack.JACK_STATUS = queryJack();
-  jack.TRANSPORT_STATUS = queryTransport();
+  store.jack.JACK_STATUS = queryJack();
+  store.jack.TRANSPORT_STATUS = queryTransport();
+  store.jack.PORTS = getAvailableJackPorts();
 }
 
 /**
@@ -36,7 +36,6 @@ function queryJack() {
 
 function queryTransport() {
   const cp = require("child_process");
-  const { wlog } = require("./layout");
   const status = cp.execSync(
     `python3 ./py/jack-audio-tools/jack/transporter.py -c mod-host-cli-poll query`,
     { encoding: "utf8" }
@@ -49,6 +48,14 @@ function setTransportStatus(status) {
   //       choices=['query', 'rewind', 'start', 'status', 'stop', 'toggle'],
 }
 
+function getAvailableJackPorts() {
+  const cp = require("child_process");
+  const info = cp.execSync(
+    `python3 ./py/jack-audio-tools/jack/client.py -c mod-host-cli-poll port-info`,
+    { encoding: "utf8" }
+  );
+  return JSON.parse(info);
+}
 // exports.isJackServerRunning = isJackServerRunning;
 exports.init = init;
 exports.poll = poll;

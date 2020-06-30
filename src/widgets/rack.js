@@ -46,7 +46,7 @@ function make(grid, x, y, xSpan, ySpan) {
     rack.move(settings.SCROLL_AMMOUNT);
   });
   rack.on("select", function (e, index) {
-    //  store.setSelectedPlugin(e.content);
+    store.setSelectedPluginIndex(e.content, index);
   });
 
   rack.key(["backspace", "delete"], function () {
