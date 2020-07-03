@@ -10,6 +10,8 @@ const LogWidget = require("./widgets/log");
 const PluginInfoWidget = require("./widgets/pluginInfo");
 const RackWidget = require("./widgets/rack");
 const MainMenuWidget = require("./widgets/mainMenu");
+const InputWidget = require("./widgets/input");
+const OutputWidget = require("./widgets/output");
 
 let focusIndex = 0;
 var mainScreen;
@@ -19,6 +21,8 @@ var statusWidget,
   pluginListWidget,
   pluginInfoWidget,
   rackWidget,
+  inputWidget,
+  outputWidget,
   mainMenu;
 
 function setUpLayout(screen) {
@@ -27,7 +31,11 @@ function setUpLayout(screen) {
   mainMenu = MainMenuWidget.make(grid, 0, 0, 12, 1);
   categoryWidget = CategoriesWidget.make(grid, 0, 1, 1, 12);
   pluginListWidget = PluginListWidget.make(grid, 1, 1, 3, 12);
-  rackWidget = RackWidget.make(grid, 4, 1, 3, 8);
+
+  inputWidget = InputWidget.make(grid, 4, 1, 3, 4);
+  rackWidget = RackWidget.make(grid, 4, 5, 3, 5);
+  outputWidget = OutputWidget.make(grid, 4, 7, 3, 2);
+
   pluginInfoWidget = PluginInfoWidget.make(grid, 4, 9, 3, 4);
 
   logWidget = LogWidget.make(grid, 0, 13, 4, 5);
@@ -48,7 +56,6 @@ function focusPrev() {
 
 function focus() {
   mainScreen.focusNext();
-  //   mainScreen.render();
 }
 
 function wlog(msg) {
