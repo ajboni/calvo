@@ -1,14 +1,21 @@
 let store = require("./store");
 const Layout = require("./layout");
+const PubSub = require("pubsub-js");
+
+let jack;
+
+PubSub.subscribe("jack", function (jackStatus) {
+  jack = jackStatus;
+});
 
 function init() {
-  queryJack();
+  //   queryJack();
   updateStatus();
   poll();
 }
 
 function poll() {
-  if (store.jack.JACK_STATUS.status === "running") {
+  if (store.getJackStatus().JACK_STATUS.status === "running") {
     updateStatus();
   } else {
     throw "JACK IS NOT RUNNING";
@@ -16,9 +23,7 @@ function poll() {
 }
 
 function updateStatus() {
-  store.jack.JACK_STATUS = queryJack();
-  store.jack.TRANSPORT_STATUS = queryTransport();
-  store.jack.PORTS = getAvailableJackPorts();
+  store.setJackStatus(queryJack(), queryTransport(), getAvailableJackPorts());
 }
 
 /**

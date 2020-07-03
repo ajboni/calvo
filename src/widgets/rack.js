@@ -2,17 +2,13 @@ const blessed = require("blessed");
 const contrib = require("blessed-contrib");
 const Layout = require("../layout");
 const store = require("../store");
+const PubSub = require("pubsub-js");
 
 var rack = {};
 function make(grid, x, y, xSpan, ySpan) {
   rack = grid.set(y, x, ySpan, xSpan, blessed.list, {
     label: "RACK",
     mouse: true,
-    scrollbar: {
-      // ch: " ",
-      // inverse: true,
-    },
-    //  items: store.rack,
     interactive: true,
     keys: true,
     padding: { left: 1, right: 1 },
@@ -33,6 +29,8 @@ function make(grid, x, y, xSpan, ySpan) {
       },
     },
   });
+
+  //   Keyboard Events
   rack.key("home", function (ch, key) {
     rack.select(0);
   });
@@ -46,19 +44,21 @@ function make(grid, x, y, xSpan, ySpan) {
     rack.move(settings.SCROLL_AMMOUNT);
   });
   rack.on("select", function (e, index) {
-    store.setSelectedPluginIndex(e.content, index);
+    if (rack.items.length > 0) store.setSelectedPluginIndex(e.content, index);
   });
 
   rack.key(["backspace", "delete"], function () {
     if (rack.items.length > 0) store.removePluginAt(rack.selected);
   });
+
+  // Subscribe to 'rack' updates
+  var token = PubSub.subscribe("rack", update);
   return rack;
 }
 
-function update() {
-  const names = store.rack.map((p) => p.name);
+function update(msg, data) {
+  const names = data.map((p) => p.name);
   rack.setItems(names);
 }
 
 exports.make = make;
-exports.update = update;

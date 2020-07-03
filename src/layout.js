@@ -38,10 +38,6 @@ function setUpLayout(screen) {
   return grid;
 }
 
-function updateLayoutData() {
-  StatusWidget.update();
-}
-
 function focusNext() {
   mainScreen.focusNext();
 }
@@ -84,7 +80,6 @@ function renderScreen() {
 exports.setUpLayout = setUpLayout;
 exports.focusPrev = focusPrev;
 exports.focusNext = focusNext;
-exports.updateLayoutData = updateLayoutData;
 exports.wlog = wlog;
 exports.wlogError = wlogError;
 exports.renderScreen = renderScreen;

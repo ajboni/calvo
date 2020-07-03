@@ -1,8 +1,12 @@
 const blessed = require("blessed");
-const { jack, modHost } = require("../store");
+const { modHost } = require("../store");
 const contrib = require("blessed-contrib");
+const PubSub = require("pubsub-js");
+const store = require("../store");
 
 var status = {};
+var jack = store.getJackStatus();
+var modhost;
 
 function make(grid, x, y, xSpan, ySpan) {
   status = grid.set(y, x, ySpan, xSpan, contrib.markdown, {
@@ -18,6 +22,16 @@ function make(grid, x, y, xSpan, ySpan) {
         //   enabled: false,
       },
     },
+  });
+
+  PubSub.subscribe("jack", function (msg, jackStatus) {
+    jack = jackStatus;
+    update();
+  });
+
+  PubSub.subscribe("modhost", function (msg, modhostStatus) {
+    modhost = modhostStatus;
+    update();
   });
 
   return status;
@@ -44,4 +58,4 @@ __Port:__ ${modHost.PORT}
 }
 
 exports.make = make;
-exports.update = update;
+// exports.update = update;

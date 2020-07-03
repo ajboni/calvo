@@ -1,10 +1,6 @@
-const blessed = require("blessed");
 const contrib = require("blessed-contrib");
-const Layout = require("../layout");
-const store = require("../store");
-const { settings } = require("../../settings");
-const { wlogError, wlog } = require("../layout");
-var emoji = require("node-emoji");
+const PubSub = require("pubsub-js");
+
 var pluginInfo = {};
 
 function make(grid, x, y, xSpan, ySpan) {
@@ -25,24 +21,19 @@ function make(grid, x, y, xSpan, ySpan) {
 
   var a = contrib.markdown();
 
-  pluginInfo.setMarkdown(`
-# Plugin Title
-  `);
+  pluginInfo.setMarkdown(` `);
+
+  var token = PubSub.subscribe("selectedPlugin", update);
+
   return pluginInfo;
 }
 
-function setText(plugin) {
-  pluginInfo.setMarkdown(``);
-}
-
-function update() {
-  const plugin = store.getSelectedPlugin();
+function update(msg, plugin) {
   if (!plugin) {
-    pluginInfo.label = "Plugin Info";
+    pluginInfo.setLabel("No Plugin Info");
     pluginInfo.setMarkdown(" ");
   } else {
     pluginInfo.setLabel(plugin.name);
-
     pluginInfo.setMarkdown(`
 \`by ${plugin.author.name}\`
 ${plugin.comment ? plugin.comment : ""}  
@@ -60,4 +51,3 @@ __MIDI__  : ${plugin.ports.midi.input.length} in / ${
 }
 
 exports.make = make;
-exports.update = update;

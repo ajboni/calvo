@@ -7,7 +7,7 @@ const ModHost = require("./modhost_client");
 const { settings } = require("../settings");
 const LV2 = require("./lv2");
 const { lv2ls, pluginInfo, grep, listAllPlugins } = require("./lv2");
-const { app } = require("./store");
+const store = require("./store");
 const program = blessed.program();
 const screen = blessed.screen({
   smartCSR: true,
@@ -27,11 +27,10 @@ try {
   process.exit(0);
 }
 
-Layout.updateLayoutData();
 screen.render();
 program.enableMouse();
 
-app.INITIALIZED = true;
+store.app.INITIALIZED = true;
 Jack.poll();
 // Set up polling
 let jackPoll = setInterval(() => {
@@ -39,7 +38,7 @@ let jackPoll = setInterval(() => {
 }, settings.JACK_POLLING_RATE);
 
 let uiPoll = setInterval(() => {
-  Layout.updateLayoutData();
+  store.notifySubscribers();
   screen.render();
 }, settings.UI_UPDATE_RATE);
 

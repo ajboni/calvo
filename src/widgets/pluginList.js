@@ -1,9 +1,7 @@
 const blessed = require("blessed");
-const contrib = require("blessed-contrib");
 const store = require("../store");
 const { settings } = require("../../settings");
-const { wlogError } = require("../layout");
-const { getPluginByName } = require("../lv2");
+const PubSub = require("pubsub-js");
 let pluginListWidget = {};
 
 function make(grid, x, y, xSpan, ySpan) {
@@ -53,12 +51,14 @@ function make(grid, x, y, xSpan, ySpan) {
     //    pluginListWidget.getItem(pluginListWidget.selected).content
     //  );
   });
+
+  var token = PubSub.subscribe("filteredPluginCatalog", update);
+
   return pluginListWidget;
 }
 
-function update() {
-  const list = store.filteredPluginCatalog.map((plugin) => plugin.name);
+function update(msg, data) {
+  const list = data.map((plugin) => plugin.name);
   pluginListWidget.setItems(list);
 }
 exports.make = make;
-exports.update = update;

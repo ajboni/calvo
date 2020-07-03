@@ -7,6 +7,7 @@ const PluginInfoWidget = require("./widgets/pluginInfo");
 const RackWidget = require("./widgets/rack");
 const ModHostClient = require("./modhost_client");
 const { getPluginByName, pluginInfo } = require("./lv2");
+const PubSub = require("pubsub-js");
 
 const modHostStatusEnum = Object.freeze({
   Stopped: "Stopped",
@@ -14,80 +15,9 @@ const modHostStatusEnum = Object.freeze({
   Connected: "Connected",
 });
 
-const pluginCatalog = [];
-const filteredPluginCatalog = [];
-const pluginCategories = ["(All)"];
-const rack = [];
-let selectedPlugin = {};
-let instanceNumber = 0;
-
-function getSelectedPlugin() {
-  return selectedPlugin;
+function notifySubscribers(topic, data) {
+  PubSub.publish(topic, data);
 }
-
-function addPluginToRack(pluginName) {
-  try {
-    const p = Lv2.getPluginByName(pluginName);
-    const plugin = pluginInfo(p.uri);
-    ModHostClient.addPlugin(p.uri, instanceNumber);
-    plugin.info = {
-      instanceNumber: instanceNumber,
-      bypass: false,
-    };
-
-    // TODO: Connect to previous, disconnect previous from master.
-    instanceNumber++;
-    rack.push(plugin);
-    RackWidget.update();
-    Layout.wlog(`Added ${plugin.name} to rack. (#${rack.length - 1})`);
-  } catch (error) {
-    Layout.wlogError(`Error adding plugin to rack: ${error}`);
-  }
-}
-
-/**
- * Removes a plugin according to the index on the rack.
- *
- * @param {*} index Rack Index
- */
-function removePluginAt(index) {
-  const plugin = rack[index];
-  rack.splice(index, 1);
-  Layout.wlog(`Remove plugin #${index} - ${plugin.name}`);
-  ModHostClient.removePlugin(plugin.info.instanceNumber);
-  RackWidget.update();
-  // TODO: Disconnect.
-}
-
-/**
- * Sets the plugin that will be focused to edit.
- *
- * @param {*} pluginName
- */
-function setSelectedPluginIndex(pluginName, index) {
-  selectedPlugin = rack[index];
-  PluginInfoWidget.update();
-}
-
-/**
- * This function will process
- *
- */
-function processConnections() {}
-
-/**
- * This function will force connection between 2 plugins. If one of them is mono, adjust as necesary
- *
- * @param {*} src
- * @param {*} dst
- */
-function connectPlugins(src, dst) {}
-
-/**
- * Connect ONLY last plugin to master output(s). If one of them is mono, adjust as necesary.
- *
- */
-function connectLastToMasterOutputs() {}
 
 const app = {
   INITIALIZED: false,
@@ -136,6 +66,105 @@ const jack = {
   },
 };
 
+function setJackStatus(
+  jackStatus = jack.JACK_STATUS,
+  transport_status = jack.TRANSPORT_STATUS,
+  ports = jack.PORTS
+) {
+  jack.JACK_STATUS = jackStatus;
+  jack.TRANSPORT_STATUS = transport_status;
+  jack.PORTS = ports;
+  notifySubscribers("jack", jack);
+}
+
+/**
+ *
+ * @returns Returns JACK state
+ */
+function getJackStatus() {
+  return jack;
+}
+
+const pluginCatalog = [];
+const filteredPluginCatalog = [];
+const pluginCategories = ["(All)"];
+const rack = [];
+let selectedPlugin = {};
+let instanceNumber = 0;
+
+function getSelectedPlugin() {
+  return selectedPlugin;
+}
+
+function addPluginToRack(pluginName) {
+  try {
+    const p = Lv2.getPluginByName(pluginName);
+    const plugin = pluginInfo(p.uri);
+    ModHostClient.addPlugin(p.uri, instanceNumber);
+    plugin.info = {
+      instanceNumber: instanceNumber,
+      bypass: false,
+    };
+
+    // TODO: Connect to previous, disconnect previous from master.
+    instanceNumber++;
+    rack.push(plugin);
+    notifySubscribers("rack", rack);
+    Layout.wlog(`Added ${plugin.name} to rack. (#${rack.length - 1})`);
+  } catch (error) {
+    Layout.wlogError(`Error adding plugin to rack: ${error}`);
+  }
+}
+
+/**
+ * Removes a plugin according to the index on the rack.
+ *
+ * @param {*} index Rack Index
+ */
+function removePluginAt(index) {
+  const plugin = rack[index];
+  rack.splice(index, 1);
+  Layout.wlog(`Remove plugin #${index} - ${plugin.name}`);
+  ModHostClient.removePlugin(plugin.info.instanceNumber);
+  if (selectedPlugin.uri === plugin.uri) {
+    selectedPlugin = null;
+    notifySubscribers("selectedPlugin", selectedPlugin);
+  }
+  notifySubscribers("rack", rack);
+
+  // TODO: Disconnect.
+}
+
+/**
+ * Sets the plugin that will be focused to edit.
+ *
+ * @param {*} pluginName
+ */
+function setSelectedPluginIndex(pluginName, index) {
+  selectedPlugin = rack[index];
+  notifySubscribers("selectedPlugin", selectedPlugin);
+}
+
+/**
+ * This function will process
+ *
+ */
+function processConnections() {}
+
+/**
+ * This function will force connection between 2 plugins. If one of them is mono, adjust as necesary
+ *
+ * @param {*} src
+ * @param {*} dst
+ */
+function connectPlugins(src, dst) {}
+
+/**
+ * Connect ONLY last plugin to master output(s). If one of them is mono, adjust as necesary.
+ *
+ */
+function connectLastToMasterOutputs() {}
+
 function setCategoryFilter(filter = "") {
   if (pluginCategories.includes(filter) && filter !== "(All)") {
     filteredPluginCatalog.length = 0;
@@ -152,7 +181,7 @@ function setCategoryFilter(filter = "") {
   }
 
   if (app.INITIALIZED) {
-    PluginListWidget.update();
+    notifySubscribers("filteredPluginCatalog", filteredPluginCatalog);
   }
 }
 
@@ -214,7 +243,8 @@ function loadCache(directoryPath = __dirname) {
 
 exports.pluginCatalog = pluginCatalog;
 exports.pluginCategories = pluginCategories;
-exports.jack = jack;
+exports.setJackStatus = setJackStatus;
+exports.getJackStatus = getJackStatus;
 exports.modHost = modHost;
 exports.modHostStatusEnum = modHostStatusEnum;
 exports.saveCache = saveCache;
@@ -227,3 +257,4 @@ exports.addPluginToRack = addPluginToRack;
 exports.rack = rack;
 exports.removePluginAt = removePluginAt;
 exports.getSelectedPlugin = getSelectedPlugin;
+exports.notifySubscribers = notifySubscribers;
