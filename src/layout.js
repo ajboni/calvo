@@ -10,8 +10,8 @@ const LogWidget = require("./widgets/log");
 const PluginInfoWidget = require("./widgets/pluginInfo");
 const RackWidget = require("./widgets/rack");
 const MainMenuWidget = require("./widgets/mainMenu");
-const InputWidget = require("./widgets/input");
-const OutputWidget = require("./widgets/output");
+const AudioSources = require("./widgets/audioSources");
+const PubSub = require("pubsub-js");
 
 let focusIndex = 0;
 var mainScreen;
@@ -23,26 +23,50 @@ var statusWidget,
   rackWidget,
   inputWidget,
   outputWidget,
-  mainMenu;
+  mainMenu,
+  carousel;
 
 function setUpLayout(screen) {
   var grid = new contrib.grid({ rows: 18, cols: 12, screen: screen });
 
-  mainMenu = MainMenuWidget.make(grid, 0, 0, 12, 1);
-  categoryWidget = CategoriesWidget.make(grid, 0, 1, 1, 12);
-  pluginListWidget = PluginListWidget.make(grid, 1, 1, 3, 12);
+  function page1(screen) {
+    mainMenu = MainMenuWidget.make(grid, 0, 0, 12, 1, 0);
+    categoryWidget = CategoriesWidget.make(grid, 0, 1, 1, 12);
+    pluginListWidget = PluginListWidget.make(grid, 1, 1, 3, 12);
+    logWidget = LogWidget.make(grid, 0, 13, 4, 5);
+    rackWidget = RackWidget.make(grid, 4, 1, 3, 8);
+    statusWidget = StatusWidget.make(grid, 4, 13, 2, 5);
+    pluginInfoWidget = PluginInfoWidget.make(grid, 4, 9, 3, 4);
 
-  inputWidget = InputWidget.make(grid, 4, 1, 3, 4);
-  rackWidget = RackWidget.make(grid, 4, 5, 3, 5);
-  outputWidget = OutputWidget.make(grid, 4, 7, 3, 2);
+    mainScreen = screen;
+    mainScreen.focusPush(categoryWidget);
+  }
 
-  pluginInfoWidget = PluginInfoWidget.make(grid, 4, 9, 3, 4);
+  function page2(screen) {
+    mainMenu = MainMenuWidget.make(grid, 0, 0, 12, 1, 1);
+    inputWidget = AudioSources.make(grid, 0, 1, 6, 12, "input");
+    outputWidget = AudioSources.make(grid, 6, 1, 6, 12, "output");
+    logWidget = LogWidget.make(grid, 0, 13, 4, 5);
+    statusWidget = StatusWidget.make(grid, 4, 13, 2, 5);
+    mainScreen = screen;
+    mainScreen.focusPush(inputWidget);
+  }
 
-  logWidget = LogWidget.make(grid, 0, 13, 4, 5);
-  statusWidget = StatusWidget.make(grid, 4, 13, 2, 5);
+  carousel = new contrib.carousel([page1, page2], {
+    screen: screen,
+    interval: 0, //how often to switch views (set 0 to never swicth automatically)
+    controlKeys: false, //should right and left keyboard arrows control view rotation
+  });
 
-  mainScreen = screen;
-  mainScreen.focusPush(categoryWidget);
+  PubSub.subscribe("app", function (msg, app) {
+    const page = app.CURRENT_PAGE;
+    if (page != carousel.currPage) {
+      carousel.currPage = page;
+      carousel.move();
+    }
+  });
+
+  carousel.start();
   return grid;
 }
 

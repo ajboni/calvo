@@ -8,6 +8,7 @@ const RackWidget = require("./widgets/rack");
 const ModHostClient = require("./modhost_client");
 const { getPluginByName, pluginInfo } = require("./lv2");
 const PubSub = require("pubsub-js");
+const { settings } = require("../settings");
 
 const modHostStatusEnum = Object.freeze({
   Stopped: "Stopped",
@@ -21,6 +22,7 @@ function notifySubscribers(topic, data) {
 
 const app = {
   INITIALIZED: false,
+  CURRENT_PAGE: 0,
 };
 
 const modHost = {
@@ -64,17 +66,93 @@ const jack = {
       capture: [],
     },
   },
+  CONNECTIONS: {
+    inputMode: settings.DEFAULT_INPUT_MODE,
+    inputLeft: settings.DEFAULT_INPUT_L,
+    inputRight: settings.DEFAULT_INPUT_R,
+    outputMode: settings.DEFAULT_OUTPUT_MODE,
+    outputLeft: settings.DEFAULT_OUTPUT_L,
+    outputRight: settings.DEFAULT_OUTPUT_R,
+  },
 };
+
+/**
+ * Sets the current Carrousel Page
+ *
+ */
+function setCurrentPage(pageNumber) {
+  app.CURRENT_PAGE = pageNumber;
+  notifySubscribers("app", app);
+}
 
 function setJackStatus(
   jackStatus = jack.JACK_STATUS,
   transport_status = jack.TRANSPORT_STATUS,
-  ports = jack.PORTS
+  ports = jack.PORTS,
+  connections = jack.CONNECTIONS
 ) {
   jack.JACK_STATUS = jackStatus;
   jack.TRANSPORT_STATUS = transport_status;
   jack.PORTS = ports;
+  jack.CONNECTIONS = connections;
   notifySubscribers("jack", jack);
+}
+
+/**
+ * Disconnects and reconnects every plugin;
+ *
+ */
+function reconectAll() {
+  disconnectAll();
+  connectAll();
+}
+
+/**
+ * Disconnects all plugin outputs
+ *
+ */
+function disconnectAll() {}
+
+/**
+ * Process connections for each plugin.
+ *
+ */
+function connectAll() {}
+
+/**
+ * Sets an audio source for a specific channel. It will trigger a total reconnection.
+ *
+ * @param {*} mode Mode should be input or output
+ * @param {*} channel 'left' or 'right'
+ * @param {*} name The name of the jack audio source.
+ */
+function setAudioSource(mode, channel, name) {
+  if (mode === "input") {
+    if (channel === "left") jack.CONNECTIONS.inputLeft = name;
+    if (channel === "right") jack.CONNECTIONS.inputRight = name;
+  }
+
+  if (mode === "output") {
+    if (channel === "left") jack.CONNECTIONS.output = name;
+    if (channel === "right") jack.CONNECTIONS.inputRight = name;
+  }
+  notifySubscribers("jack", jack);
+  Layout.wlog(jack.CONNECTIONS.inputLeft);
+  Layout.wlog(jack.CONNECTIONS.inputRight);
+}
+
+/**
+ * Set Input/Output mode to mono or stereo.
+ * This will trigger a complete reconnection of all plugins
+ *
+ * @param {*} direction 'input | output
+ * @param {*} mode mono | stereo
+ */
+function setAudioSourceMode(direction, mode) {
+  jack.CONNECTIONS[direction + "Mode"] = mode;
+  notifySubscribers("jack", jack);
+
+  // TODO: RESET CONNECTIONS
 }
 
 /**
@@ -258,3 +336,6 @@ exports.rack = rack;
 exports.removePluginAt = removePluginAt;
 exports.getSelectedPlugin = getSelectedPlugin;
 exports.notifySubscribers = notifySubscribers;
+exports.setCurrentPage = setCurrentPage;
+exports.setAudioSource = setAudioSource;
+exports.setAudioSourceMode = setAudioSourceMode;

@@ -2,14 +2,19 @@ const blessed = require("blessed");
 const { jack, modHost } = require("../store");
 const contrib = require("blessed-contrib");
 const App = require("../app");
+const store = require("../store");
 
 var mainMenu = {};
 
-function make(grid, x, y, xSpan, ySpan) {
+function make(grid, x, y, xSpan, ySpan, page = -1) {
   mainMenu = grid.set(y, x, ySpan, xSpan, blessed.listbar, {
     items: {
-      Main: () => {},
-      Minimal: function () {},
+      Main: () => {
+        store.setCurrentPage(0);
+      },
+      Connections: () => {
+        store.setCurrentPage(1);
+      },
       Help: () => {},
       Exit: () => {
         App.exit();
@@ -39,6 +44,10 @@ function make(grid, x, y, xSpan, ySpan) {
       },
     },
   });
+
+  if (page > 0) {
+    mainMenu.select(page);
+  }
 
   return mainMenu;
 }
