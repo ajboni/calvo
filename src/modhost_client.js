@@ -3,6 +3,7 @@ const { removeNewLines } = require("./string_utils");
 const getPort = require("get-port");
 const { settings } = require("../settings");
 const store = require("./store");
+const Layout = require("./layout");
 
 var net = require("net");
 var client = new net.Socket();
@@ -160,8 +161,10 @@ function bypassPlugin(instanceNumber, value) {
  * @param {*} src
  * @param {*} dst
  */
-function connectPorts(src, dst) {
-  client.write(`connect ${src} ${dst}`, "utf8");
+async function connectPorts(src, dst) {
+  const msg = `connect ${src} ${dst} \0`;
+  Layout.wlog(msg);
+  client.write(msg, "utf8");
 }
 
 /**
@@ -172,8 +175,98 @@ function connectPorts(src, dst) {
  * @param {*} src
  * @param {*} dst
  */
-function disconnectPorts(src, dst) {
-  client.write(`diconnect ${src} ${dst}`, "utf8");
+async function disconnectPorts(src, dst) {
+  client.write(`disconnect ${src} ${dst}`, "utf8");
+}
+
+/**
+ * It will connect two plugins, dealing with mono/stereo conversions.
+ * Use 'input|output' to use a mono/stero I/O ports as src/dst.
+ *
+ * @param {*} src plugin to connect, should be taken from rack as it will use the instance number.
+ * @param {*} dst
+ */
+/**
+ *
+ *
+ * @param {*} src
+ * @param {*} dst
+ * @returns
+ */
+function connectPlugins(src, dst) {
+  const il = store.getJackStatus().CONNECTIONS.inputLeft;
+  const ir = store.getJackStatus().CONNECTIONS.inputRight;
+  const im = store.getJackStatus().CONNECTIONS.inputMode;
+  const ol = store.getJackStatus().CONNECTIONS.outputLeft;
+  const or = store.getJackStatus().CONNECTIONS.outputRight;
+  const om = store.getJackStatus().CONNECTIONS.outputMode;
+
+  //   Direct Monitor not supported right now (It may conflict on multi instance mode.)
+  if (src === "input" && dst === "output") {
+    return;
+  }
+
+  //  Input => Plugin
+  if (src === "input") {
+    if (!dst.ports.audio || dst.ports.audio.length === 0) {
+      Layout.wlog(
+        "Dst plugin does not have correct number of ports or does not exist."
+      );
+      return;
+    }
+    const dstMode = dst.ports.audio.length === 1 ? "mono" : "stereo";
+    const dl = `effect_${dst.info.instanceNumber}:${dst.ports.audio.input[0].symbol}`;
+    const dr =
+      dstMode === "stereo"
+        ? `effect_${dst.info.instanceNumber}:${dst.ports.audio.input[1].symbol}`
+        : "";
+
+    if (im === "mono" && dstMode === "mono") {
+      connectPorts(il, dl);
+    } else if (im === "mono" && dstMode === "stereo") {
+      connectPorts(il, dl);
+      connectPorts(il, dr);
+    } else if (im === "stereo" && dstMode === "mono") {
+      connectPorts(il, dl);
+      //   connectPorts(ir, dst.ports.audio.input[0].symbol);
+    } else if (im === "stereo" && dstMode === "stereo") {
+      connectPorts(il, dl);
+      //   connectPorts(ir, dst.ports.audio.input[1].symbol);
+    }
+  }
+
+  //   Plugin => Output
+  if (dst === "output") {
+  }
+  //   Plugin => Plugin
+  else {
+  }
+  //   console.log(dst.ports.audio.input);
+}
+
+/**
+ * It will disconnect two plugins, dealing with mono/stereo conversions.
+ * Use 'input|output' to use a mono/stero I/O ports as src/dst.
+ *
+ * @param {*} src source plugin to disconnect (output ports), should be taken from rack as it will use the instance number.
+ * @param {*} dst destination plugin to disconnect (input ports), should be taken from rack as it will use the instance number.
+ */
+function disconnectPlugins(src, dst) {
+  const il = store.getJackStatus().CONNECTIONS.inputLeft;
+  const ir = store.getJackStatus().CONNECTIONS.inputRight;
+  const im = store.getJackStatus().CONNECTIONS.inputMode;
+  const ol = store.getJackStatus().CONNECTIONS.outputLeft;
+  const or = store.getJackStatus().CONNECTIONS.outputRight;
+  const om = store.getJackStatus().CONNECTIONS.outputMode;
+
+  // If we are connecting input to output
+  if (src === "input" && dst === "output") {
+    return;
+  }
+}
+
+async function sequencialCall(fnArray) {
+  // TODO, execute client.write secquencially.
 }
 
 exports.connect = connect;
@@ -184,3 +277,5 @@ exports.removePlugin = removePlugin;
 exports.bypassPlugin = bypassPlugin;
 exports.connectPorts = connectPorts;
 exports.disconnectPorts = disconnectPorts;
+exports.connectPlugins = connectPlugins;
+exports.disconnectPlugins = disconnectPlugins;

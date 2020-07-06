@@ -1,6 +1,6 @@
 const settings = {
   UI_UPDATE_RATE: 300, // Time in ms in which the UI refresh
-  JACK_POLLING_RATE: 5000, // Time in ms in which we query JACK server for statistics.
+  JACK_POLLING_RATE: 10000, // Time in ms in which we query JACK server for statistics.
   MOD_HOST_PORT_START: 12200, // Start of range Port to start assigning  to ModHost
   MOD_HOST_PORT_END: 12500, // End of port range
   MOD_HOST_SERVER: "localhost", // For future network based hosts
@@ -11,7 +11,7 @@ const settings = {
   DEFAULT_INPUT_MODE: "mono",
   DEFAULT_INPUT_L: "system:capture_1",
   DEFAULT_INPUT_R: "system:capture_2",
-  DEFAULT_OUTPUT_MODE: "stereo",
+  DEFAULT_OUTPUT_MODE: "mono",
   DEFAULT_OUTPUT_L: "system:playback_1", // Left Channel for the master output. Last plug	in will connect to this.
   DEFAULT_OUTPUT_R: "system:playback_2", // Right Channel for the master output. Last plugin will connect to this.
 };

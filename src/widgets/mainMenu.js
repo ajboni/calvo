@@ -15,6 +15,9 @@ function make(grid, x, y, xSpan, ySpan, page = -1) {
       Connections: () => {
         store.setCurrentPage(1);
       },
+      "Reconnect All": () => {
+        store.reconectAll();
+      },
       Help: () => {},
       Exit: () => {
         App.exit();

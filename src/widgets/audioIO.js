@@ -109,8 +109,8 @@ function make(grid, x, y, xSpan, ySpan, mode) {
   );
 
   store.getJackStatus().CONNECTIONS[mode + "Mode"] === "mono"
-    ? monoCheckbox.check()
-    : monoCheckbox.uncheck();
+    ? (monoCheckbox.checked = true)
+    : (monoCheckbox.checked = false);
 
   return ioWidget;
 }

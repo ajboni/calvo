@@ -103,7 +103,7 @@ function setJackStatus(
  *
  */
 function reconectAll() {
-  disconnectAll();
+  //   disconnectAll();
   connectAll();
 }
 
@@ -111,13 +111,23 @@ function reconectAll() {
  * Disconnects all plugin outputs
  *
  */
-function disconnectAll() {}
+function disconnectAll() {
+  // If RACK is empty just disconnect input from output.
+  if (rack.length <= 0) {
+    return;
+  }
+}
 
 /**
  * Process connections for each plugin.
  *
  */
-function connectAll() {}
+function connectAll() {
+  // If RACK is empty just connect input to output.
+  if (rack.length <= 0) {
+    return;
+  }
+}
 
 /**
  * Sets an audio source for a specific channel. It will trigger a total reconnection.
@@ -127,18 +137,21 @@ function connectAll() {}
  * @param {*} name The name of the jack audio source.
  */
 function setAudioSource(mode, channel, name) {
+  //   disconnectAll();
+
   if (mode === "input") {
     if (channel === "left") jack.CONNECTIONS.inputLeft = name;
     if (channel === "right") jack.CONNECTIONS.inputRight = name;
   }
 
   if (mode === "output") {
-    if (channel === "left") jack.CONNECTIONS.output = name;
-    if (channel === "right") jack.CONNECTIONS.inputRight = name;
+    if (channel === "left") jack.CONNECTIONS.outputLeft = name;
+    if (channel === "right") jack.CONNECTIONS.outputRight = name;
   }
   notifySubscribers("jack", jack);
   Layout.wlog(jack.CONNECTIONS.inputLeft);
   Layout.wlog(jack.CONNECTIONS.inputRight);
+  //   connectAll();
 }
 
 /**
@@ -149,8 +162,13 @@ function setAudioSource(mode, channel, name) {
  * @param {*} mode mono | stereo
  */
 function setAudioSourceMode(direction, mode) {
+  // TODO: If mode is input disconnect input with first plugin.
+  // If its output disconnect last plugin with outputs.
+  // After the modification reconnect.
+
   jack.CONNECTIONS[direction + "Mode"] = mode;
   notifySubscribers("jack", jack);
+  //   connectAll();
 
   // TODO: RESET CONNECTIONS
 }
@@ -184,9 +202,18 @@ function addPluginToRack(pluginName) {
       bypass: false,
     };
 
-    // TODO: Connect to previous, disconnect previous from master.
     instanceNumber++;
     rack.push(plugin);
+
+    // TODO: Connect to previous, disconnect previous from master.
+    if (rack.length === 1) {
+      ModHostClient.connectPlugins("input", plugin);
+    } else {
+      ModHostClient.disconnectPlugins(rack[rack.length - 2], "output");
+    }
+
+    ModHostClient.connectPlugins(plugin, "output");
+
     notifySubscribers("rack", rack);
     Layout.wlog(`Added ${plugin.name} to rack. (#${rack.length - 1})`);
   } catch (error) {
@@ -339,3 +366,4 @@ exports.notifySubscribers = notifySubscribers;
 exports.setCurrentPage = setCurrentPage;
 exports.setAudioSource = setAudioSource;
 exports.setAudioSourceMode = setAudioSourceMode;
+exports.reconectAll = reconectAll;

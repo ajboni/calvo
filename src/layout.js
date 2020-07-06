@@ -10,7 +10,7 @@ const LogWidget = require("./widgets/log");
 const PluginInfoWidget = require("./widgets/pluginInfo");
 const RackWidget = require("./widgets/rack");
 const MainMenuWidget = require("./widgets/mainMenu");
-const AudioSources = require("./widgets/audioSources");
+const AudioIO = require("./widgets/audioIO");
 const PubSub = require("pubsub-js");
 
 let focusIndex = 0;
@@ -44,8 +44,8 @@ function setUpLayout(screen) {
 
   function page2(screen) {
     mainMenu = MainMenuWidget.make(grid, 0, 0, 12, 1, 1);
-    inputWidget = AudioSources.make(grid, 0, 1, 6, 12, "input");
-    outputWidget = AudioSources.make(grid, 6, 1, 6, 12, "output");
+    inputWidget = AudioIO.make(grid, 0, 1, 6, 12, "input");
+    outputWidget = AudioIO.make(grid, 6, 1, 6, 12, "output");
     logWidget = LogWidget.make(grid, 0, 13, 4, 5);
     statusWidget = StatusWidget.make(grid, 4, 13, 2, 5);
     mainScreen = screen;
