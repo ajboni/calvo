@@ -5,16 +5,9 @@ const Lv2 = require("./lv2");
 const PluginListWidget = require("./widgets/pluginList");
 const PluginInfoWidget = require("./widgets/pluginInfo");
 const RackWidget = require("./widgets/rack");
-const ModHostClient = require("./modhost_client");
 const { getPluginByName, pluginInfo } = require("./lv2");
 const PubSub = require("pubsub-js");
 const { settings } = require("../settings");
-
-const modHostStatusEnum = Object.freeze({
-  Stopped: "Stopped",
-  StartedDisconnected: "Disconnected",
-  Connected: "Connected",
-});
 
 function notifySubscribers(topic, data) {
   PubSub.publish(topic, data);
@@ -23,13 +16,6 @@ function notifySubscribers(topic, data) {
 const app = {
   INITIALIZED: false,
   CURRENT_PAGE: 0,
-};
-
-const modHost = {
-  PID: 0,
-  PORT: 0,
-  FEEDBACK_PORT: 0,
-  STATUS: modHostStatusEnum.Stopped,
 };
 
 const jack = {
@@ -196,7 +182,7 @@ function addPluginToRack(pluginName) {
   try {
     const p = Lv2.getPluginByName(pluginName);
     const plugin = pluginInfo(p.uri);
-    ModHostClient.addPlugin(p.uri, instanceNumber);
+
     plugin.info = {
       instanceNumber: instanceNumber,
       bypass: false,
@@ -207,12 +193,12 @@ function addPluginToRack(pluginName) {
 
     // TODO: Connect to previous, disconnect previous from master.
     if (rack.length === 1) {
-      ModHostClient.connectPlugins("input", plugin);
+      //   ModHostClient.connectPlugins("input", plugin);
     } else {
-      ModHostClient.disconnectPlugins(rack[rack.length - 2], "output");
+      //   ModHostClient.disconnectPlugins(rack[rack.length - 2], "output");
     }
 
-    ModHostClient.connectPlugins(plugin, "output");
+    // ModHostClient.connectPlugins(plugin, "output");
 
     notifySubscribers("rack", rack);
     Layout.wlog(`Added ${plugin.name} to rack. (#${rack.length - 1})`);
@@ -230,7 +216,7 @@ function removePluginAt(index) {
   const plugin = rack[index];
   rack.splice(index, 1);
   Layout.wlog(`Remove plugin #${index} - ${plugin.name}`);
-  ModHostClient.removePlugin(plugin.info.instanceNumber);
+  //   ModHostClient.removePlugin(plugin.info.instanceNumber);
   if (selectedPlugin.uri === plugin.uri) {
     selectedPlugin = null;
     notifySubscribers("selectedPlugin", selectedPlugin);
@@ -350,8 +336,6 @@ exports.pluginCatalog = pluginCatalog;
 exports.pluginCategories = pluginCategories;
 exports.setJackStatus = setJackStatus;
 exports.getJackStatus = getJackStatus;
-exports.modHost = modHost;
-exports.modHostStatusEnum = modHostStatusEnum;
 exports.saveCache = saveCache;
 exports.loadCache = loadCache;
 exports.app = app;

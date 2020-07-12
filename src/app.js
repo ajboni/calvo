@@ -3,7 +3,6 @@ const contrib = require("blessed-contrib");
 const Layout = require("./layout");
 const Keyboard = require("./keyboard");
 const Jack = require("./jack_client");
-const ModHost = require("./modhost_client");
 const { settings } = require("../settings");
 const LV2 = require("./lv2");
 const { lv2ls, pluginInfo, grep, listAllPlugins } = require("./lv2");
@@ -16,7 +15,6 @@ const screen = blessed.screen({
 try {
   LV2.init();
   Jack.init();
-  ModHost.init();
 
   // Create a screen object.
   const mainGrid = Layout.setUpLayout(screen);
@@ -45,7 +43,6 @@ let uiPoll = setInterval(() => {
 function exit() {
   program.clear();
   screen.detach();
-  ModHost.destroy();
   return process.exit(0);
 }
 

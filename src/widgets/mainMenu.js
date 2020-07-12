@@ -1,5 +1,4 @@
 const blessed = require("blessed");
-const { jack, modHost } = require("../store");
 const contrib = require("blessed-contrib");
 const App = require("../app");
 const store = require("../store");

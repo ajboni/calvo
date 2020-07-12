@@ -4,7 +4,6 @@ const { settings } = require("../settings");
 const { app } = require("./store");
 const CategoriesWidget = require("./widgets/categories");
 const PluginListWidget = require("./widgets/pluginList");
-const ModHostStatusWidget = require("./widgets/modHostStatus");
 const StatusWidget = require("./widgets/status");
 const LogWidget = require("./widgets/log");
 const PluginInfoWidget = require("./widgets/pluginInfo");

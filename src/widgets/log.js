@@ -1,7 +1,6 @@
 const blessed = require("blessed");
 const contrib = require("blessed-contrib");
 const Layout = require("../layout");
-const { pluginCategories, setCategoryFilter, modHost } = require("../store");
 const { settings } = require("../../settings");
 const { wlogError, wlog } = require("../layout");
 

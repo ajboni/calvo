@@ -1,12 +1,10 @@
 const blessed = require("blessed");
-const { modHost } = require("../store");
 const contrib = require("blessed-contrib");
 const PubSub = require("pubsub-js");
 const store = require("../store");
 
 var status = {};
 var jack = store.getJackStatus();
-var modhost;
 
 function make(grid, x, y, xSpan, ySpan) {
   status = grid.set(y, x, ySpan, xSpan, contrib.markdown, {
@@ -29,11 +27,6 @@ function make(grid, x, y, xSpan, ySpan) {
     update();
   });
 
-  PubSub.subscribe("modhost", function (msg, modhostStatus) {
-    modhost = modhostStatus;
-    update();
-  });
-
   return status;
 }
 
@@ -50,9 +43,6 @@ __Time__: ${jack.TRANSPORT_STATUS.beats_per_bar}/${
     jack.TRANSPORT_STATUS.beat_type
   } @ ${jack.TRANSPORT_STATUS.beats_per_minute} bpm
 
-__MOD-HOST:__ ${modHost.STATUS}
-__PID:__ ${modHost.PID}
-__Port:__ ${modHost.PORT}
 
 `);
 }
