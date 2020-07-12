@@ -5,6 +5,7 @@ const Lv2 = require("./lv2");
 const { pluginInfo } = require("./lv2");
 const PubSub = require("pubsub-js");
 const { settings } = require("../settings");
+const Jalv = require("./jalv");
 
 function notifySubscribers(topic, data) {
   PubSub.publish(topic, data);
@@ -185,6 +186,8 @@ function addPluginToRack(pluginName) {
       bypass: false,
     };
 
+    plugin.process = Jalv.spawn_plugin(p.uri, rack.length);
+
     instanceNumber++;
     rack.push(plugin);
 
@@ -213,7 +216,10 @@ function removePluginAt(index) {
   const plugin = rack[index];
   rack.splice(index, 1);
   Layout.wlog(`Remove plugin #${index} - ${plugin.name}`);
-  //   ModHostClient.removePlugin(plugin.info.instanceNumber);
+
+  Jalv.kill_plugin(plugin.process, index);
+
+  //   plugin.info.process.disconnect();
   if (selectedPlugin.uri === plugin.uri) {
     selectedPlugin = null;
     notifySubscribers("selectedPlugin", selectedPlugin);
