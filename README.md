@@ -1,10 +1,17 @@
 ## DO NOT USE. WIP!
 
-# Calvo 👨‍🦲
+# Calvo 🧑🏼‍🦲
 
-A jalv based lv2 plugin host for your terminal.
+A [jalv](http://drobilla.net/software/jalv) based lv2 plugin host for your terminal.
 
+# Description
 Calvo is an LV2 plugin browser and host to stack plugins in a rack fashion.
+
+It uses:
+- [jalv](http://drobilla.net/software/jalv) to host plugins
+- [lilv](http://drobilla.net/software/lilv) to get plugin data
+- [blessed](https://github.com/chjj/blessed) for the UI.
+- nodejs to glue all together
 
 # Dependencies
 
