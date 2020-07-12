@@ -2,10 +2,7 @@ const fs = require("fs");
 const path = require("path");
 const Layout = require("./layout");
 const Lv2 = require("./lv2");
-const PluginListWidget = require("./widgets/pluginList");
-const PluginInfoWidget = require("./widgets/pluginInfo");
-const RackWidget = require("./widgets/rack");
-const { getPluginByName, pluginInfo } = require("./lv2");
+const { pluginInfo } = require("./lv2");
 const PubSub = require("pubsub-js");
 const { settings } = require("../settings");
 

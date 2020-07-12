@@ -7,7 +7,6 @@ const {
   filteredPluginCatalog,
 } = require("../store");
 const { settings } = require("../../settings");
-const { wlogError, wlog } = require("../layout");
 
 function make(grid, x, y, xSpan, ySpan) {
   categoryWidget = grid.set(y, x, ySpan, xSpan, blessed.list, {

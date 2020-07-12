@@ -1,5 +1,3 @@
-const { tabbedTreeToJSON, stringToTrimmedArray } = require("./string_utils");
-const { pluginCategories, filteredPluginCatalog } = require("./store");
 const { settings } = require("../settings");
 const { existsSync } = require("fs");
 const store = require("./store");
