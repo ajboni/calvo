@@ -31,7 +31,7 @@ function make(grid, x, y, xSpan, ySpan, page = -1) {
     style: {
       selected: {
         bg: "#689d6a",
-        fg: "#FFFFFF",
+        fg: "#f0f0f0",
         bold: true,
       },
       focus: {
@@ -39,7 +39,7 @@ function make(grid, x, y, xSpan, ySpan, page = -1) {
         enabled: false,
         selected: {
           bg: "#689d6a",
-          fg: "#FFFFFF",
+          fg: "#f0f0f0",
 
           bold: true,
         },
