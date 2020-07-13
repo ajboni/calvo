@@ -91,6 +91,8 @@ const jack = {
 function setCurrentPage(pageNumber) {
   app.CURRENT_PAGE = pageNumber;
   notifySubscribers("app", app);
+  //   // Also notify rack so it can display it again.
+  //   notifySubscribers("rack", rack);
 }
 
 /**
@@ -210,6 +212,12 @@ function getSelectedPlugin() {
   return selectedPlugin;
 }
 
+/**
+ * Adds a plugin to the rack.
+ * It will reprocess the connections stack, and notify subscribers of __rack__
+ *
+ * @param {*} pluginName The plugin name as appears in the plugin catalog JSON file.
+ */
 function addPluginToRack(pluginName) {
   try {
     const p = Lv2.getPluginByName(pluginName);

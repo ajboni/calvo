@@ -5,13 +5,16 @@ const store = require("../store");
 const PubSub = require("pubsub-js");
 
 var rack = {};
+
 function make(grid, x, y, xSpan, ySpan) {
+  const rackItems = store.rack.map((p) => p.name);
   rack = grid.set(y, x, ySpan, xSpan, blessed.list, {
     label: "RACK",
     mouse: true,
     interactive: true,
     keys: true,
     padding: { left: 1, right: 1 },
+    items: rackItems,
     style: {
       selected: {
         bg: "#4d5e4d",
@@ -38,7 +41,7 @@ function make(grid, x, y, xSpan, ySpan) {
     rack.select(rack.items.length - 1);
   });
   rack.key("pageup", function (ch, key) {
-    rack.move(-settings.SCROLL_AMMOUNT);
+    rack.move(settings.SCROLL_AMMOUNT);
   });
   rack.key("pagedown", function (ch, key) {
     rack.move(settings.SCROLL_AMMOUNT);
