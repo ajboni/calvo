@@ -1,10 +1,15 @@
+/**
+ * Audio Input/Output widget.
+ * @module widgets
+ */
+
 const blessed = require("blessed");
 const contrib = require("blessed-contrib");
 const PubSub = require("pubsub-js");
 const store = require("../store");
 
 /**
- *
+ * @variation audioIO
  * @param {*} grid
  * @param {*} x
  * @param {*} y

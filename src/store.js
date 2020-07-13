@@ -1,3 +1,8 @@
+/**
+ * The "store" contains state and app-wide methods.
+ * @module store
+ */
+
 const fs = require("fs");
 const path = require("path");
 const Layout = require("./layout");
@@ -7,16 +12,31 @@ const PubSub = require("pubsub-js");
 const { settings } = require("../settings");
 const Jalv = require("./jalv");
 
+/**
+ * Notify all subscribers of a given topic.
+ *
+ * @param {*} topic Topic to target
+ * @param {*} data Data to send.
+ */
 function notifySubscribers(topic, data) {
   PubSub.publish(topic, data);
 }
 
+/** Tracks App State
+ *  @enum
+ */
 const app = {
+  /** Is app initializated and ready to use? */
   INITIALIZED: false,
+  /** What page the layout is currently showing. @see layout */
   CURRENT_PAGE: 0,
 };
 
+/** Tracks several Jack Statuses
+ *  @enum
+ */
 const jack = {
+  /** Jack server status and info*/
   JACK_STATUS: {
     status: "---",
     cpu_load: 0,
@@ -24,6 +44,7 @@ const jack = {
     realtime: true,
     sample_rate: 0,
   },
+  /** Jack Transport and info*/
   TRANSPORT_STATUS: {
     state: "stopped",
     cpu_load: 1.2,
@@ -39,6 +60,7 @@ const jack = {
     ticks_per_beat: 1920.0,
     usecs: 15881132220,
   },
+  /** Audio and midi ports availbale to use */
   PORTS: {
     all: [],
     audio: {
@@ -50,6 +72,7 @@ const jack = {
       capture: [],
     },
   },
+  /** Tracks the connection settings @see settings */
   CONNECTIONS: {
     inputMode: settings.DEFAULT_INPUT_MODE,
     inputLeft: settings.DEFAULT_INPUT_L,
@@ -61,7 +84,8 @@ const jack = {
 };
 
 /**
- * Sets the current Carrousel Page
+ * Sets the current Carrousel Page,  and notify subscribers.
+ * @see layout
  *
  */
 function setCurrentPage(pageNumber) {
@@ -69,6 +93,15 @@ function setCurrentPage(pageNumber) {
   notifySubscribers("app", app);
 }
 
+/**
+ * Sets  Jack status and notify subscribers.
+ * This function is used in the jack widget polling.
+ * @see jack_client
+ * @param {*} [jackStatus=jack.JACK_STATUS]
+ * @param {*} [transport_status=jack.TRANSPORT_STATUS]
+ * @param {*} [ports=jack.PORTS]
+ * @param {*} [connections=jack.CONNECTIONS]
+ */
 function setJackStatus(
   jackStatus = jack.JACK_STATUS,
   transport_status = jack.TRANSPORT_STATUS,
@@ -115,7 +148,8 @@ function connectAll() {
 
 /**
  * Sets an audio source for a specific channel. It will trigger a total reconnection.
- *
+ * @fires notifySubscribers
+ * @see settings
  * @param {*} mode Mode should be input or output
  * @param {*} channel 'left' or 'right'
  * @param {*} name The name of the jack audio source.

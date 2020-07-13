@@ -1,3 +1,8 @@
+/**
+ * This module handles the main layout instance and widget placement.
+ * @module layout
+ */
+
 const blessed = require("blessed");
 const contrib = require("blessed-contrib");
 const { settings } = require("../settings");
@@ -25,9 +30,20 @@ var statusWidget,
   mainMenu,
   carousel;
 
+/**
+ * Sets up the layout in a given screen.
+ *
+ * @param {*} screen Blessed screen where the layout will be appended to.
+ * @returns Returns a blessed grid.
+ */
 function setUpLayout(screen) {
   var grid = new contrib.grid({ rows: 18, cols: 12, screen: screen });
 
+  /**
+   *
+   * Main Page
+   * @param {*} screen
+   */
   function page1(screen) {
     mainMenu = MainMenuWidget.make(grid, 0, 0, 12, 1, 0);
     categoryWidget = CategoriesWidget.make(grid, 0, 1, 1, 12);
@@ -41,6 +57,11 @@ function setUpLayout(screen) {
     mainScreen.focusPush(categoryWidget);
   }
 
+  /**
+   * Input/Output page
+   *
+   * @param {*} screen
+   */
   function page2(screen) {
     mainMenu = MainMenuWidget.make(grid, 0, 0, 12, 1, 1);
     inputWidget = AudioIO.make(grid, 0, 1, 6, 12, "input");
@@ -69,30 +90,39 @@ function setUpLayout(screen) {
   return grid;
 }
 
+/**
+ * Focus next widget
+ *
+ */
 function focusNext() {
   mainScreen.focusNext();
 }
 
+/**
+ * Focus previous widget
+ *
+ */
 function focusPrev() {
   mainScreen.focusPrevious();
 }
 
-function focus() {
-  mainScreen.focusNext();
-}
-
+/**
+ * Logs a message in the log-widget
+ * @todo Move to the widget module.
+ * @param {*} msg message to log.
+ */
 function wlog(msg) {
   if (logWidget && app.INITIALIZED) {
     logWidget.log(msg);
-
-    //  msg.split("\n").forEach((line) => {
-    //    logWidget.log(line);
-    //  });
   } else {
     console.log(msg);
   }
 }
 
+/**
+ * Logs an error message in the log Widget
+ * * @param {*} msg
+ */
 function wlogError(msg) {
   if (logWidget) {
     logWidget.log(`{red-fg}${msg}{/}`);
@@ -101,6 +131,10 @@ function wlogError(msg) {
   }
 }
 
+/**
+ * triggers a screen re-render
+ *
+ */
 function renderScreen() {
   if (mainScreen) {
     mainScreen.render();

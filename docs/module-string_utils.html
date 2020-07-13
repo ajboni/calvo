@@ -3,7 +3,7 @@
 <head>
     
     <meta charset="utf-8">
-    <title>settings.js - Documentation</title>
+    <title>string_utils - Documentation</title>
     
     
     <script src="scripts/prettify/prettify.js"></script>
@@ -34,51 +34,432 @@
 
 <div id="main">
     
-    <h1 class="page-title">settings.js</h1>
+    <h1 class="page-title">string_utils</h1>
     
 
     
 
 
 
+
+<section>
+
+<header>
     
-    <section>
-        <article>
-            <pre class="prettyprint source linenums"><code>/**
- * User configurable settings to alter how the app works.
- * @module settings
- */
+        
+            
+        
+    
+</header>
 
-/**  @enum  */
-const settings = {
-  /** @type {number} Time in ms in which the UI refresh */
-  UI_UPDATE_RATE: 300,
-  /** @type {number}Time in ms in which we query JACK server for statistics. */
-  JACK_POLLING_RATE: 10000,
-  /** @type {string} Location where to scan folders. */
-  LV2_PLUGINS_FOLDER: "/user/lib/lv2",
-  /** @type {boolean} If false, it will not scan for plugins on startup (use with caution). */
-  SCAN_PLUGINS: false,
-  /** @type {number} Ammount to scroll when using page up or page dow keys. */
-  SCROLL_AMMOUNT: 10,
-  /** @type {"mono"|"stereo"} Define what the default input mode will be.*/
-  DEFAULT_INPUT_MODE: "mono",
-  /** @type {string} Define what the default left input port mode will be. (jack port name: ex: system:capture_1*/
-  DEFAULT_INPUT_L: "system:capture_1",
-  /** @type {string} Define what the default right input port mode will be. (jack port name: ex: system:capture_1*/
-  DEFAULT_INPUT_R: "system:capture_2",
-  /** @type {"mono"|"stereo"} Define what the default input mode will be.*/
-  DEFAULT_OUTPUT_MODE: "mono",
-  /** @type {string} Left Channel for the master output. Last plug	in will connect to this. */
-  DEFAULT_OUTPUT_L: "system:playback_1",
-  /** @type {string} Right Channel for the master output. Last plugin will connect to this. */
-  DEFAULT_OUTPUT_R: "system:playback_2",
-};
+<article>
+    
+        <div class="container-overview">
+        
+            
+                <div class="description usertext">Assorted string utils.</div>
+            
 
-exports.settings = settings;
-</code></pre>
-        </article>
-    </section>
+            
+                
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="src_string_utils.js.html">src/string_utils.js</a>, <a href="src_string_utils.js.html#line1">line 1</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            
+        
+        </div>
+    
+
+    
+
+    
+
+    
+    
+    
+
+     
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+
+    
+
+    <h4 class="name" id="~removeNewLines"><span class="type-signature">(inner) </span>removeNewLines<span class="signature">(str)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="src_string_utils.js.html">src/string_utils.js</a>, <a href="src_string_utils.js.html#line12">line 12</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description usertext">
+    Removes new lines in a string
+</div>
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>str</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">*</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">string to remove lines.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    the formatted string
+</div>
+
+
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="~stringToTrimmedArray"><span class="type-signature">(inner) </span>stringToTrimmedArray<span class="signature">(str)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="src_string_utils.js.html">src/string_utils.js</a>, <a href="src_string_utils.js.html#line22">line 22</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+<div class="description usertext">
+    Converts a multiline text into a string array, trimming each line
+</div>
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>str</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">*</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    A strimmed array
+</div>
+
+
+
+    
+
+
+
+        
+    
+
+    
+
+    
+</article>
+
+</section>
 
 
 

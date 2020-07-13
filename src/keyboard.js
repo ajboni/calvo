@@ -1,9 +1,17 @@
+/**
+ * Global Keyboard shortcuts
+ * @module keyboard
+ */
+
 const Layout = require("./layout");
 const App = require("./app");
-const { wlog } = require("./layout");
-const { jack } = require("./store");
-const { queryTransport } = require("./jack_client");
 
+/**
+ * Register keyboard shorcuts for a screen
+ *
+ * @param {*} screen The blessed screen which will receive the shortcuts.
+ * @param {*} mainGrid (not used)
+ */
 function registerKeyboardShortcuts(screen, mainGrid) {
   screen.key(["escape", "q", "C-c"], function (ch, key) {
     App.exit();

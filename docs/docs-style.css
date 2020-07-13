@@ -29,3 +29,9 @@ footer {
   color: #c5c1c1;
   height: 50px;
 }
+
+h5 {
+  margin: 8px 0 8px 0;
+  border-left: 5px solid #8f456d;
+  padding: 5px;
+}
