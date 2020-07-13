@@ -19,6 +19,9 @@ It uses:
 
 JACK, Nodejs, lilv, jalv
 
+# Settings
+Modify `settings.js` with your settings, more info [in the docs](https://ajboni.github.io/calvo/module-settings.html).
+
 # Keys
 
 ### Layout
@@ -30,6 +33,8 @@ JACK, Nodejs, lilv, jalv
 
 - `enter` Select plugin for handling
 - `delete | backspace` Remove plugin
+
+
 
 # DEV
 
@@ -43,8 +48,11 @@ npm install
 npm start
 ```
 
-### Generate documentation
+### Documentation
 
+Dev Documentation is available at: https://ajboni.github.io/calvo/
+
+To build doc locally:
 ```
 npm run document
 ```
