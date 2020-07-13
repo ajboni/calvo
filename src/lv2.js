@@ -1,3 +1,8 @@
+/**
+ * This module handles lv2 interaction: scanninj plugins and getting info about ports, controls. etc.
+ * @module lv2
+ */
+
 const { settings } = require("../settings");
 const { existsSync } = require("fs");
 const store = require("./store");
@@ -26,7 +31,9 @@ function init() {
  * Scans the system for installed plugins, and save a database in memory and disk.
  */
 function buildPluginCache() {
-  wlog("Building plugins cache, this might take a while, please wait...");
+  Layout.wlog(
+    "Building plugins cache, this might take a while, please wait..."
+  );
   try {
     //  const names = lv2ls(true);
     const plugins = grep();

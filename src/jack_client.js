@@ -1,3 +1,8 @@
+/**
+ * Query JACK info and status. uses https://github.com/ajboni/jack-audio-tools
+ * @module jack_client
+ */
+
 let store = require("./store");
 const Layout = require("./layout");
 const PubSub = require("pubsub-js");
@@ -8,12 +13,20 @@ PubSub.subscribe("jack", function (jackStatus) {
   jack = jackStatus;
 });
 
+/**
+ * Initialize. Set up polling.
+ *
+ */
 function init() {
   //   queryJack();
   updateStatus();
   poll();
 }
 
+/**
+ * Poll JACK for info.
+ * @see settings
+ */
 function poll() {
   if (store.getJackStatus().JACK_STATUS.status === "running") {
     updateStatus();

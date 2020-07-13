@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="utf-8">
+    <title>lv2.js - Documentation</title>
+    
+    
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+    <script src="scripts/nav.js" defer></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav >
+    
+    <input type="text" id="nav-search" placeholder="Search" />
+    
+    <h2><a href="index.html">Home</a></h2><h2><a href="https://github.com/ajboni/calvo" target="_blank" class="menu-item" id="website_link" >Project Website</a></h2><h3>Modules</h3><ul><li><a href="module-app.html">app</a></li><li><a href="module-lv2.html">lv2</a><ul class='methods'><li data-type='method'><a href="module-lv2.html#~buildPluginCache">buildPluginCache</a></li><li data-type='method'><a href="module-lv2.html#~getPluginByName">getPluginByName</a></li><li data-type='method'><a href="module-lv2.html#~grep">grep</a></li><li data-type='method'><a href="module-lv2.html#~init">init</a></li><li data-type='method'><a href="module-lv2.html#~init">init</a></li><li data-type='method'><a href="module-lv2.html#~pluginInfo">pluginInfo</a></li><li data-type='method'><a href="module-lv2.html#~poll">poll</a></li><li data-type='method'><a href="module-lv2.html#~queryJack">queryJack</a></li></ul></li><li></li></ul><h3>Global</h3><ul><li><a href="global.html#connectAll">connectAll</a></li><li><a href="global.html#connectLastToMasterOutputs">connectLastToMasterOutputs</a></li><li><a href="global.html#connectPlugins">connectPlugins</a></li><li><a href="global.html#disconnectAll">disconnectAll</a></li><li><a href="global.html#getJackStatus">getJackStatus</a></li><li><a href="global.html#kill_plugin">kill_plugin</a></li><li><a href="global.html#make">make</a></li><li><a href="global.html#processConnections">processConnections</a></li><li><a href="global.html#reconectAll">reconectAll</a></li><li><a href="global.html#removePluginAt">removePluginAt</a></li><li><a href="global.html#setAudioSource">setAudioSource</a></li><li><a href="global.html#setAudioSourceMode">setAudioSourceMode</a></li><li><a href="global.html#setCurrentPage">setCurrentPage</a></li><li><a href="global.html#setSelectedPluginIndex">setSelectedPluginIndex</a></li><li><a href="global.html#spawn_plugin">spawn_plugin</a></li><li><a href="global.html#stringToTrimmedArray">stringToTrimmedArray</a></li><li><a href="global.html#write">write</a></li></ul>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">lv2.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * This module handles lv2 interaction: scanninj plugins and getting info about ports, controls. etc.
+ * @module lv2
+ */
+
+const { settings } = require("../settings");
+const { existsSync } = require("fs");
+const store = require("./store");
+const path = require("path");
+const Layout = require("./layout");
+
+/**
+ * Initialize: Scan for plugins and setup store (cache)
+ *
+ */
+function init() {
+  if (
+    existsSync(path.join(__dirname, "pluginCatalog.json")) &amp;&amp;
+    !settings.SCAN_PLUGINS
+  ) {
+    console.log("Loading plugins cache...");
+    store.loadCache();
+  } else {
+    buildPluginCache();
+  }
+
+  store.setCategoryFilter("");
+}
+
+/**
+ * Scans the system for installed plugins, and save a database in memory and disk.
+ */
+function buildPluginCache() {
+  Layout.wlog(
+    "Building plugins cache, this might take a while, please wait..."
+  );
+  try {
+    //  const names = lv2ls(true);
+    const plugins = grep();
+    store.pluginCatalog.length = 0;
+    store.pluginCatalog.push(...plugins);
+    plugins.forEach((plugin, index) => {
+      plugin.categories.forEach((cat) => {
+        if (!store.pluginCategories.includes(cat)) {
+          store.pluginCategories.push(cat);
+        }
+      });
+    });
+    store.saveCache();
+  } catch (error) {
+    Layout.wlog(error);
+  }
+}
+
+/**
+ * Grep LV2 plugin by uris, filtered by regex.
+ *
+ * @param {string} [regex="."] Regex to query plugins. By default it will return all plugins available.
+ * @returns Returns an array with the plugins found filtered by the regex.
+ */
+function grep(regex = ".") {
+  const cp = require("child_process");
+  try {
+    const result = cp.execSync(
+      `python3 ./py/jack-audio-tools/lv2/grep.py -c --json ${regex}`,
+      {
+        encoding: "utf8",
+      }
+    );
+    return JSON.parse(result);
+  } catch (error) {
+    Layout.wlog(error);
+    return error;
+  }
+}
+
+/**
+ * Find a plugin by its name on the catalog.
+ *
+ * @param {*} pluginName The name to search for.
+ */
+function getPluginByName(pluginName) {
+  const result = store.pluginCatalog.filter(
+    (plugin) => plugin.name === pluginName
+  );
+
+  return result ? result[0] : null;
+}
+
+/**
+ * Get detailed information about a plugin.
+ * @param {*} uri URI of the plugin.
+ * @returns Returns a JSON object with the plugin's LV2 properties.
+ */
+function pluginInfo(uri) {
+  const cp = require("child_process");
+
+  try {
+    const result = cp.execSync(
+      `python3 -m jackaudiotools.lv2.plugin_info ${uri}`,
+      {
+        cwd: "./py",
+        encoding: "utf8",
+      }
+    );
+    return JSON.parse(result);
+  } catch (error) {
+    Layout.wlogError(`Plugin ${uri} could not be loaded.`);
+    throw error;
+  }
+}
+
+exports.grep = grep;
+exports.pluginInfo = pluginInfo;
+exports.init = init;
+exports.getPluginByName = getPluginByName;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+    
+    
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.4</a> on Mon Jul 13 2020 00:21:14 GMT-0300 (Argentina Standard Time) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/polyfill.js"></script>
+<script src="scripts/linenumber.js"></script>
+
+<script src="scripts/search.js" defer></script>
+
+
+
+    <link type="text/css" rel="stylesheet" href="./docs-style.css">
+    
+</body>
+</html>

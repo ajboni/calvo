@@ -1,3 +1,8 @@
+/**
+ * App initialization is done here.
+ * @module app
+ */
+
 const blessed = require("blessed");
 const contrib = require("blessed-contrib");
 const Layout = require("./layout");
@@ -5,7 +10,6 @@ const Keyboard = require("./keyboard");
 const Jack = require("./jack_client");
 const { settings } = require("../settings");
 const LV2 = require("./lv2");
-const { lv2ls, pluginInfo, grep, listAllPlugins } = require("./lv2");
 const store = require("./store");
 const program = blessed.program();
 const screen = blessed.screen({

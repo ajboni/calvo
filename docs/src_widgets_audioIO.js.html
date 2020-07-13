@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="utf-8">
+    <title>src/widgets/audioIO.js - Documentation</title>
+    
+    
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+    <script src="scripts/nav.js" defer></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav >
+    
+    <input type="text" id="nav-search" placeholder="Search" />
+    
+    <h2><a href="index.html">Home</a></h2><h2><a href="https://github.com/ajboni/calvo" target="_blank" class="menu-item" id="website_link" >Project Website</a></h2><h3>Modules</h3><ul><li><a href="module-app.html">app</a></li><li><a href="module-jack_client.html">jack_client</a><ul class='methods'><li data-type='method'><a href="module-jack_client.html#~init">init</a></li><li data-type='method'><a href="module-jack_client.html#~poll">poll</a></li><li data-type='method'><a href="module-jack_client.html#~queryJack">queryJack</a></li></ul></li><li><a href="module-lv2.html">lv2</a><ul class='methods'><li data-type='method'><a href="module-lv2.html#~buildPluginCache">buildPluginCache</a></li><li data-type='method'><a href="module-lv2.html#~getPluginByName">getPluginByName</a></li><li data-type='method'><a href="module-lv2.html#~grep">grep</a></li><li data-type='method'><a href="module-lv2.html#~init">init</a></li><li data-type='method'><a href="module-lv2.html#~pluginInfo">pluginInfo</a></li></ul></li><li><a href="module-settings.html">settings</a></li></ul><h3>Global</h3><ul><li><a href="global.html#connectAll">connectAll</a></li><li><a href="global.html#connectLastToMasterOutputs">connectLastToMasterOutputs</a></li><li><a href="global.html#connectPlugins">connectPlugins</a></li><li><a href="global.html#disconnectAll">disconnectAll</a></li><li><a href="global.html#getJackStatus">getJackStatus</a></li><li><a href="global.html#kill_plugin">kill_plugin</a></li><li><a href="global.html#make">make</a></li><li><a href="global.html#processConnections">processConnections</a></li><li><a href="global.html#reconectAll">reconectAll</a></li><li><a href="global.html#removePluginAt">removePluginAt</a></li><li><a href="global.html#setAudioSource">setAudioSource</a></li><li><a href="global.html#setAudioSourceMode">setAudioSourceMode</a></li><li><a href="global.html#setCurrentPage">setCurrentPage</a></li><li><a href="global.html#setSelectedPluginIndex">setSelectedPluginIndex</a></li><li><a href="global.html#spawn_plugin">spawn_plugin</a></li><li><a href="global.html#stringToTrimmedArray">stringToTrimmedArray</a></li><li><a href="global.html#write">write</a></li></ul>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">src/widgets/audioIO.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>const blessed = require("blessed");
+const contrib = require("blessed-contrib");
+const PubSub = require("pubsub-js");
+const store = require("../store");
+
+/**
+ *
+ * @param {*} grid
+ * @param {*} x
+ * @param {*} y
+ * @param {*} xSpan
+ * @param {*} ySpan
+ * @param {*} mode Mode should be input or output
+ * @returns Returns the newly generated widget.
+ */
+function make(grid, x, y, xSpan, ySpan, mode) {
+  const ioWidget = grid.set(y, x, ySpan, xSpan, blessed.box, {
+    label: mode.toUpperCase(),
+    mouse: true,
+    interactive: true,
+    keys: true,
+    padding: { left: 1, right: 1 },
+    scrollable: true,
+    style: {
+      selected: {
+        bg: "#4d5e4d",
+        fg: "#f0f0f0",
+        bold: true,
+      },
+      focus: {
+        border: { fg: "red" },
+        enabled: false,
+        selected: {
+          bg: "#689d6a",
+          fg: "#f0f0f0",
+          bold: true,
+        },
+      },
+    },
+  });
+
+  const sources =
+    mode === "input"
+      ? store.getJackStatus().PORTS.audio.capture
+      : store.getJackStatus().PORTS.audio.playback;
+
+  const monoCheckbox = blessed.checkbox({ text: "Mono " + mode, top: 1 });
+
+  //   	LEFT CHANNEL SELECTOR
+  const leftChannelBox = blessed.box({
+    width: "45%",
+    left: 0,
+    top: 3,
+  });
+
+  const lRadioSet = blessed.radioset({ label: "LEFT" });
+
+  for (let index = 0; index &lt; sources.length; index++) {
+    const element = sources[index];
+    const radio = blessed.radiobutton({ content: element, top: index + 2 });
+    if (element === store.getJackStatus().CONNECTIONS[mode + "Left"]) {
+      radio.checked = true;
+    }
+    radio.on("check", () => {
+      store.setAudioSource(mode, "left", element);
+    });
+    lRadioSet.append(radio);
+  }
+  leftChannelBox.append(lRadioSet);
+
+  //   RIGHT CHANNEL SELECTOR
+  const rightChannelBox = blessed.box({
+    width: "45%",
+    left: "50%",
+    top: 3,
+  });
+
+  const rRadioSet = blessed.radioset({ label: "RIGHT" });
+
+  for (let index = 0; index &lt; sources.length; index++) {
+    const element = sources[index];
+    const radio = blessed.radiobutton({ content: element, top: index + 2 });
+    if (element === store.getJackStatus().CONNECTIONS[mode + "Right"]) {
+      radio.checked = true;
+    }
+    radio.on("check", () => {
+      store.setAudioSource(mode, "right", element);
+    });
+    rRadioSet.append(radio);
+  }
+  rightChannelBox.append(rRadioSet);
+  rightChannelBox.hidden =
+    store.getJackStatus().CONNECTIONS[mode + "Mode"] === "mono";
+
+  //  EVENTS
+  monoCheckbox.on("check", () => store.setAudioSourceMode(mode, "mono"));
+  monoCheckbox.on("uncheck", () => store.setAudioSourceMode(mode, "stereo"));
+
+  ioWidget.append(monoCheckbox);
+  ioWidget.append(leftChannelBox);
+  ioWidget.append(rightChannelBox);
+
+  var token = PubSub.subscribe("jack", (m, j) =>
+    update(m, j, mode, rightChannelBox)
+  );
+
+  store.getJackStatus().CONNECTIONS[mode + "Mode"] === "mono"
+    ? (monoCheckbox.checked = true)
+    : (monoCheckbox.checked = false);
+
+  return ioWidget;
+}
+
+function update(msg, jackStatus, mode, rightChannelBox) {
+  if (jackStatus.CONNECTIONS[mode + "Mode"] === "mono") rightChannelBox.hide();
+  else rightChannelBox.show();
+}
+
+exports.make = make;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+    
+    
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.4</a> on Mon Jul 13 2020 00:41:17 GMT-0300 (Argentina Standard Time) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/polyfill.js"></script>
+<script src="scripts/linenumber.js"></script>
+
+<script src="scripts/search.js" defer></script>
+
+
+
+    <link type="text/css" rel="stylesheet" href="./docs-style.css">
+    
+</body>
+</html>

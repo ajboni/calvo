@@ -1,24 +1,27 @@
 {
-  "name": "mod-ui-cli",
+  "name": "calvo",
   "version": "1.0.0",
-  "description": "A CLI mod host client to load and stack LV2 plugins.",
+  "description": "A jalv based lv2 plugin host for your terminal.",
   "main": "index.js",
   "scripts": {
     "start": "node src/app.js",
     "start-t": "node --trace-warnings src/app.js",
     "dev": "nodemon --no-stdin app.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "document": "node_modules/.bin/jsdoc -c ./jsdoc.json",
+    "doc-status": "TODO"
   },
   "author": "",
   "license": "AGPL-3.0-or-later",
   "devDependencies": {
+    "docdash": "^1.2.0",
+    "jsdoc": "^3.6.4",
     "nodemon": "^2.0.4",
     "prettier": "^2.0.5"
   },
   "dependencies": {
     "blessed": "^0.1.81",
     "blessed-contrib": "^4.8.20",
-    "get-port": "^5.1.1",
     "pubsub-js": "^1.8.0"
   }
 }

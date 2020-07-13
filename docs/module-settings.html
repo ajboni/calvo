@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="utf-8">
+    <title>settings - Documentation</title>
+    
+    
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+    <script src="scripts/nav.js" defer></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav >
+    
+    <input type="text" id="nav-search" placeholder="Search" />
+    
+    <h2><a href="index.html">Home</a></h2><h2><a href="https://github.com/ajboni/calvo" target="_blank" class="menu-item" id="website_link" >Project Website</a></h2><h3>Modules</h3><ul><li><a href="module-app.html">app</a></li><li><a href="module-jack_client.html">jack_client</a><ul class='methods'><li data-type='method'><a href="module-jack_client.html#~init">init</a></li><li data-type='method'><a href="module-jack_client.html#~poll">poll</a></li><li data-type='method'><a href="module-jack_client.html#~queryJack">queryJack</a></li></ul></li><li><a href="module-lv2.html">lv2</a><ul class='methods'><li data-type='method'><a href="module-lv2.html#~buildPluginCache">buildPluginCache</a></li><li data-type='method'><a href="module-lv2.html#~getPluginByName">getPluginByName</a></li><li data-type='method'><a href="module-lv2.html#~grep">grep</a></li><li data-type='method'><a href="module-lv2.html#~init">init</a></li><li data-type='method'><a href="module-lv2.html#~pluginInfo">pluginInfo</a></li></ul></li><li><a href="module-settings.html">settings</a></li></ul><h3>Global</h3><ul><li><a href="global.html#connectAll">connectAll</a></li><li><a href="global.html#connectLastToMasterOutputs">connectLastToMasterOutputs</a></li><li><a href="global.html#connectPlugins">connectPlugins</a></li><li><a href="global.html#disconnectAll">disconnectAll</a></li><li><a href="global.html#getJackStatus">getJackStatus</a></li><li><a href="global.html#kill_plugin">kill_plugin</a></li><li><a href="global.html#make">make</a></li><li><a href="global.html#processConnections">processConnections</a></li><li><a href="global.html#reconectAll">reconectAll</a></li><li><a href="global.html#removePluginAt">removePluginAt</a></li><li><a href="global.html#setAudioSource">setAudioSource</a></li><li><a href="global.html#setAudioSourceMode">setAudioSourceMode</a></li><li><a href="global.html#setCurrentPage">setCurrentPage</a></li><li><a href="global.html#setSelectedPluginIndex">setSelectedPluginIndex</a></li><li><a href="global.html#spawn_plugin">spawn_plugin</a></li><li><a href="global.html#stringToTrimmedArray">stringToTrimmedArray</a></li><li><a href="global.html#write">write</a></li></ul>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">settings</h1>
+    
+
+    
+
+
+
+
+<section>
+
+<header>
+    
+        
+            
+        
+    
+</header>
+
+<article>
+    
+        <div class="container-overview">
+        
+            
+                <div class="description usertext">User configurable settings to alter how the app works.</div>
+            
+
+            
+                
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="settings.js.html">settings.js</a>, <a href="settings.js.html#line1">line 1</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            
+        
+        </div>
+    
+
+    
+
+    
+
+    
+    
+    
+
+     
+
+    
+
+    
+        <h3 class="subsection-title">Members</h3>
+
+        
+            
+<h4 class="name" id="~settings"><span class="type-signature">(inner, constant) </span>settings<span class="type-signature"></span></h4>
+
+
+
+
+
+<dl class="details">
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="settings.js.html">settings.js</a>, <a href="settings.js.html#line7">line 7</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+    <h5 class="subsection-title">Properties:</h5>
+
+    
+
+<table class="props">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>UI_UPDATE_RATE</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Time in ms in which the UI refresh</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>JACK_POLLING_RATE</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Time in ms in which we query JACK server for statistics.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>LV2_PLUGINS_FOLDER</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Location where to scan folders.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>SCAN_PLUGINS</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">boolean</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">If false, it will not scan for plugins on startup (use with caution).</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>SCROLL_AMMOUNT</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Ammount to scroll when using page up or page dow keys.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>DEFAULT_INPUT_MODE</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">"mono"</span>
+|
+
+<span class="param-type">"stereo"</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Define what the default input mode will be.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>DEFAULT_INPUT_L</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Define what the default left input port mode will be. (jack port name: ex: system:capture_1</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>DEFAULT_INPUT_R</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Define what the default right input port mode will be. (jack port name: ex: system:capture_1</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>DEFAULT_OUTPUT_MODE</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">"mono"</span>
+|
+
+<span class="param-type">"stereo"</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Define what the default input mode will be.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>DEFAULT_OUTPUT_L</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Left Channel for the master output. Last plug	in will connect to this.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>DEFAULT_OUTPUT_R</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">string</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Right Channel for the master output. Last plugin will connect to this.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+    
+
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+    
+    
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.4</a> on Mon Jul 13 2020 00:41:17 GMT-0300 (Argentina Standard Time) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/polyfill.js"></script>
+<script src="scripts/linenumber.js"></script>
+
+<script src="scripts/search.js" defer></script>
+
+
+
+    <link type="text/css" rel="stylesheet" href="./docs-style.css">
+    
+</body>
+</html>

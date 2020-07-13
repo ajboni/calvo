@@ -3,10 +3,6 @@ const contrib = require("blessed-contrib");
 const PubSub = require("pubsub-js");
 const store = require("../store");
 
-// var ioWidget = {};
-// var monoCheckbox = {};
-// var leftChannelBox, rightChannelBox;
-
 /**
  *
  * @param {*} grid
@@ -15,7 +11,7 @@ const store = require("../store");
  * @param {*} xSpan
  * @param {*} ySpan
  * @param {*} mode Mode should be input or output
- * @returns
+ * @returns Returns the newly generated widget.
  */
 function make(grid, x, y, xSpan, ySpan, mode) {
   const ioWidget = grid.set(y, x, ySpan, xSpan, blessed.box, {

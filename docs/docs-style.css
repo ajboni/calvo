@@ -1,0 +1,31 @@
+nav,
+body {
+  background-color: #343131;
+}
+
+#main {
+  background-color: #fcfcfc;
+  min-height: calc(100vh - 50px);
+}
+nav h1,
+nav h2,
+nav h3,
+nav h4,
+nav a,
+nav a:hover,
+nav ul,
+nav > ul > li > a,
+nav > h2 > a {
+  color: white !important;
+  font-size: 14px;
+}
+
+nav ul a {
+  font-size: 13px;
+}
+
+footer {
+  background-color: #272525;
+  color: #c5c1c1;
+  height: 50px;
+}

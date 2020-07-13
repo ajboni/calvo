@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    
+    <meta charset="utf-8">
+    <title>src/store.js - Documentation</title>
+    
+    
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
+    <script src="scripts/nav.js" defer></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav >
+    
+    <input type="text" id="nav-search" placeholder="Search" />
+    
+    <h2><a href="index.html">Home</a></h2><h2><a href="https://github.com/ajboni/calvo" target="_blank" class="menu-item" id="website_link" >Project Website</a></h2><h3>Modules</h3><ul><li><a href="module-app.html">app</a></li><li><a href="module-jack_client.html">jack_client</a><ul class='methods'><li data-type='method'><a href="module-jack_client.html#~init">init</a></li><li data-type='method'><a href="module-jack_client.html#~poll">poll</a></li><li data-type='method'><a href="module-jack_client.html#~queryJack">queryJack</a></li></ul></li><li><a href="module-lv2.html">lv2</a><ul class='methods'><li data-type='method'><a href="module-lv2.html#~buildPluginCache">buildPluginCache</a></li><li data-type='method'><a href="module-lv2.html#~getPluginByName">getPluginByName</a></li><li data-type='method'><a href="module-lv2.html#~grep">grep</a></li><li data-type='method'><a href="module-lv2.html#~init">init</a></li><li data-type='method'><a href="module-lv2.html#~pluginInfo">pluginInfo</a></li></ul></li><li><a href="module-settings.html">settings</a></li></ul><h3>Global</h3><ul><li><a href="global.html#connectAll">connectAll</a></li><li><a href="global.html#connectLastToMasterOutputs">connectLastToMasterOutputs</a></li><li><a href="global.html#connectPlugins">connectPlugins</a></li><li><a href="global.html#disconnectAll">disconnectAll</a></li><li><a href="global.html#getJackStatus">getJackStatus</a></li><li><a href="global.html#kill_plugin">kill_plugin</a></li><li><a href="global.html#make">make</a></li><li><a href="global.html#processConnections">processConnections</a></li><li><a href="global.html#reconectAll">reconectAll</a></li><li><a href="global.html#removePluginAt">removePluginAt</a></li><li><a href="global.html#setAudioSource">setAudioSource</a></li><li><a href="global.html#setAudioSourceMode">setAudioSourceMode</a></li><li><a href="global.html#setCurrentPage">setCurrentPage</a></li><li><a href="global.html#setSelectedPluginIndex">setSelectedPluginIndex</a></li><li><a href="global.html#spawn_plugin">spawn_plugin</a></li><li><a href="global.html#stringToTrimmedArray">stringToTrimmedArray</a></li><li><a href="global.html#write">write</a></li></ul>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">src/store.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>const fs = require("fs");
+const path = require("path");
+const Layout = require("./layout");
+const Lv2 = require("./lv2");
+const { pluginInfo } = require("./lv2");
+const PubSub = require("pubsub-js");
+const { settings } = require("../settings");
+const Jalv = require("./jalv");
+
+function notifySubscribers(topic, data) {
+  PubSub.publish(topic, data);
+}
+
+const app = {
+  INITIALIZED: false,
+  CURRENT_PAGE: 0,
+};
+
+const jack = {
+  JACK_STATUS: {
+    status: "---",
+    cpu_load: 0,
+    block_size: 0,
+    realtime: true,
+    sample_rate: 0,
+  },
+  TRANSPORT_STATUS: {
+    state: "stopped",
+    cpu_load: 1.2,
+    bar: 5,
+    bar_start_tick: 30720.0,
+    beat: 4,
+    beat_type: 4.0,
+    beats_per_bar: 4.0,
+    beats_per_minute: 120.0,
+    frame: 430592,
+    frame_rate: 44,
+    tick: 1014,
+    ticks_per_beat: 1920.0,
+    usecs: 15881132220,
+  },
+  PORTS: {
+    all: [],
+    audio: {
+      playback: [],
+      capture: [],
+    },
+    midi: {
+      playback: [],
+      capture: [],
+    },
+  },
+  CONNECTIONS: {
+    inputMode: settings.DEFAULT_INPUT_MODE,
+    inputLeft: settings.DEFAULT_INPUT_L,
+    inputRight: settings.DEFAULT_INPUT_R,
+    outputMode: settings.DEFAULT_OUTPUT_MODE,
+    outputLeft: settings.DEFAULT_OUTPUT_L,
+    outputRight: settings.DEFAULT_OUTPUT_R,
+  },
+};
+
+/**
+ * Sets the current Carrousel Page
+ *
+ */
+function setCurrentPage(pageNumber) {
+  app.CURRENT_PAGE = pageNumber;
+  notifySubscribers("app", app);
+}
+
+function setJackStatus(
+  jackStatus = jack.JACK_STATUS,
+  transport_status = jack.TRANSPORT_STATUS,
+  ports = jack.PORTS,
+  connections = jack.CONNECTIONS
+) {
+  jack.JACK_STATUS = jackStatus;
+  jack.TRANSPORT_STATUS = transport_status;
+  jack.PORTS = ports;
+  jack.CONNECTIONS = connections;
+  notifySubscribers("jack", jack);
+}
+
+/**
+ * Disconnects and reconnects every plugin;
+ *
+ */
+function reconectAll() {
+  //   disconnectAll();
+  connectAll();
+}
+
+/**
+ * Disconnects all plugin outputs
+ *
+ */
+function disconnectAll() {
+  // If RACK is empty just disconnect input from output.
+  if (rack.length &lt;= 0) {
+    return;
+  }
+}
+
+/**
+ * Process connections for each plugin.
+ *
+ */
+function connectAll() {
+  // If RACK is empty just connect input to output.
+  if (rack.length &lt;= 0) {
+    return;
+  }
+}
+
+/**
+ * Sets an audio source for a specific channel. It will trigger a total reconnection.
+ *
+ * @param {*} mode Mode should be input or output
+ * @param {*} channel 'left' or 'right'
+ * @param {*} name The name of the jack audio source.
+ */
+function setAudioSource(mode, channel, name) {
+  //   disconnectAll();
+
+  if (mode === "input") {
+    if (channel === "left") jack.CONNECTIONS.inputLeft = name;
+    if (channel === "right") jack.CONNECTIONS.inputRight = name;
+  }
+
+  if (mode === "output") {
+    if (channel === "left") jack.CONNECTIONS.outputLeft = name;
+    if (channel === "right") jack.CONNECTIONS.outputRight = name;
+  }
+  notifySubscribers("jack", jack);
+  Layout.wlog(jack.CONNECTIONS.inputLeft);
+  Layout.wlog(jack.CONNECTIONS.inputRight);
+  //   connectAll();
+}
+
+/**
+ * Set Input/Output mode to mono or stereo.
+ * This will trigger a complete reconnection of all plugins
+ *
+ * @param {*} direction 'input | output
+ * @param {*} mode mono | stereo
+ */
+function setAudioSourceMode(direction, mode) {
+  // TODO: If mode is input disconnect input with first plugin.
+  // If its output disconnect last plugin with outputs.
+  // After the modification reconnect.
+
+  jack.CONNECTIONS[direction + "Mode"] = mode;
+  notifySubscribers("jack", jack);
+  //   connectAll();
+
+  // TODO: RESET CONNECTIONS
+}
+
+/**
+ *
+ * @returns Returns JACK state
+ */
+function getJackStatus() {
+  return jack;
+}
+
+const pluginCatalog = [];
+const filteredPluginCatalog = [];
+const pluginCategories = ["(All)"];
+const rack = [];
+let selectedPlugin = {};
+let instanceNumber = 0;
+
+function getSelectedPlugin() {
+  return selectedPlugin;
+}
+
+function addPluginToRack(pluginName) {
+  try {
+    const p = Lv2.getPluginByName(pluginName);
+    const plugin = pluginInfo(p.uri);
+
+    plugin.info = {
+      instanceNumber: instanceNumber,
+      bypass: false,
+    };
+
+    plugin.process = Jalv.spawn_plugin(p.uri, rack.length);
+
+    instanceNumber++;
+    rack.push(plugin);
+
+    // TODO: Connect to previous, disconnect previous from master.
+    if (rack.length === 1) {
+      //   ModHostClient.connectPlugins("input", plugin);
+    } else {
+      //   ModHostClient.disconnectPlugins(rack[rack.length - 2], "output");
+    }
+
+    // ModHostClient.connectPlugins(plugin, "output");
+
+    notifySubscribers("rack", rack);
+    Layout.wlog(`Added ${plugin.name} to rack. (#${rack.length - 1})`);
+  } catch (error) {
+    Layout.wlogError(`Error adding plugin to rack: ${error}`);
+  }
+}
+
+/**
+ * Removes a plugin according to the index on the rack.
+ *
+ * @param {*} index Rack Index
+ */
+function removePluginAt(index) {
+  const plugin = rack[index];
+  rack.splice(index, 1);
+  Layout.wlog(`Remove plugin #${index} - ${plugin.name}`);
+
+  Jalv.kill_plugin(plugin.process, index);
+
+  //   plugin.info.process.disconnect();
+  if (selectedPlugin.uri === plugin.uri) {
+    selectedPlugin = null;
+    notifySubscribers("selectedPlugin", selectedPlugin);
+  }
+  notifySubscribers("rack", rack);
+
+  // TODO: Disconnect.
+}
+
+/**
+ * Sets the plugin that will be focused to edit.
+ *
+ * @param {*} pluginName
+ */
+function setSelectedPluginIndex(pluginName, index) {
+  selectedPlugin = rack[index];
+  notifySubscribers("selectedPlugin", selectedPlugin);
+}
+
+/**
+ * This function will process
+ *
+ */
+function processConnections() {}
+
+/**
+ * This function will force connection between 2 plugins. If one of them is mono, adjust as necesary
+ *
+ * @param {*} src
+ * @param {*} dst
+ */
+function connectPlugins(src, dst) {}
+
+/**
+ * Connect ONLY last plugin to master output(s). If one of them is mono, adjust as necesary.
+ *
+ */
+function connectLastToMasterOutputs() {}
+
+function setCategoryFilter(filter = "") {
+  if (pluginCategories.includes(filter) &amp;&amp; filter !== "(All)") {
+    filteredPluginCatalog.length = 0;
+    const filteredData = pluginCatalog.filter((plugin) =>
+      plugin.categories.includes(filter)
+    );
+    filteredPluginCatalog.length = 0;
+    filteredPluginCatalog.push(...filteredData);
+    Layout.renderScreen();
+  } else {
+    filteredPluginCatalog.length = 0;
+    filteredPluginCatalog.push(...pluginCatalog);
+    Layout.renderScreen();
+  }
+
+  if (app.INITIALIZED) {
+    notifySubscribers("filteredPluginCatalog", filteredPluginCatalog);
+  }
+}
+
+function saveCache(directoryPath = __dirname) {
+  Layout.wlog("Saving cache...");
+  try {
+    if (fs.existsSync(path.join(directoryPath, `pluginCatalog.json`))) {
+      fs.unlinkSync(path.join(directoryPath, `pluginCatalog.json`));
+    }
+    if (fs.existsSync(path.join(directoryPath, `pluginCatalog.json`))) {
+      fs.unlinkSync(path.join(directoryPath, `pluginCategories.json`));
+    }
+
+    const stringifiedData = JSON.stringify(pluginCatalog);
+    fs.writeFileSync(
+      path.join(directoryPath, `pluginCatalog.json`),
+      stringifiedData
+    );
+    const categories = ["(All)"];
+    pluginCatalog.map((item) => {
+      const cats = item.categories;
+      cats.forEach((cat) => {
+        if (!categories.includes(cat)) {
+          categories.push(cat);
+        }
+      });
+    });
+
+    pluginCategories.length = 0;
+    pluginCategories.push(...categories);
+
+    fs.writeFileSync(
+      path.join(directoryPath, `pluginCategories.json`),
+      JSON.stringify(categories.sort())
+    );
+
+    Layout.wlog("Cache Saved.");
+  } catch (error) {
+    Layout.wlog(error);
+  }
+}
+
+function loadCache(directoryPath = __dirname) {
+  const filePath = path.join(directoryPath, `pluginCatalog.json`);
+  if (fs.existsSync(filePath)) {
+    const jsonData = fs.readFileSync(filePath, "utf8");
+    const data = JSON.parse(jsonData);
+    pluginCatalog.length = 0;
+    pluginCatalog.push(...data);
+  }
+
+  const catPath = path.join(directoryPath, `pluginCategories.json`);
+  if (fs.existsSync(catPath)) {
+    const catData = fs.readFileSync(catPath, "utf8");
+    pluginCategories.length = 0;
+    pluginCategories.push(...JSON.parse(catData));
+  }
+}
+
+exports.pluginCatalog = pluginCatalog;
+exports.pluginCategories = pluginCategories;
+exports.setJackStatus = setJackStatus;
+exports.getJackStatus = getJackStatus;
+exports.saveCache = saveCache;
+exports.loadCache = loadCache;
+exports.app = app;
+exports.setCategoryFilter = setCategoryFilter;
+exports.filteredPluginCatalog = filteredPluginCatalog;
+exports.setSelectedPluginIndex = setSelectedPluginIndex;
+exports.addPluginToRack = addPluginToRack;
+exports.rack = rack;
+exports.removePluginAt = removePluginAt;
+exports.getSelectedPlugin = getSelectedPlugin;
+exports.notifySubscribers = notifySubscribers;
+exports.setCurrentPage = setCurrentPage;
+exports.setAudioSource = setAudioSource;
+exports.setAudioSourceMode = setAudioSourceMode;
+exports.reconectAll = reconectAll;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+    
+    
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.4</a> on Mon Jul 13 2020 00:41:17 GMT-0300 (Argentina Standard Time) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/polyfill.js"></script>
+<script src="scripts/linenumber.js"></script>
+
+<script src="scripts/search.js" defer></script>
+
+
+
+    <link type="text/css" rel="stylesheet" href="./docs-style.css">
+    
+</body>
+</html>

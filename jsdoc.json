@@ -1,0 +1,30 @@
+{
+  "opts": {
+    "template": "node_modules/docdash",
+    "destination": "./docs/",
+    "recurse": true,
+    "verbose": true
+  },
+  "source": {
+    "include": ["./src/", "./README.md", "./settings.js"]
+  },
+  "docdash": {
+    "search": true,
+    "scripts": ["./docs-style.css"],
+    "menu": {
+      "Project Website": {
+        "href": "https://github.com/ajboni/calvo",
+        "target": "_blank",
+        "class": "menu-item",
+        "id": "website_link"
+      }
+    }
+  },
+  "templates": {
+    "default": {
+      "staticFiles": {
+        "include": ["./static"]
+      }
+    }
+  }
+}
