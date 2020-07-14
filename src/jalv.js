@@ -12,21 +12,22 @@ const { writeFile } = require("fs");
 /**
  * Spawns a plugin. It will execute jalv and load the plugin. ALl communcations can be reachead via the process now at plugin.process
  *
- * @param {*} uri
+ * @param {plugin} plugin
  * @param {*} rackIndex
  * @returns The nodejs child process.
  */
-function spawn_plugin(uri, rackIndex) {
+function spawn_plugin(plugin, rackIndex) {
   // We need to loose the buffer to get a fast response:
   // https://gitlab.com/drobilla/jalv/-/issues/7
   const process = spawn("stdbuf", [
     "-oL",
     "-eL",
     "jalv",
-    "-d",
     "-p",
     "-t",
-    uri,
+    "-n",
+    `calvo_${plugin.info.instanceNumber}`,
+    plugin.uri,
   ]);
   process.stdout.setEncoding("utf8");
   process.stdin.setEncoding("utf8");
@@ -74,6 +75,8 @@ function kill_plugin(process, rackIndex) {
 function write(process, msg) {
   process.stdin.write(msg + "\n");
 }
+
+function connectPlugins(src, dst) {}
 
 exports.spawn_plugin = spawn_plugin;
 exports.kill_plugin = kill_plugin;

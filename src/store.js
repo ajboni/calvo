@@ -91,6 +91,7 @@ const jack = {
 function setCurrentPage(pageNumber) {
   app.CURRENT_PAGE = pageNumber;
   notifySubscribers("app", app);
+  notifySubscribers("jack", jack);
   //   // Also notify rack so it can display it again.
   //   notifySubscribers("rack", rack);
 }
@@ -157,8 +158,6 @@ function connectAll() {
  * @param {*} name The name of the jack audio source.
  */
 function setAudioSource(mode, channel, name) {
-  //   disconnectAll();
-
   if (mode === "input") {
     if (channel === "left") jack.CONNECTIONS.inputLeft = name;
     if (channel === "right") jack.CONNECTIONS.inputRight = name;
@@ -228,7 +227,7 @@ function addPluginToRack(pluginName) {
       bypass: false,
     };
 
-    plugin.process = Jalv.spawn_plugin(p.uri, rack.length);
+    plugin.process = Jalv.spawn_plugin(plugin, rack.length);
 
     instanceNumber++;
     rack.push(plugin);
