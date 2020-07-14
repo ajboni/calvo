@@ -46,7 +46,7 @@ function updateStatus() {
 function queryJack() {
   const cp = require("child_process");
   const status = cp.execSync(
-    "python3 ./py/jack-audio-tools/jack/client.py -c mod-host-cli-poll query",
+    "python3 ./py/jack-audio-tools/jack/client.py -c calvo-poll query",
     { encoding: "utf8" }
   );
   return JSON.parse(status);
@@ -60,7 +60,7 @@ function queryJack() {
 function queryTransport() {
   const cp = require("child_process");
   const status = cp.execSync(
-    `python3 ./py/jack-audio-tools/jack/transporter.py -c mod-host-cli-poll query`,
+    `python3 ./py/jack-audio-tools/jack/transporter.py -c calvo-poll query`,
     { encoding: "utf8" }
   );
   return JSON.parse(status);
@@ -78,7 +78,7 @@ function setTransportStatus(status) {
 function getAvailableJackPorts() {
   const cp = require("child_process");
   const info = cp.execSync(
-    `python3 ./py/jack-audio-tools/jack/client.py -c mod-host-cli-poll port-info`,
+    `python3 ./py/jack-audio-tools/jack/client.py -c calvo-poll port-info`,
     { encoding: "utf8" }
   );
   return JSON.parse(info);
