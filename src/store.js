@@ -13,6 +13,7 @@ const { settings } = require("../settings");
 const Jalv = require("./jalv");
 const Jack = require("./jack_client");
 const Nanoid = require("nanoid");
+const string_utils = require("./string_utils");
 const nanoid = Nanoid.customAlphabet(
   "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz",
   4
@@ -232,6 +233,7 @@ async function addPluginToRack(pluginName) {
     plugin.info = {
       instanceNumber: instanceNumber,
       bypass: false,
+      safeName: string_utils.safe(pluginName),
     };
 
     plugin.process = await Jalv.spawn_plugin(plugin, rack.length);

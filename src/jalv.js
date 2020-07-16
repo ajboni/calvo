@@ -27,7 +27,7 @@ async function spawn_plugin(plugin, rackIndex) {
     "-p",
     "-t",
     "-n",
-    `calvo_${store.app.APP_ID}_${plugin.info.instanceNumber}`,
+    `calvo_${store.app.APP_ID}_${plugin.info.instanceNumber}_${plugin.info.safeName}`,
     plugin.uri,
   ]);
   process.stdout.setEncoding("utf8");

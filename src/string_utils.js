@@ -24,5 +24,17 @@ function stringToTrimmedArray(str) {
   return arr;
 }
 
+/**
+ * Convert a string to a "safe" only letters string.
+ *
+ * @param {string} str String to convert
+ * @returns A-Za-z
+ */
+function safe(str) {
+  s = str.replace(/[^A-Za-z]/g, "");
+  return s;
+}
+
 exports.removeNewLines = removeNewLines;
 exports.stringToTrimmedArray = stringToTrimmedArray;
+exports.safe = safe;

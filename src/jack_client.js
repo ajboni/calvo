@@ -137,10 +137,10 @@ function connectPlugins(src, dst, disconnect = false) {
     }
 
     const dstMode = dst.ports.audio.input.length === 1 ? "mono" : "stereo";
-    const dl = `${instanceName}_${dst.info.instanceNumber}:${dst.ports.audio.input[0].symbol}`;
+    const dl = `${instanceName}_${dst.info.instanceNumber}_${dst.info.safeName}:${dst.ports.audio.input[0].symbol}`;
     const dr =
       dstMode === "stereo"
-        ? `${instanceName}_${dst.info.instanceNumber}:${dst.ports.audio.input[1].symbol}`
+        ? `${instanceName}_${dst.info.instanceNumber}_${dst.info.safeName}:${dst.ports.audio.input[1].symbol}`
         : "";
 
     if (im === "mono" && dstMode === "mono") {
@@ -166,10 +166,10 @@ function connectPlugins(src, dst, disconnect = false) {
       return;
     }
     const srcMode = src.ports.audio.output.length === 1 ? "mono" : "stereo";
-    const sl = `${instanceName}_${src.info.instanceNumber}:${src.ports.audio.output[0].symbol}`;
+    const sl = `${instanceName}_${src.info.instanceNumber}_${src.info.safeName}:${src.ports.audio.output[0].symbol}`;
     const sr =
       srcMode === "stereo"
-        ? `${instanceName}_${src.info.instanceNumber}:${src.ports.audio.output[1].symbol}`
+        ? `${instanceName}_${src.info.instanceNumber}_${src.info.safeName}:${src.ports.audio.output[1].symbol}`
         : "";
 
     if (srcMode === "mono" && om === "mono") {
@@ -202,17 +202,17 @@ function connectPlugins(src, dst, disconnect = false) {
     }
 
     const srcMode = src.ports.audio.output.length === 1 ? "mono" : "stereo";
-    const sl = `${instanceName}_${src.info.instanceNumber}:${src.ports.audio.output[0].symbol}`;
+    const sl = `${instanceName}_${src.info.instanceNumber}_${src.info.safeName}:${src.ports.audio.output[0].symbol}`;
     const sr =
       srcMode === "stereo"
-        ? `${instanceName}_${src.info.instanceNumber}:${src.ports.audio.output[1].symbol}`
+        ? `${instanceName}_${src.info.instanceNumber}_${src.info.safeName}:${src.ports.audio.output[1].symbol}`
         : "";
 
     const dstMode = dst.ports.audio.input.length === 1 ? "mono" : "stereo";
-    const dl = `${instanceName}_${dst.info.instanceNumber}:${dst.ports.audio.input[0].symbol}`;
+    const dl = `${instanceName}_${dst.info.instanceNumber}_${dst.info.safeName}:${dst.ports.audio.input[0].symbol}`;
     const dr =
       dstMode === "stereo"
-        ? `${instanceName}_${dst.info.instanceNumber}:${dst.ports.audio.input[1].symbol}`
+        ? `${instanceName}_${dst.info.instanceNumber}_${dst.info.safeName}:${dst.ports.audio.input[1].symbol}`
         : "";
 
     if (srcMode === "mono" && dstMode === "mono") {
