@@ -1,220 +1,50 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8" />
+<head>
+    
+    <meta charset="utf-8">
     <title>src/jack_client.js - Documentation</title>
-
+    
+    
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
     <!--[if lt IE 9]>
       <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
-    <link type="text/css" rel="stylesheet" href="styles/prettify.css" />
-    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css" />
+    <link type="text/css" rel="stylesheet" href="styles/prettify.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc.css">
     <script src="scripts/nav.js" defer></script>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  </head>
-  <body>
-    <input type="checkbox" id="nav-trigger" class="nav-trigger" />
-    <label for="nav-trigger" class="navicon-button x">
-      <div class="navicon"></div>
-    </label>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
 
-    <label for="nav-trigger" class="overlay"></label>
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
 
-    <nav>
-      <input type="text" id="nav-search" placeholder="Search" />
+<label for="nav-trigger" class="overlay"></label>
 
-      <h2><a href="index.html">Home</a></h2>
-      <h2>
-        <a
-          href="https://github.com/ajboni/calvo"
-          target="_blank"
-          class="menu-item"
-          id="website_link"
-          >Project Website</a
-        >
-      </h2>
-      <h3>Modules</h3>
-      <ul>
-        <li><a href="module-app.html">app</a></li>
-        <li>
-          <a href="module-jack_client.html">jack_client</a>
-          <ul class="methods">
-            <li data-type="method">
-              <a href="module-jack_client.html#~getAvailableJackPorts"
-                >getAvailableJackPorts</a
-              >
-            </li>
-            <li data-type="method">
-              <a href="module-jack_client.html#~init">init</a>
-            </li>
-            <li data-type="method">
-              <a href="module-jack_client.html#~poll">poll</a>
-            </li>
-            <li data-type="method">
-              <a href="module-jack_client.html#~queryJack">queryJack</a>
-            </li>
-            <li data-type="method">
-              <a href="module-jack_client.html#~queryTransport"
-                >queryTransport</a
-              >
-            </li>
-          </ul>
-        </li>
-        <li>
-          <a href="module-jalv.html">jalv</a>
-          <ul class="methods">
-            <li data-type="method">
-              <a href="module-jalv.html#~kill_plugin">kill_plugin</a>
-            </li>
-            <li data-type="method">
-              <a href="module-jalv.html#~spawn_plugin">spawn_plugin</a>
-            </li>
-            <li data-type="method">
-              <a href="module-jalv.html#~write">write</a>
-            </li>
-          </ul>
-        </li>
-        <li>
-          <a href="module-keyboard.html">keyboard</a>
-          <ul class="methods">
-            <li data-type="method">
-              <a href="module-keyboard.html#~registerKeyboardShortcuts"
-                >registerKeyboardShortcuts</a
-              >
-            </li>
-          </ul>
-        </li>
-        <li>
-          <a href="module-layout.html">layout</a>
-          <ul class="methods">
-            <li data-type="method">
-              <a href="module-layout.html#~focusNext">focusNext</a>
-            </li>
-            <li data-type="method">
-              <a href="module-layout.html#~focusPrev">focusPrev</a>
-            </li>
-            <li data-type="method">
-              <a href="module-layout.html#~renderScreen">renderScreen</a>
-            </li>
-            <li data-type="method">
-              <a href="module-layout.html#~setUpLayout">setUpLayout</a>
-            </li>
-            <li data-type="method">
-              <a href="module-layout.html#~wlog">wlog</a>
-            </li>
-            <li data-type="method">
-              <a href="module-layout.html#~wlogError">wlogError</a>
-            </li>
-          </ul>
-        </li>
-        <li>
-          <a href="module-lv2.html">lv2</a>
-          <ul class="methods">
-            <li data-type="method">
-              <a href="module-lv2.html#~buildPluginCache">buildPluginCache</a>
-            </li>
-            <li data-type="method">
-              <a href="module-lv2.html#~getPluginByName">getPluginByName</a>
-            </li>
-            <li data-type="method"><a href="module-lv2.html#~grep">grep</a></li>
-            <li data-type="method"><a href="module-lv2.html#~init">init</a></li>
-            <li data-type="method">
-              <a href="module-lv2.html#~pluginInfo">pluginInfo</a>
-            </li>
-          </ul>
-        </li>
-        <li><a href="module-settings.html">settings</a></li>
-        <li>
-          <a href="module-store.html">store</a>
-          <ul class="methods">
-            <li data-type="method">
-              <a href="module-store.html#~connectAll">connectAll</a>
-            </li>
-            <li data-type="method">
-              <a href="module-store.html#~connectLastToMasterOutputs"
-                >connectLastToMasterOutputs</a
-              >
-            </li>
-            <li data-type="method">
-              <a href="module-store.html#~connectPlugins">connectPlugins</a>
-            </li>
-            <li data-type="method">
-              <a href="module-store.html#~disconnectAll">disconnectAll</a>
-            </li>
-            <li data-type="method">
-              <a href="module-store.html#~getJackStatus">getJackStatus</a>
-            </li>
-            <li data-type="method">
-              <a href="module-store.html#~notifySubscribers"
-                >notifySubscribers</a
-              >
-            </li>
-            <li data-type="method">
-              <a href="module-store.html#~processConnections"
-                >processConnections</a
-              >
-            </li>
-            <li data-type="method">
-              <a href="module-store.html#~reconectAll">reconectAll</a>
-            </li>
-            <li data-type="method">
-              <a href="module-store.html#~removePluginAt">removePluginAt</a>
-            </li>
-            <li data-type="method">
-              <a href="module-store.html#~setAudioSource">setAudioSource</a>
-            </li>
-            <li data-type="method">
-              <a href="module-store.html#~setAudioSourceMode"
-                >setAudioSourceMode</a
-              >
-            </li>
-            <li data-type="method">
-              <a href="module-store.html#~setCurrentPage">setCurrentPage</a>
-            </li>
-            <li data-type="method">
-              <a href="module-store.html#~setJackStatus">setJackStatus</a>
-            </li>
-            <li data-type="method">
-              <a href="module-store.html#~setSelectedPluginIndex"
-                >setSelectedPluginIndex</a
-              >
-            </li>
-          </ul>
-        </li>
-        <li>
-          <a href="module-string_utils.html">string_utils</a>
-          <ul class="methods">
-            <li data-type="method">
-              <a href="module-string_utils.html#~removeNewLines"
-                >removeNewLines</a
-              >
-            </li>
-            <li data-type="method">
-              <a href="module-string_utils.html#~stringToTrimmedArray"
-                >stringToTrimmedArray</a
-              >
-            </li>
-          </ul>
-        </li>
-        <li>
-          <a href="module-widgets.html">widgets</a>
-          <ul class="methods">
-            <li data-type="method">
-              <a href="module-widgets.html#~makeaudioIO">make</a>
-            </li>
-          </ul>
-        </li>
-      </ul>
-    </nav>
+<nav >
+    
+    <input type="text" id="nav-search" placeholder="Search" />
+    
+    <h2><a href="index.html">Home</a></h2><h2><a href="https://github.com/ajboni/calvo" target="_blank" class="menu-item" id="website_link" >Project Website</a></h2><h3>Modules</h3><ul><li><a href="module-app.html">app</a></li><li><a href="module-jack_client.html">jack_client</a><ul class='methods'><li data-type='method'><a href="module-jack_client.html#~connectPlugins">connectPlugins</a></li><li data-type='method'><a href="module-jack_client.html#~connectPorts">connectPorts</a></li><li data-type='method'><a href="module-jack_client.html#~disconnectPlugins">disconnectPlugins</a></li><li data-type='method'><a href="module-jack_client.html#~getAvailableJackPorts">getAvailableJackPorts</a></li><li data-type='method'><a href="module-jack_client.html#~init">init</a></li><li data-type='method'><a href="module-jack_client.html#~poll">poll</a></li><li data-type='method'><a href="module-jack_client.html#~queryJack">queryJack</a></li><li data-type='method'><a href="module-jack_client.html#~queryTransport">queryTransport</a></li></ul></li><li><a href="module-jalv.html">jalv</a><ul class='methods'><li data-type='method'><a href="module-jalv.html#~kill_plugin">kill_plugin</a></li><li data-type='method'><a href="module-jalv.html#~spawn_plugin">spawn_plugin</a></li><li data-type='method'><a href="module-jalv.html#~write">write</a></li></ul></li><li><a href="module-keyboard.html">keyboard</a><ul class='methods'><li data-type='method'><a href="module-keyboard.html#~registerKeyboardShortcuts">registerKeyboardShortcuts</a></li></ul></li><li><a href="module-layout.html">layout</a><ul class='methods'><li data-type='method'><a href="module-layout.html#~focusNext">focusNext</a></li><li data-type='method'><a href="module-layout.html#~focusPrev">focusPrev</a></li><li data-type='method'><a href="module-layout.html#~renderScreen">renderScreen</a></li><li data-type='method'><a href="module-layout.html#~setUpLayout">setUpLayout</a></li><li data-type='method'><a href="module-layout.html#~wlog">wlog</a></li><li data-type='method'><a href="module-layout.html#~wlogError">wlogError</a></li></ul></li><li><a href="module-lv2.html">lv2</a><ul class='methods'><li data-type='method'><a href="module-lv2.html#~buildPluginCache">buildPluginCache</a></li><li data-type='method'><a href="module-lv2.html#~getPluginByName">getPluginByName</a></li><li data-type='method'><a href="module-lv2.html#~grep">grep</a></li><li data-type='method'><a href="module-lv2.html#~init">init</a></li><li data-type='method'><a href="module-lv2.html#~pluginInfo">pluginInfo</a></li></ul></li><li><a href="module-settings.html">settings</a></li><li><a href="module-store.html">store</a><ul class='methods'><li data-type='method'><a href="module-store.html#~addPluginToRack">addPluginToRack</a></li><li data-type='method'><a href="module-store.html#~connectAll">connectAll</a></li><li data-type='method'><a href="module-store.html#~connectLastToMasterOutputs">connectLastToMasterOutputs</a></li><li data-type='method'><a href="module-store.html#~connectPlugins">connectPlugins</a></li><li data-type='method'><a href="module-store.html#~disconnectAll">disconnectAll</a></li><li data-type='method'><a href="module-store.html#~getJackStatus">getJackStatus</a></li><li data-type='method'><a href="module-store.html#~notifySubscribers">notifySubscribers</a></li><li data-type='method'><a href="module-store.html#~processConnections">processConnections</a></li><li data-type='method'><a href="module-store.html#~reconectAll">reconectAll</a></li><li data-type='method'><a href="module-store.html#~removePluginAt">removePluginAt</a></li><li data-type='method'><a href="module-store.html#~setAudioSource">setAudioSource</a></li><li data-type='method'><a href="module-store.html#~setAudioSourceMode">setAudioSourceMode</a></li><li data-type='method'><a href="module-store.html#~setCurrentPage">setCurrentPage</a></li><li data-type='method'><a href="module-store.html#~setJackStatus">setJackStatus</a></li><li data-type='method'><a href="module-store.html#~setSelectedPluginIndex">setSelectedPluginIndex</a></li></ul></li><li><a href="module-string_utils.html">string_utils</a><ul class='methods'><li data-type='method'><a href="module-string_utils.html#~removeNewLines">removeNewLines</a></li><li data-type='method'><a href="module-string_utils.html#~safe">safe</a></li><li data-type='method'><a href="module-string_utils.html#~stringToTrimmedArray">stringToTrimmedArray</a></li></ul></li><li><a href="module-widgets.html">widgets</a><ul class='methods'><li data-type='method'><a href="module-widgets.html#~makeaudioIO">make</a></li></ul></li></ul>
+</nav>
 
-    <div id="main">
-      <h1 class="page-title">src/jack_client.js</h1>
+<div id="main">
+    
+    <h1 class="page-title">src/jack_client.js</h1>
+    
 
-      <section>
+    
+
+
+
+    
+    <section>
         <article>
-          <pre class="prettyprint source linenums"><code>/**
+            <pre class="prettyprint source linenums"><code>/**
  * Query JACK info and status. uses https://github.com/ajboni/jack-audio-tools
  * @module jack_client
  */
@@ -299,31 +129,196 @@ function getAvailableJackPorts() {
   );
   return JSON.parse(info);
 }
+
+/**
+ * connect &lt;origin_port> to &lt;destination_port>
+ * connect two jack ports together. Both ports must be same type.
+ * @param {string} src Origin port: Must be an output port.
+ * @param {string} dst Destination port: Must be an Input port
+ */
+async function connectPorts(src, dst, disconnect = false) {
+  const cp = require("child_process");
+  const rm = disconnect ? "--disconnect" : "";
+  try {
+    const status = cp.execSync(
+      `python3 ./py/jack-audio-tools/jack/connect_ports.py ${src} ${dst} ${rm}`,
+      { encoding: "utf8" }
+    );
+  } catch (error) {
+    Layout.wlogError(error);
+  }
+}
+
+/**
+ * It will (dis) connect two plugins, dealing with mono/stereo conversions.
+ * Use 'input|output' to use a mono/stero I/O ports as src/dst.
+ * @param {plugin} src Source plugin instance. It should exist on the RACK. It will use the plugin's output ports.
+ * @param {plugin} dst Destination plugin.It should exist on the RACK. It will use the plugin's input ports.
+ * @param {boolean} [disconnect=false] Disconnect plugins
+ */
+function connectPlugins(src, dst, disconnect = false) {
+  const il = store.getJackStatus().CONNECTIONS.inputLeft;
+  const ir = store.getJackStatus().CONNECTIONS.inputRight;
+  const im = store.getJackStatus().CONNECTIONS.inputMode;
+  const ol = store.getJackStatus().CONNECTIONS.outputLeft;
+  const or = store.getJackStatus().CONNECTIONS.outputRight;
+  const om = store.getJackStatus().CONNECTIONS.outputMode;
+  const instanceName = `calvo_${store.app.APP_ID}`;
+
+  //   Direct Monitor not supported right now (It may conflict on multi instance mode.)
+  if (src === "input" &amp;&amp; dst === "output") {
+    Layout.wlogError(
+      "Direct Monitor not supported right now (It may conflict on multi instance mode.)"
+    );
+    return;
+  }
+
+  //  Input => Plugin
+  if (src === "input") {
+    if (!dst.ports.audio.input || dst.ports.audio.input.length === 0) {
+      Layout.wlog(
+        "Dst plugin does not have correct number of ports or does not exist."
+      );
+      return;
+    }
+
+    const dstMode = dst.ports.audio.input.length === 1 ? "mono" : "stereo";
+    const dl = `${instanceName}_${dst.info.instanceNumber}_${dst.info.safeName}:${dst.ports.audio.input[0].symbol}`;
+    const dr =
+      dstMode === "stereo"
+        ? `${instanceName}_${dst.info.instanceNumber}_${dst.info.safeName}:${dst.ports.audio.input[1].symbol}`
+        : "";
+
+    if (im === "mono" &amp;&amp; dstMode === "mono") {
+      connectPorts(il, dl, disconnect);
+    } else if (im === "mono" &amp;&amp; dstMode === "stereo") {
+      connectPorts(il, dl, disconnect);
+      connectPorts(il, dr, disconnect);
+    } else if (im === "stereo" &amp;&amp; dstMode === "mono") {
+      connectPorts(il, dl, disconnect);
+      connectPorts(ir, dl, disconnect);
+    } else if (im === "stereo" &amp;&amp; dstMode === "stereo") {
+      connectPorts(il, dl, disconnect);
+      connectPorts(ir, dr, disconnect);
+    }
+  }
+
+  //   Plugin => Output
+  else if (dst === "output") {
+    if (!src.ports.audio.output || src.ports.audio.output.length === 0) {
+      Layout.wlog(
+        "src plugin does not have correct number of ports or does not exist."
+      );
+      return;
+    }
+    const srcMode = src.ports.audio.output.length === 1 ? "mono" : "stereo";
+    const sl = `${instanceName}_${src.info.instanceNumber}_${src.info.safeName}:${src.ports.audio.output[0].symbol}`;
+    const sr =
+      srcMode === "stereo"
+        ? `${instanceName}_${src.info.instanceNumber}_${src.info.safeName}:${src.ports.audio.output[1].symbol}`
+        : "";
+
+    if (srcMode === "mono" &amp;&amp; om === "mono") {
+      connectPorts(sl, ol, disconnect);
+    } else if (srcMode === "mono" &amp;&amp; om === "stereo") {
+      connectPorts(sl, ol, disconnect);
+      connectPorts(sl, or, disconnect);
+    } else if (srcMode === "stereo" &amp;&amp; om === "mono") {
+      connectPorts(sl, ol, disconnect);
+      connectPorts(sr, ol, disconnect);
+    } else if (srcMode === "stereo" &amp;&amp; om === "stereo") {
+      connectPorts(sl, ol, disconnect);
+      connectPorts(sr, or, disconnect);
+    }
+  }
+  //   Plugin => Plugin
+  else {
+    if (!src.ports.audio.output || src.ports.audio.output.length === 0) {
+      Layout.wlog(
+        "src plugin does not have correct number of ports or does not exist."
+      );
+      return;
+    }
+
+    if (!dst.ports.audio.input || dst.ports.audio.input.length === 0) {
+      Layout.wlog(
+        "dst plugin does not have correct number of ports or does not exist."
+      );
+      return;
+    }
+
+    const srcMode = src.ports.audio.output.length === 1 ? "mono" : "stereo";
+    const sl = `${instanceName}_${src.info.instanceNumber}_${src.info.safeName}:${src.ports.audio.output[0].symbol}`;
+    const sr =
+      srcMode === "stereo"
+        ? `${instanceName}_${src.info.instanceNumber}_${src.info.safeName}:${src.ports.audio.output[1].symbol}`
+        : "";
+
+    const dstMode = dst.ports.audio.input.length === 1 ? "mono" : "stereo";
+    const dl = `${instanceName}_${dst.info.instanceNumber}_${dst.info.safeName}:${dst.ports.audio.input[0].symbol}`;
+    const dr =
+      dstMode === "stereo"
+        ? `${instanceName}_${dst.info.instanceNumber}_${dst.info.safeName}:${dst.ports.audio.input[1].symbol}`
+        : "";
+
+    if (srcMode === "mono" &amp;&amp; dstMode === "mono") {
+      connectPorts(sl, dl, disconnect);
+    } else if (srcMode === "mono" &amp;&amp; dstMode === "stereo") {
+      connectPorts(sl, dl, disconnect);
+      connectPorts(sl, dr, disconnect);
+    } else if (srcMode === "stereo" &amp;&amp; dstMode === "mono") {
+      connectPorts(sl, dl, disconnect);
+      connectPorts(sr, dl, disconnect);
+    } else if (srcMode === "stereo" &amp;&amp; dstMode === "stereo") {
+      connectPorts(sl, dl, disconnect);
+      connectPorts(sr, dr, disconnect);
+    }
+  }
+}
+
+/**
+ * Alias for connect(src, dst, { disconnect: true })
+ * It will (dis) connect two plugins, dealing with mono/stereo conversions.
+ * Use 'input|output' to use a mono/stero I/O ports as src/dst.
+ * @param {plugin} src Source plugin instance. It should exist on the RACK. It will use the plugin's output ports.
+ * @param {plugin} dst Destination plugin.It should exist on the RACK. It will use the plugin's input ports.
+ * @param {boolean} [disconnect=true]
+ */
+function disconnectPlugins(src, dst, disconnect = true) {
+  connectPlugins(src, dst, disconnect);
+}
+
 exports.init = init;
 exports.poll = poll;
 exports.queryTransport = queryTransport;
+exports.connectPlugins = connectPlugins;
+exports.disconnectPlugins = disconnectPlugins;
 </code></pre>
         </article>
-      </section>
-    </div>
+    </section>
 
-    <br class="clear" />
 
-    <footer>
-      Documentation generated by
-      <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.4</a> on Mon Jul 13
-      2020 01:43:14 GMT-0300 (Argentina Standard Time) using the
-      <a href="https://github.com/clenemt/docdash">docdash</a> theme.
-    </footer>
 
-    <script>
-      prettyPrint();
-    </script>
-    <script src="scripts/polyfill.js"></script>
-    <script src="scripts/linenumber.js"></script>
 
-    <script src="scripts/search.js" defer></script>
+    
+    
+</div>
 
-    <link type="text/css" rel="stylesheet" href="./docs-style.css" />
-  </body>
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.6.4</a> on Thu Jul 16 2020 01:36:38 GMT-0300 (Argentina Standard Time) using the <a href="https://github.com/clenemt/docdash">docdash</a> theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/polyfill.js"></script>
+<script src="scripts/linenumber.js"></script>
+
+<script src="scripts/search.js" defer></script>
+
+
+
+    <link type="text/css" rel="stylesheet" href="./docs-style.css">
+    
+</body>
 </html>
