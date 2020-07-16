@@ -11,6 +11,12 @@ const { pluginInfo } = require("./lv2");
 const PubSub = require("pubsub-js");
 const { settings } = require("../settings");
 const Jalv = require("./jalv");
+const Jack = require("./jack_client");
+const Nanoid = require("nanoid");
+const nanoid = Nanoid.customAlphabet(
+  "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz",
+  4
+);
 
 /**
  * Notify all subscribers of a given topic.
@@ -28,6 +34,7 @@ function notifySubscribers(topic, data) {
 const app = {
   /** Is app initializated and ready to use? */
   INITIALIZED: false,
+  APP_ID: nanoid(),
   /** What page the layout is currently showing. @see layout */
   CURRENT_PAGE: 0,
 };
@@ -123,7 +130,7 @@ function setJackStatus(
  *
  */
 function reconectAll() {
-  //   disconnectAll();
+  disconnectAll();
   connectAll();
 }
 
@@ -132,7 +139,7 @@ function reconectAll() {
  *
  */
 function disconnectAll() {
-  // If RACK is empty just disconnect input from output.
+  // If RACK is empty return (In the future could be used for direct monitoring.)
   if (rack.length <= 0) {
     return;
   }
@@ -143,7 +150,7 @@ function disconnectAll() {
  *
  */
 function connectAll() {
-  // If RACK is empty just connect input to output.
+  // If RACK is empty return (In the future could be used for direct monitoring.)
   if (rack.length <= 0) {
     return;
   }
@@ -176,7 +183,7 @@ function setAudioSource(mode, channel, name) {
 /**
  * Set Input/Output mode to mono or stereo.
  * This will trigger a complete reconnection of all plugins
- *
+ * @fires notifySubscribers (jack)
  * @param {*} direction 'input | output
  * @param {*} mode mono | stereo
  */
@@ -214,10 +221,10 @@ function getSelectedPlugin() {
 /**
  * Adds a plugin to the rack.
  * It will reprocess the connections stack, and notify subscribers of __rack__
- *
- * @param {*} pluginName The plugin name as appears in the plugin catalog JSON file.
+ * @fires notifySubscribers (rack)
+ * @param {string} pluginName The plugin name as appears in the plugin catalog JSON file.
  */
-function addPluginToRack(pluginName) {
+async function addPluginToRack(pluginName) {
   try {
     const p = Lv2.getPluginByName(pluginName);
     const plugin = pluginInfo(p.uri);
@@ -227,24 +234,29 @@ function addPluginToRack(pluginName) {
       bypass: false,
     };
 
-    plugin.process = Jalv.spawn_plugin(plugin, rack.length);
+    plugin.process = await Jalv.spawn_plugin(plugin, rack.length);
 
     instanceNumber++;
     rack.push(plugin);
 
-    // TODO: Connect to previous, disconnect previous from master.
+    // This is the first plugin in the rack, connect it to Input.
     if (rack.length === 1) {
-      //   ModHostClient.connectPlugins("input", plugin);
+      Jack.connectPlugins("input", plugin);
     } else {
-      //   ModHostClient.disconnectPlugins(rack[rack.length - 2], "output");
+      // Disconnect previously last plugin from output.
+      Jack.disconnectPlugins(rack[rack.length - 2], "output");
+      // Connect this plugin to the previous
+      Jack.connectPlugins(rack[rack.length - 2], plugin);
     }
 
-    // ModHostClient.connectPlugins(plugin, "output");
+    // Finnally, connect this plugin to main output
+    Jack.connectPlugins(plugin, "output");
 
     notifySubscribers("rack", rack);
     Layout.wlog(`Added ${plugin.name} to rack. (#${rack.length - 1})`);
   } catch (error) {
     Layout.wlogError(`Error adding plugin to rack: ${error}`);
+    console.trace(error);
   }
 }
 

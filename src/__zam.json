@@ -1,53 +1,17 @@
 {
-  "author": {
-    "email": null,
-    "homepage": "http://www.zamaudio.com",
-    "name": "Damien Zammit"
-  },
-  "binary": "/usr/lib/lv2/ZamVerb.lv2/ZamVerb_dsp.so",
-  "brand": "ZamAudio",
-  "bundles": ["/usr/lib/lv2/ZamVerb.lv2"],
-  "category": ["Reverb"],
-  "comment": "Convolution Reverb effect",
-  "errors": [],
-  "label": "ZamVerb",
+  "author": { "email": null, "homepage": null, "name": "Damien Zammit" },
+  "binary": "/usr/lib/lv2/ZamPhono.lv2/ZamPhono_dsp.so",
+  "brand": null,
+  "bundles": ["/usr/lib/lv2/ZamPhono.lv2"],
+  "category": ["Utility"],
+  "comment": null,
+  "errors": ["plugin comment is missing"],
+  "label": "ZamPhono",
   "license": "GPL v2+",
   "microVersion": 12,
   "minorVersion": 2,
-  "name": "ZamVerb",
+  "name": "ZamPhono",
   "ports": {
-    "atom": {
-      "input": [
-        {
-          "comment": null,
-          "designation": null,
-          "index": 4,
-          "name": "Events Input",
-          "properties": [],
-          "rangeSteps": null,
-          "ranges": {},
-          "scalePoints": [],
-          "shortName": "Events Input",
-          "symbol": "lv2_events_in",
-          "units": {}
-        }
-      ],
-      "output": [
-        {
-          "comment": null,
-          "designation": null,
-          "index": 5,
-          "name": "Events Output",
-          "properties": [],
-          "rangeSteps": null,
-          "ranges": {},
-          "scalePoints": [],
-          "shortName": "Events Output",
-          "symbol": "lv2_events_out",
-          "units": {}
-        }
-      ]
-    },
     "audio": {
       "input": [
         {
@@ -62,26 +26,13 @@
           "shortName": "Audio Input 1",
           "symbol": "lv2_audio_in_1",
           "units": {}
-        },
-        {
-          "comment": null,
-          "designation": null,
-          "index": 1,
-          "name": "Audio Input 2",
-          "properties": [],
-          "rangeSteps": null,
-          "ranges": {},
-          "scalePoints": [],
-          "shortName": "Audio Input 2",
-          "symbol": "lv2_audio_in_2",
-          "units": {}
         }
       ],
       "output": [
         {
           "comment": null,
           "designation": null,
-          "index": 2,
+          "index": 1,
           "name": "Audio Output 1",
           "properties": [],
           "rangeSteps": null,
@@ -89,19 +40,6 @@
           "scalePoints": [],
           "shortName": "Audio Output 1",
           "symbol": "lv2_audio_out_1",
-          "units": {}
-        },
-        {
-          "comment": null,
-          "designation": null,
-          "index": 3,
-          "name": "Audio Output 2",
-          "properties": [],
-          "rangeSteps": null,
-          "ranges": {},
-          "scalePoints": [],
-          "shortName": "Audio Output 2",
-          "symbol": "lv2_audio_out_2",
           "units": {}
         }
       ]
@@ -111,40 +49,27 @@
         {
           "comment": null,
           "designation": null,
-          "index": 6,
-          "name": "Master level",
-          "properties": [],
+          "index": 2,
+          "name": "Reproduction/Production",
+          "properties": ["toggled"],
           "rangeSteps": null,
-          "ranges": { "default": 0.0, "maximum": 30.0, "minimum": -30.0 },
+          "ranges": { "default": 0.0, "maximum": 1.0, "minimum": 0.0 },
           "scalePoints": [],
-          "shortName": "Master level",
-          "symbol": "master",
-          "units": { "label": "decibels", "render": "%f dB", "symbol": "dB" }
+          "shortName": "Reproduction/Pro",
+          "symbol": "inv",
+          "units": { "label": " ", "render": "%f  ", "symbol": " " }
         },
         {
           "comment": null,
           "designation": null,
-          "index": 7,
-          "name": "Wet / Dry",
-          "properties": [],
-          "rangeSteps": null,
-          "ranges": { "default": 50.0, "maximum": 100.0, "minimum": 0.0 },
-          "scalePoints": [],
-          "shortName": "Wet / Dry",
-          "symbol": "wetdry",
-          "units": { "label": "percent", "render": "%f%%", "symbol": "%" }
-        },
-        {
-          "comment": null,
-          "designation": null,
-          "index": 8,
-          "name": "Room",
+          "index": 3,
+          "name": "Phono Filter Type",
           "properties": ["integer"],
           "rangeSteps": null,
-          "ranges": { "default": 0, "maximum": 6, "minimum": 0 },
+          "ranges": { "default": 3, "maximum": 4, "minimum": 0 },
           "scalePoints": [],
-          "shortName": "Room",
-          "symbol": "room",
+          "shortName": "Phono Filter Typ",
+          "symbol": "type",
           "units": { "label": " ", "render": "%f  ", "symbol": " " }
         }
       ],
@@ -152,10 +77,12 @@
     },
     "midi": { "input": [], "output": [] }
   },
-  "presets": [{ "label": "Default", "uri": "urn:zamaudio:ZamVerb#preset001" }],
+  "presets": [
+    { "label": "RIAA (Playback)", "uri": "urn:zamaudio:ZamPhono#preset001" }
+  ],
   "properties": {},
   "stability": "stable",
-  "uri": "urn:zamaudio:ZamVerb",
+  "uri": "urn:zamaudio:ZamPhono",
   "version": "2.12",
-  "warnings": []
+  "warnings": ["plugin brand is missing", "plugin label is missing"]
 }

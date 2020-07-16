@@ -7,8 +7,7 @@
 
 const Layout = require("./layout");
 const { spawn, exec, spawnSync } = require("child_process");
-const { writeFile } = require("fs");
-
+const store = require("./store");
 /**
  * Spawns a plugin. It will execute jalv and load the plugin. ALl communcations can be reachead via the process now at plugin.process
  *
@@ -16,7 +15,9 @@ const { writeFile } = require("fs");
  * @param {*} rackIndex
  * @returns The nodejs child process.
  */
-function spawn_plugin(plugin, rackIndex) {
+async function spawn_plugin(plugin, rackIndex) {
+  const sleep = require("util").promisify(setTimeout);
+  let processSpawned = false;
   // We need to loose the buffer to get a fast response:
   // https://gitlab.com/drobilla/jalv/-/issues/7
   const process = spawn("stdbuf", [
@@ -26,11 +27,18 @@ function spawn_plugin(plugin, rackIndex) {
     "-p",
     "-t",
     "-n",
-    `calvo_${plugin.info.instanceNumber}`,
+    `calvo_${store.app.APP_ID}_${plugin.info.instanceNumber}`,
     plugin.uri,
   ]);
   process.stdout.setEncoding("utf8");
   process.stdin.setEncoding("utf8");
+  process.stderr.once("data", function (msg) {
+    processSpawned = true;
+  });
+
+  process.stdout.once("data", function (msg) {
+    processSpawned = true;
+  });
   process.stdout.on("data", function (msg) {
     Layout.wlog(`[#${rackIndex}] ${msg}`);
   });
@@ -41,6 +49,16 @@ function spawn_plugin(plugin, rackIndex) {
   process.on("message", function (msg) {
     Layout.wlog(`[#${rackIndex}] ${msg}`);
   });
+
+  let retries = 0;
+  while (!processSpawned && retries < 5) {
+    await sleep(200);
+  }
+
+  if (!processSpawned) {
+    Layout.wlogError("Could not load plugin");
+    return null;
+  }
   return process;
 }
 
@@ -75,8 +93,6 @@ function kill_plugin(process, rackIndex) {
 function write(process, msg) {
   process.stdin.write(msg + "\n");
 }
-
-function connectPlugins(src, dst) {}
 
 exports.spawn_plugin = spawn_plugin;
 exports.kill_plugin = kill_plugin;

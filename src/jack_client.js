@@ -83,6 +83,167 @@ function getAvailableJackPorts() {
   );
   return JSON.parse(info);
 }
+
+/**
+ * connect <origin_port> to <destination_port>
+ * connect two jack ports together. Both ports must be same type.
+ * @param {string} src Origin port: Must be an output port.
+ * @param {string} dst Destination port: Must be an Input port
+ */
+async function connectPorts(src, dst, disconnect = false) {
+  const cp = require("child_process");
+  const rm = disconnect ? "--disconnect" : "";
+  try {
+    const status = cp.execSync(
+      `python3 ./py/jack-audio-tools/jack/connect_ports.py ${src} ${dst} ${rm}`,
+      { encoding: "utf8" }
+    );
+  } catch (error) {
+    Layout.wlogError(error);
+  }
+}
+
+/**
+ * It will (dis) connect two plugins, dealing with mono/stereo conversions.
+ * Use 'input|output' to use a mono/stero I/O ports as src/dst.
+ * @param {plugin} src Source plugin instance. It should exist on the RACK. It will use the plugin's output ports.
+ * @param {plugin} dst Destination plugin.It should exist on the RACK. It will use the plugin's input ports.
+ * @param {boolean} [disconnect=false] Disconnect plugins
+ */
+function connectPlugins(src, dst, disconnect = false) {
+  const il = store.getJackStatus().CONNECTIONS.inputLeft;
+  const ir = store.getJackStatus().CONNECTIONS.inputRight;
+  const im = store.getJackStatus().CONNECTIONS.inputMode;
+  const ol = store.getJackStatus().CONNECTIONS.outputLeft;
+  const or = store.getJackStatus().CONNECTIONS.outputRight;
+  const om = store.getJackStatus().CONNECTIONS.outputMode;
+  const instanceName = `calvo_${store.app.APP_ID}`;
+
+  //   Direct Monitor not supported right now (It may conflict on multi instance mode.)
+  if (src === "input" && dst === "output") {
+    Layout.wlogError(
+      "Direct Monitor not supported right now (It may conflict on multi instance mode.)"
+    );
+    return;
+  }
+
+  //  Input => Plugin
+  if (src === "input") {
+    if (!dst.ports.audio.input || dst.ports.audio.input.length === 0) {
+      Layout.wlog(
+        "Dst plugin does not have correct number of ports or does not exist."
+      );
+      return;
+    }
+
+    const dstMode = dst.ports.audio.input.length === 1 ? "mono" : "stereo";
+    const dl = `${instanceName}_${dst.info.instanceNumber}:${dst.ports.audio.input[0].symbol}`;
+    const dr =
+      dstMode === "stereo"
+        ? `${instanceName}_${dst.info.instanceNumber}:${dst.ports.audio.input[1].symbol}`
+        : "";
+
+    if (im === "mono" && dstMode === "mono") {
+      connectPorts(il, dl, disconnect);
+    } else if (im === "mono" && dstMode === "stereo") {
+      connectPorts(il, dl, disconnect);
+      connectPorts(il, dr, disconnect);
+    } else if (im === "stereo" && dstMode === "mono") {
+      connectPorts(il, dl, disconnect);
+      connectPorts(ir, dl, disconnect);
+    } else if (im === "stereo" && dstMode === "stereo") {
+      connectPorts(il, dl, disconnect);
+      connectPorts(ir, dr, disconnect);
+    }
+  }
+
+  //   Plugin => Output
+  else if (dst === "output") {
+    if (!src.ports.audio.output || src.ports.audio.output.length === 0) {
+      Layout.wlog(
+        "src plugin does not have correct number of ports or does not exist."
+      );
+      return;
+    }
+    const srcMode = src.ports.audio.output.length === 1 ? "mono" : "stereo";
+    const sl = `${instanceName}_${src.info.instanceNumber}:${src.ports.audio.output[0].symbol}`;
+    const sr =
+      srcMode === "stereo"
+        ? `${instanceName}_${src.info.instanceNumber}:${src.ports.audio.output[1].symbol}`
+        : "";
+
+    if (srcMode === "mono" && om === "mono") {
+      connectPorts(sl, ol, disconnect);
+    } else if (srcMode === "mono" && om === "stereo") {
+      connectPorts(sl, ol, disconnect);
+      connectPorts(sl, or, disconnect);
+    } else if (srcMode === "stereo" && om === "mono") {
+      connectPorts(sl, ol, disconnect);
+      connectPorts(sr, ol, disconnect);
+    } else if (srcMode === "stereo" && om === "stereo") {
+      connectPorts(sl, ol, disconnect);
+      connectPorts(sr, or, disconnect);
+    }
+  }
+  //   Plugin => Plugin
+  else {
+    if (!src.ports.audio.output || src.ports.audio.output.length === 0) {
+      Layout.wlog(
+        "src plugin does not have correct number of ports or does not exist."
+      );
+      return;
+    }
+
+    if (!dst.ports.audio.input || dst.ports.audio.input.length === 0) {
+      Layout.wlog(
+        "dst plugin does not have correct number of ports or does not exist."
+      );
+      return;
+    }
+
+    const srcMode = src.ports.audio.output.length === 1 ? "mono" : "stereo";
+    const sl = `${instanceName}_${src.info.instanceNumber}:${src.ports.audio.output[0].symbol}`;
+    const sr =
+      srcMode === "stereo"
+        ? `${instanceName}_${src.info.instanceNumber}:${src.ports.audio.output[1].symbol}`
+        : "";
+
+    const dstMode = dst.ports.audio.input.length === 1 ? "mono" : "stereo";
+    const dl = `${instanceName}_${dst.info.instanceNumber}:${dst.ports.audio.input[0].symbol}`;
+    const dr =
+      dstMode === "stereo"
+        ? `${instanceName}_${dst.info.instanceNumber}:${dst.ports.audio.input[1].symbol}`
+        : "";
+
+    if (srcMode === "mono" && dstMode === "mono") {
+      connectPorts(sl, dl, disconnect);
+    } else if (srcMode === "mono" && dstMode === "stereo") {
+      connectPorts(sl, dl, disconnect);
+      connectPorts(sl, dr, disconnect);
+    } else if (srcMode === "stereo" && dstMode === "mono") {
+      connectPorts(sl, dl, disconnect);
+      connectPorts(sr, dl, disconnect);
+    } else if (srcMode === "stereo" && dstMode === "stereo") {
+      connectPorts(sl, dl, disconnect);
+      connectPorts(sr, dr, disconnect);
+    }
+  }
+}
+
+/**
+ * Alias for connect(src, dst, { disconnect: true })
+ * It will (dis) connect two plugins, dealing with mono/stereo conversions.
+ * Use 'input|output' to use a mono/stero I/O ports as src/dst.
+ * @param {plugin} src Source plugin instance. It should exist on the RACK. It will use the plugin's output ports.
+ * @param {plugin} dst Destination plugin.It should exist on the RACK. It will use the plugin's input ports.
+ * @param {boolean} [disconnect=true]
+ */
+function disconnectPlugins(src, dst, disconnect = true) {
+  connectPlugins(src, dst, disconnect);
+}
+
 exports.init = init;
 exports.poll = poll;
 exports.queryTransport = queryTransport;
+exports.connectPlugins = connectPlugins;
+exports.disconnectPlugins = disconnectPlugins;
