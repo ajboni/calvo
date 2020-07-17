@@ -12,7 +12,7 @@ function make(grid, x, y, xSpan, ySpan) {
     label: "RACK",
     mouse: true,
     interactive: true,
-    keys: true,
+    // keys: true,
     padding: { left: 1, right: 1 },
     items: rackItems,
     style: {
@@ -46,12 +46,41 @@ function make(grid, x, y, xSpan, ySpan) {
   rack.key("pagedown", function (ch, key) {
     rack.move(settings.SCROLL_AMMOUNT);
   });
-  rack.on("select", function (e, index) {
-    if (rack.items.length > 0) store.setSelectedPluginIndex(e.content, index);
+  //   rack.on("select", function (e, index) {
+  //     console.log("ss");
+  //     if (rack.items.length > 0) store.setSelectedPluginIndex(e.content, index);
+  //   });
+
+  rack.key(["return"], function () {
+    if (rack.items.length > 0) store.setSelectedPluginIndex(rack.selected);
   });
 
   rack.key(["backspace", "delete"], function () {
     if (rack.items.length > 0) store.removePluginAt(rack.selected);
+  });
+
+  rack.key(["down"], function (e, key) {
+    rack.down(1);
+  });
+
+  rack.key(["up"], function (e, key) {
+    rack.up(1);
+  });
+
+  rack.key(["C-down"], function (e, key) {
+    store.moveRackItem(rack.selected, "down", false);
+  });
+
+  rack.key(["C-S-down"], function (e, index) {
+    store.moveRackItem(rack.selected, "down", true);
+  });
+
+  rack.key(["C-up"], function (e, index) {
+    store.moveRackItem(rack.selected, "up", false);
+  });
+
+  rack.key(["C-S-up"], function (e, index) {
+    store.moveRackItem(rack.selected, "up", true);
   });
 
   // Subscribe to 'rack' updates

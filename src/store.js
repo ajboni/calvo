@@ -263,6 +263,16 @@ async function addPluginToRack(pluginName) {
 }
 
 /**
+ * "Safely" Removes all plugins from rack.
+ *
+ */
+function clearRack() {
+  for (let index = 0; index < rack.length; index++) {
+    removePluginAt(index);
+  }
+}
+
+/**
  * Removes a plugin according to the index on the rack.
  *
  * @param {*} index Rack Index
@@ -289,10 +299,24 @@ function removePluginAt(index) {
  *
  * @param {*} pluginName
  */
-function setSelectedPluginIndex(pluginName, index) {
+function setSelectedPluginIndex(index) {
   selectedPlugin = rack[index];
   notifySubscribers("selectedPlugin", selectedPlugin);
 }
+
+/**
+ * Moves a plugin in the rack. It will trigger a reconnection among (max 3) affected plugins
+ *
+ * @param {number} rackIndex Rack Index of plugin to move.
+ * @param {string} direction ["up"|"down"] Direction to move the plugin.
+ * @param {boolean} [max=false] By default it will move 1 unit. If this is true, it will position the plugin on the top/bottom of the rack.
+ * @fires notifySubscribers(rack)
+ */
+function moveRackItem(rackIndex, direction, max = false) {
+  Layout.wlogError(`${rackIndex} => ${direction} => ${max}`);
+}
+
+notifySubscribers("rack", rack);
 
 /**
  * This function will process
@@ -409,3 +433,5 @@ exports.setCurrentPage = setCurrentPage;
 exports.setAudioSource = setAudioSource;
 exports.setAudioSourceMode = setAudioSourceMode;
 exports.reconectAll = reconectAll;
+exports.clearRack = clearRack;
+exports.moveRackItem = moveRackItem;

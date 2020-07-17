@@ -95,7 +95,7 @@ async function connectPorts(src, dst, disconnect = false) {
   const rm = disconnect ? "--disconnect" : "";
   try {
     const status = cp.execSync(
-      `python3 ./py/calvo_cli_tools/jack_tools/connect_ports.py ${src} ${dst} ${rm}`,
+      `python3 ./py/calvo_cli_tools/jack_tools/port_tools.py connect ${src} ${dst} ${rm}`,
       { encoding: "utf8" }
     );
   } catch (error) {
