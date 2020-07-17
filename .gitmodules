@@ -1,6 +1,3 @@
-[submodule "py/jack-audio-tools"]
-	path = py/jack-audio-tools
-	url = git@github.com:ajboni/jack-audio-tools.git
 [submodule "py/calvo_cli_tools"]
 	path = py/calvo_cli_tools
-	url = https://github.com/ajboni/calvo-cli-tools
+	url =  git@github.com:ajboni/calvo-cli-tools.git

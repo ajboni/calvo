@@ -62,7 +62,7 @@ function grep(regex = ".") {
   const cp = require("child_process");
   try {
     const result = cp.execSync(
-      `python3 ./py/jack-audio-tools/lv2/grep.py -c --json ${regex}`,
+      `python3 ./py/calvo_cli_tools/lv2/grep.py -c --json ${regex}`,
       {
         encoding: "utf8",
       }
