@@ -45,6 +45,7 @@ let uiPoll = setInterval(() => {
 }, settings.UI_UPDATE_RATE);
 
 function exit() {
+  store.clearRack();
   program.clear();
   screen.detach();
   return process.exit(0);
