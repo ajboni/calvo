@@ -31,7 +31,7 @@ function stringToTrimmedArray(str) {
  * @returns A-Za-z
  */
 function safe(str) {
-  s = str.replace(/[^A-Za-z]/g, "");
+  s = str.replace(/[^A-Za-z0-9]/g, "");
   return s;
 }
 
