@@ -3,7 +3,7 @@ const contrib = require("blessed-contrib");
 const Layout = require("../layout");
 const store = require("../store");
 const PubSub = require("pubsub-js");
-
+const settings = require("../../settings");
 var rack = {};
 
 function make(grid, x, y, xSpan, ySpan) {

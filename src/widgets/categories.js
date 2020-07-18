@@ -1,13 +1,10 @@
 const blessed = require("blessed");
 const contrib = require("blessed-contrib");
 const Layout = require("../layout");
-const {
-  pluginCategories,
-  setCategoryFilter,
-  filteredPluginCatalog,
-} = require("../store");
+const store = require("../store");
 const { settings } = require("../../settings");
 
+var categoryWidget = {};
 function make(grid, x, y, xSpan, ySpan) {
   categoryWidget = grid.set(y, x, ySpan, xSpan, blessed.list, {
     label: "Categories",
@@ -16,7 +13,7 @@ function make(grid, x, y, xSpan, ySpan) {
       // ch: " ",
       // inverse: true,
     },
-    items: pluginCategories,
+
     interactive: true,
     keys: true,
     padding: { left: 1, right: 1 },
@@ -38,6 +35,9 @@ function make(grid, x, y, xSpan, ySpan) {
     },
   });
 
+  //  It might be a bug in blessed.contrib, but, if I set the items on the constructor, the items duplicate when changing screens.
+  categoryWidget.setItems(store.pluginCategories);
+
   categoryWidget.key("home", function (ch, key) {
     categoryWidget.select(0);
   });
@@ -54,7 +54,7 @@ function make(grid, x, y, xSpan, ySpan) {
   });
 
   categoryWidget.on("select", function (cat, index) {
-    setCategoryFilter(cat.content);
+    store.setCategoryFilter(cat.content);
     Layout.focusNext();
   });
 

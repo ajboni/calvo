@@ -29,6 +29,13 @@ function notifySubscribers(topic, data) {
   PubSub.publish(topic, data);
 }
 
+const pluginCatalog = [];
+const filteredPluginCatalog = [];
+const pluginCategories = ["(All)"];
+const rack = [];
+let selectedPlugin = {};
+let instanceNumber = 0;
+
 /** Tracks App State
  *  @enum
  */
@@ -100,6 +107,9 @@ function setCurrentPage(pageNumber) {
   app.CURRENT_PAGE = pageNumber;
   notifySubscribers("app", app);
   notifySubscribers("jack", jack);
+  //   setCategoryFilter("");
+  //   notifySubscribers("filteredPluginCatalog", filteredPluginCatalog);
+
   //   // Also notify rack so it can display it again.
   //   notifySubscribers("rack", rack);
 }
@@ -230,13 +240,6 @@ function setAudioSourceMode(direction, mode) {
 function getJackStatus() {
   return jack;
 }
-
-const pluginCatalog = [];
-const filteredPluginCatalog = [];
-const pluginCategories = ["(All)"];
-const rack = [];
-let selectedPlugin = {};
-let instanceNumber = 0;
 
 function getSelectedPlugin() {
   return selectedPlugin;

@@ -37,21 +37,21 @@ var statusWidget,
  * @returns Returns a blessed grid.
  */
 function setUpLayout(screen) {
-  var grid = new contrib.grid({ rows: 18, cols: 12, screen: screen });
+  var grid = new contrib.grid({ rows: 18, cols: 18, screen: screen });
 
   /**
    *
    * Main Page
    * @param {*} screen
    */
-  function page1(screen) {
-    mainMenu = MainMenuWidget.make(grid, 0, 0, 12, 1, 0);
-    categoryWidget = CategoriesWidget.make(grid, 0, 1, 1, 12);
-    pluginListWidget = PluginListWidget.make(grid, 1, 1, 3, 12);
-    logWidget = LogWidget.make(grid, 0, 13, 4, 5);
-    rackWidget = RackWidget.make(grid, 4, 1, 3, 8);
-    statusWidget = StatusWidget.make(grid, 4, 13, 2, 5);
-    pluginInfoWidget = PluginInfoWidget.make(grid, 4, 9, 3, 4);
+  function page0(screen) {
+    mainMenu = MainMenuWidget.make(grid, 0, 0, 18, 1, 0);
+    categoryWidget = CategoriesWidget.make(grid, 0, 1, 2, 17);
+    pluginListWidget = PluginListWidget.make(grid, 2, 1, 5, 17);
+    rackWidget = RackWidget.make(grid, 7, 1, 6, 8);
+    pluginInfoWidget = PluginInfoWidget.make(grid, 7, 9, 6, 4);
+    statusWidget = StatusWidget.make(grid, 7, 13, 6, 5);
+    logWidget = LogWidget.make(grid, 13, 1, 5, 17);
 
     mainScreen = screen;
     mainScreen.focusPush(categoryWidget);
@@ -62,17 +62,17 @@ function setUpLayout(screen) {
    *
    * @param {*} screen
    */
-  function page2(screen) {
-    mainMenu = MainMenuWidget.make(grid, 0, 0, 12, 1, 1);
-    inputWidget = AudioIO.make(grid, 0, 1, 6, 12, "input");
-    outputWidget = AudioIO.make(grid, 6, 1, 6, 12, "output");
-    logWidget = LogWidget.make(grid, 0, 13, 4, 5);
-    statusWidget = StatusWidget.make(grid, 4, 13, 2, 5);
+  function page4(screen) {
+    mainMenu = MainMenuWidget.make(grid, 0, 0, 18, 1, 4);
+    inputWidget = AudioIO.make(grid, 0, 1, 7, 12, "input");
+    outputWidget = AudioIO.make(grid, 7, 1, 7, 12, "output");
+    logWidget = LogWidget.make(grid, 14, 1, 4, 17);
+    statusWidget = StatusWidget.make(grid, 7, 13, 7, 5);
     mainScreen = screen;
     mainScreen.focusPush(inputWidget);
   }
 
-  carousel = new contrib.carousel([page1, page2], {
+  carousel = new contrib.carousel([page0, page0, page0, page0, page4, page0], {
     screen: screen,
     interval: 0, //how often to switch views (set 0 to never swicth automatically)
     controlKeys: false, //should right and left keyboard arrows control view rotation

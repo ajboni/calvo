@@ -8,11 +8,23 @@ var mainMenu = {};
 function make(grid, x, y, xSpan, ySpan, page = -1) {
   mainMenu = grid.set(y, x, ySpan, xSpan, blessed.listbar, {
     items: {
-      Main: () => {
+      Choose: () => {
         store.setCurrentPage(0);
       },
-      Connections: () => {
+      Mix: () => {
         store.setCurrentPage(1);
+      },
+      Perform: () => {
+        store.setCurrentPage(2);
+      },
+      Visualize: () => {
+        store.setCurrentPage(3);
+      },
+      Connect: () => {
+        store.setCurrentPage(4);
+      },
+      Debug: () => {
+        store.setCurrentPage(5);
       },
       "Reconnect All": () => {
         store.reconectAll();
