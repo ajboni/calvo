@@ -33,7 +33,7 @@ Modify `settings.js` with your settings, more info [in the docs](https://ajboni.
 
 - `enter` Select plugin for handling
 - `delete | backspace` Remove plugin
-
+- `CTRL + up/down` Swap plugins up/down
 
 
 # DEV

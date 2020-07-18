@@ -6,7 +6,7 @@
 /**  @enum  */
 const settings = {
   /** @type {number} Time in ms in which the UI refresh */
-  UI_UPDATE_RATE: 300,
+  UI_UPDATE_RATE: 100,
   /** @type {number}Time in ms in which we query JACK server for statistics. */
   JACK_POLLING_RATE: 10000,
   /** @type {string} Location where to scan folders. */
@@ -21,12 +21,14 @@ const settings = {
   DEFAULT_INPUT_L: "system:capture_1",
   /** @type {string} Define what the default right input port mode will be. (jack port name: ex: system:capture_1*/
   DEFAULT_INPUT_R: "system:capture_2",
-  /** @type {"mono"|"stereo"} Define what the default input mode will be.*/
-  DEFAULT_OUTPUT_MODE: "mono",
+  /** @type {"mono"|"stereo"} Define what the default output mode will be.*/
+  DEFAULT_OUTPUT_MODE: "stereo",
   /** @type {string} Left Channel for the master output. Last plug	in will connect to this. */
   DEFAULT_OUTPUT_L: "system:playback_1",
   /** @type {string} Right Channel for the master output. Last plugin will connect to this. */
   DEFAULT_OUTPUT_R: "system:playback_2",
+  /** @type {boolean} Whether to reconnect all plugins or not automatically after significant changes. If false, user will have to manually reconnect with the button */
+  AUTO_RECONNECT: true,
 };
 
 exports.settings = settings;

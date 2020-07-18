@@ -90,12 +90,13 @@ function getAvailableJackPorts() {
  * @param {string} src Origin port: Must be an output port.
  * @param {string} dst Destination port: Must be an Input port
  */
-async function connectPorts(src, dst, disconnect = false) {
+async function connectPorts(src, dst, disconnect = false, quiet = true) {
   const cp = require("child_process");
   const rm = disconnect ? "--disconnect" : "";
+  const q = quiet ? "--quiet" : "";
   try {
     const status = cp.execSync(
-      `python3 ./py/calvo_cli_tools/jack_tools/port_tools.py connect ${src} ${dst} ${rm}`,
+      `python3 ./py/calvo_cli_tools/jack_tools/port_tools.py connect ${src} ${dst} ${rm} ${q}`,
       { encoding: "utf8" }
     );
   } catch (error) {
@@ -242,8 +243,46 @@ function disconnectPlugins(src, dst, disconnect = true) {
   connectPlugins(src, dst, disconnect);
 }
 
+/**
+ * Disconnect all plugin ports from any target.
+ *
+ * @param {plugin} plugin Plugin Instance
+ * @param {string} direction [all|input|output] What ports to disconnect.
+ *
+ */
+function clearPluginPorts(plugin, direction = "all") {
+  const cp = require("child_process");
+  const arr = [];
+
+  if (direction === "all" || direction === "input") {
+    arr.push(...plugin.ports.audio.input);
+  }
+  if (direction === "all" || direction === "output") {
+    arr.push(...plugin.ports.audio.output);
+  }
+  const instanceName = `calvo_${store.app.APP_ID}`;
+
+  const ports = arr
+    .map(
+      (port) =>
+        `${instanceName}_${plugin.info.instanceNumber}_${plugin.info.safeName}:${port.symbol}`
+    )
+    .join(",");
+  //   Layout.wlog(ports);
+
+  try {
+    const status = cp.execSync(
+      `python3 ./py/calvo_cli_tools/jack_tools/port_tools.py clear ${ports}`,
+      { encoding: "utf8" }
+    );
+  } catch (error) {
+    Layout.wlogError(error.toString());
+  }
+}
+
 exports.init = init;
 exports.poll = poll;
 exports.queryTransport = queryTransport;
 exports.connectPlugins = connectPlugins;
 exports.disconnectPlugins = disconnectPlugins;
+exports.clearPluginPorts = clearPluginPorts;

@@ -130,7 +130,7 @@ function setJackStatus(
  * Disconnects and reconnects every plugin;
  *
  */
-function reconectAll() {
+async function reconectAll() {
   disconnectAll();
   connectAll();
 }
@@ -144,6 +144,10 @@ function disconnectAll() {
   if (rack.length <= 0) {
     return;
   }
+
+  rack.forEach((plugin, index, arr) => {
+    Jack.clearPluginPorts(plugin);
+  });
 }
 
 /**
@@ -155,6 +159,25 @@ function connectAll() {
   if (rack.length <= 0) {
     return;
   }
+
+  rack.forEach((plugin, index, arr) => {
+    switch (index) {
+      case 0:
+        Jack.connectPlugins("input", plugin);
+        if (index < rack.length - 1) {
+          Jack.connectPlugins(plugin, rack[index + 1]);
+        }
+        break;
+
+      case rack.length - 1:
+        Jack.connectPlugins(plugin, "output");
+        break;
+
+      default:
+        Jack.connectPlugins(plugin, rack[index + 1]);
+        break;
+    }
+  });
 }
 
 /**
@@ -289,9 +312,9 @@ function removePluginAt(index) {
     selectedPlugin = null;
     notifySubscribers("selectedPlugin", selectedPlugin);
   }
-  notifySubscribers("rack", rack);
 
-  // TODO: Disconnect.
+  if (settings.AUTO_RECONNECT) reconectAll();
+  notifySubscribers("rack", rack);
 }
 
 /**
@@ -313,10 +336,27 @@ function setSelectedPluginIndex(index) {
  * @fires notifySubscribers(rack)
  */
 function moveRackItem(rackIndex, direction, max = false) {
-  Layout.wlogError(`${rackIndex} => ${direction} => ${max}`);
-}
+  const plugin = rack[rackIndex];
+  const prev_plugin = rackIndex === 0 ? null : rack[rackIndex - 1];
+  const next_plugin = rackIndex >= rack.length - 1 ? null : rack[rackIndex + 1];
+  const offset = direction === "up" ? -1 : 1;
 
-notifySubscribers("rack", rack);
+  if (direction === "up" && !prev_plugin) return;
+  if (direction === "down" && !next_plugin) return;
+
+  rack[rackIndex] = rack[rackIndex + offset];
+  rack[rackIndex + offset] = plugin;
+
+  notifySubscribers("rack", rack);
+
+  //   if (prev_plugin) Jack.disconnectPlugins(prev_plugin, plugin, true);
+  //   if (next_plugin) Jack.disconnectPlugins(plugin, next_plugin, true);
+
+  //   Layout.wlogError(`${rackIndex} => ${direction} => ${max}`);
+  // TODO: This could be better but for now we will disconnect and reconnect everything.
+
+  if (settings.AUTO_RECONNECT) reconectAll();
+}
 
 /**
  * This function will process

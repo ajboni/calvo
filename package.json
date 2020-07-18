@@ -9,7 +9,8 @@
     "dev": "nodemon --no-stdin app.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "document": "node_modules/.bin/jsdoc -c ./jsdoc.json",
-    "doc-status": "TODO"
+    "doc-status": "TODO",
+    "debug": "node --nolazy --inspect-brk=9229 src/app.js"
   },
   "author": "",
   "license": "AGPL-3.0-or-later",
