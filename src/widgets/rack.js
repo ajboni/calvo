@@ -59,27 +59,27 @@ function make(grid, x, y, xSpan, ySpan) {
     if (rack.items.length > 0) store.removePluginAt(rack.selected);
   });
 
-  rack.key(["down"], function (e, key) {
+  rack.key(["down"], function () {
     rack.down(1);
   });
 
-  rack.key(["up"], function (e, key) {
+  rack.key(["up"], function () {
     rack.up(1);
   });
 
-  rack.key(["C-down"], function (e, key) {
+  rack.key(["C-down"], function () {
     store.moveRackItem(rack.selected, "down", false);
   });
 
-  rack.key(["C-S-down"], function (e, index) {
+  rack.key(["C-S-down"], function () {
     store.moveRackItem(rack.selected, "down", true);
   });
 
-  rack.key(["C-up"], function (e, index) {
+  rack.key(["C-up"], function () {
     store.moveRackItem(rack.selected, "up", false);
   });
 
-  rack.key(["C-S-up"], function (e, index) {
+  rack.key(["C-S-up"], function () {
     store.moveRackItem(rack.selected, "up", true);
   });
 
@@ -91,6 +91,7 @@ function make(grid, x, y, xSpan, ySpan) {
 function update(msg, data) {
   const names = data.map((p) => p.name);
   rack.setItems(names);
+  Layout.renderScreen();
 }
 
 exports.make = make;
