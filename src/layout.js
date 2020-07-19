@@ -12,6 +12,7 @@ const PluginListWidget = require("./widgets/pluginList");
 const StatusWidget = require("./widgets/status");
 const LogWidget = require("./widgets/log");
 const PluginInfoWidget = require("./widgets/pluginInfo");
+const PluginControlWidget = require("./widgets/pluginControls");
 const RackWidget = require("./widgets/rack");
 const MainMenuWidget = require("./widgets/mainMenu");
 const AudioIO = require("./widgets/audioIO");
@@ -24,6 +25,7 @@ var statusWidget,
   categoryWidget,
   pluginListWidget,
   pluginInfoWidget,
+  pluginControlWidget,
   rackWidget,
   inputWidget,
   outputWidget,
@@ -58,6 +60,23 @@ function setUpLayout(screen) {
   }
 
   /**
+   *
+   * Perform Page
+   * @param {*} screen
+   */
+  function page2(screen) {
+    mainMenu = MainMenuWidget.make(grid, 0, 0, 18, 2, 2);
+    rackWidget = RackWidget.make(grid, 0, 2, 6, 12);
+    pluginInfoWidget = PluginInfoWidget.make(grid, 0, 14, 6, 7);
+    statusWidget = StatusWidget.make(grid, 0, 21, 6, 7);
+    pluginControlWidget = PluginControlWidget.make(grid, 6, 2, 7, 12);
+    logWidget = LogWidget.make(grid, 13, 2, 5, 26);
+
+    mainScreen = screen;
+    mainScreen.focusPush(rackWidget);
+  }
+
+  /**
    * Input/Output page
    *
    * @param {*} screen
@@ -72,7 +91,7 @@ function setUpLayout(screen) {
     mainScreen.focusPush(inputWidget);
   }
 
-  carousel = new contrib.carousel([page0, page0, page0, page0, page4, page0], {
+  carousel = new contrib.carousel([page0, page0, page2, page0, page4, page0], {
     screen: screen,
     interval: 0, //how often to switch views (set 0 to never swicth automatically)
     controlKeys: false, //should right and left keyboard arrows control view rotation
