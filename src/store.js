@@ -211,7 +211,6 @@ function setAudioSource(mode, channel, name) {
   notifySubscribers("jack", jack);
   Layout.wlog(jack.CONNECTIONS.inputLeft);
   Layout.wlog(jack.CONNECTIONS.inputRight);
-  //   connectAll();
 }
 
 /**
@@ -267,19 +266,23 @@ async function addPluginToRack(pluginName) {
     instanceNumber++;
     rack.push(plugin);
 
-    // This is the first plugin in the rack, connect it to Input.
-    if (rack.length === 1) {
-      Jack.connectPlugins("input", plugin);
-    } else {
-      // Disconnect previously last plugin from output.
-      Jack.disconnectPlugins(rack[rack.length - 2], "output");
-      // Connect this plugin to the previous
-      Jack.connectPlugins(rack[rack.length - 2], plugin);
+    // Autoconnect if applicable
+    if (settings.AUTO_CONNECT) {
+      // This is the first plugin in the rack, connect it to Input.
+      if (rack.length === 1) {
+        Jack.connectPlugins("input", plugin);
+      } else {
+        if (settings.AUTO_CONNECT) {
+          // Disconnect previously last plugin from output.
+          Jack.disconnectPlugins(rack[rack.length - 2], "output");
+          // Connect this plugin to the previous
+          Jack.connectPlugins(rack[rack.length - 2], plugin);
+        }
+      }
+
+      // Finnally, connect this plugin to main output
+      Jack.connectPlugins(plugin, "output");
     }
-
-    // Finnally, connect this plugin to main output
-    Jack.connectPlugins(plugin, "output");
-
     notifySubscribers("rack", rack);
     Layout.wlog(`Added ${plugin.name} to rack. (#${rack.length - 1})`);
   } catch (error) {

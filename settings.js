@@ -18,7 +18,7 @@ const settings = {
   /** @type {"mono"|"stereo"} Define what the default input mode will be.*/
   DEFAULT_INPUT_MODE: "mono",
   /** @type {string} Define what the default left input port mode will be. (jack port name: ex: system:capture_1*/
-  DEFAULT_INPUT_L: "system:capture_1",
+  DEFAULT_INPUT_L: "PulseAudio JACK Sink:front-left",
   /** @type {string} Define what the default right input port mode will be. (jack port name: ex: system:capture_1*/
   DEFAULT_INPUT_R: "system:capture_2",
   /** @type {"mono"|"stereo"} Define what the default output mode will be.*/
@@ -27,6 +27,8 @@ const settings = {
   DEFAULT_OUTPUT_L: "system:playback_1",
   /** @type {string} Right Channel for the master output. Last plugin will connect to this. */
   DEFAULT_OUTPUT_R: "system:playback_2",
+  /** @type {boolean} Each time a plugin is added its connected to the previous and to the master output. Setting this to false will leave connections to the user. */
+  AUTO_CONNECT: true,
   /** @type {boolean} Whether to reconnect all plugins or not automatically after significant changes. If false, user will have to manually reconnect with the button */
   AUTO_RECONNECT: true,
 };

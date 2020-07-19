@@ -37,7 +37,7 @@ var statusWidget,
  * @returns Returns a blessed grid.
  */
 function setUpLayout(screen) {
-  var grid = new contrib.grid({ rows: 18, cols: 18, screen: screen });
+  var grid = new contrib.grid({ rows: 28, cols: 18, screen: screen });
 
   /**
    *
@@ -45,13 +45,13 @@ function setUpLayout(screen) {
    * @param {*} screen
    */
   function page0(screen) {
-    mainMenu = MainMenuWidget.make(grid, 0, 0, 18, 1, 0);
-    categoryWidget = CategoriesWidget.make(grid, 0, 1, 2, 17);
-    pluginListWidget = PluginListWidget.make(grid, 2, 1, 5, 17);
-    rackWidget = RackWidget.make(grid, 7, 1, 6, 8);
-    pluginInfoWidget = PluginInfoWidget.make(grid, 7, 9, 6, 4);
-    statusWidget = StatusWidget.make(grid, 7, 13, 6, 5);
-    logWidget = LogWidget.make(grid, 13, 1, 5, 17);
+    mainMenu = MainMenuWidget.make(grid, 0, 0, 18, 2, 0);
+    categoryWidget = CategoriesWidget.make(grid, 0, 2, 2, 26);
+    pluginListWidget = PluginListWidget.make(grid, 2, 2, 5, 26);
+    rackWidget = RackWidget.make(grid, 7, 2, 6, 12);
+    pluginInfoWidget = PluginInfoWidget.make(grid, 7, 14, 6, 7);
+    statusWidget = StatusWidget.make(grid, 7, 21, 6, 7);
+    logWidget = LogWidget.make(grid, 13, 2, 5, 26);
 
     mainScreen = screen;
     mainScreen.focusPush(categoryWidget);
@@ -63,10 +63,10 @@ function setUpLayout(screen) {
    * @param {*} screen
    */
   function page4(screen) {
-    mainMenu = MainMenuWidget.make(grid, 0, 0, 18, 1, 4);
-    inputWidget = AudioIO.make(grid, 0, 1, 7, 12, "input");
-    outputWidget = AudioIO.make(grid, 7, 1, 7, 12, "output");
-    logWidget = LogWidget.make(grid, 14, 1, 4, 17);
+    mainMenu = MainMenuWidget.make(grid, 0, 0, 18, 2, 4);
+    inputWidget = AudioIO.make(grid, 0, 2, 7, 11, "input");
+    outputWidget = AudioIO.make(grid, 7, 2, 7, 11, "output");
+    logWidget = LogWidget.make(grid, 14, 2, 4, 16);
     statusWidget = StatusWidget.make(grid, 7, 13, 7, 5);
     mainScreen = screen;
     mainScreen.focusPush(inputWidget);
