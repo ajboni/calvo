@@ -69,7 +69,7 @@ function setUpLayout(screen) {
     rackWidget = RackWidget.make(grid, 0, 2, 6, 12);
     pluginInfoWidget = PluginInfoWidget.make(grid, 0, 14, 6, 7);
     statusWidget = StatusWidget.make(grid, 0, 21, 6, 7);
-    pluginControlWidget = PluginControlWidget.make(grid, 6, 2, 7, 12);
+    pluginControlWidget = PluginControlWidget.make(grid, 6, 2, 7, 26);
     logWidget = LogWidget.make(grid, 13, 2, 5, 26);
 
     mainScreen = screen;

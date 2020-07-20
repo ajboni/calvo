@@ -6,7 +6,7 @@
  */
 
 const Layout = require("./layout");
-const { spawn, exec, spawnSync } = require("child_process");
+const { spawn } = require("child_process");
 const store = require("./store");
 /**
  * Spawns a plugin. It will execute jalv and load the plugin. ALl communcations can be reachead via the process now at plugin.process
@@ -39,16 +39,16 @@ async function spawn_plugin(plugin, rackIndex) {
   process.stdout.once("data", function (msg) {
     processSpawned = true;
   });
-  process.stdout.on("data", function (msg) {
-    Layout.wlog(`[#${rackIndex}] ${msg}`);
-  });
-  process.stderr.on("data", function (msg) {
-    Layout.wlogError(`[#${rackIndex}] ${msg}`);
-  });
+  //   process.stdout.on("data", function (msg) {
+  //     Layout.wlog(`[#${rackIndex}] ${msg}`);
+  //   });
+  //   process.stderr.on("data", function (msg) {
+  //     Layout.wlogError(`[#${rackIndex}] ${msg}`);
+  //   });
 
-  process.on("message", function (msg) {
-    Layout.wlog(`[#${rackIndex}] ${msg}`);
-  });
+  //   process.on("message", function (msg) {
+  //     Layout.wlog(`[#${rackIndex}] ${msg}`);
+  //   });
 
   let retries = 0;
   while (!processSpawned && retries < 5) {
@@ -60,6 +60,50 @@ async function spawn_plugin(plugin, rackIndex) {
     return null;
   }
   return process;
+}
+
+/**
+ * Gets the control values for a jalv process.
+ *
+ * @param {plugin} plugin Plugin instance (from rack)
+ * @param {string} type Type of control to get('controls'|'monitor' )
+ * @returns
+ */
+async function getControls(plugin, type) {
+  const sleep = require("util").promisify(setTimeout);
+
+  let done = false;
+  let result = "";
+  const process = plugin.process;
+
+  write(plugin.process, type);
+  process.stdout.once("data", function (msg) {
+    result = msg;
+    done = true;
+  });
+
+  let retries = 0;
+  while (!done && retries < 5) {
+    await sleep(200);
+  }
+
+  if (!done) {
+    Layout.wlogError("Could not load plugin");
+    return null;
+  }
+
+  //  Format result
+  const obj = {};
+  result = result.replace(">", "").trim();
+  result.split("\n").forEach((line) => {
+    const kvp = line.split("=");
+    const k = kvp[0].toString().trim();
+    const v = kvp[1];
+    obj[k] = v;
+  });
+
+  //   Layout.wlogError(JSON.stringify(obj));
+  return obj;
 }
 
 /**
@@ -78,8 +122,8 @@ function kill_plugin(process, rackIndex) {
 
 /**
  * Writes a message to a plugin process.
- * @param {*} process The jalv process to write into.
- * @param {*} msg The Jalv prompt supports several commands for interactive control.
+ * @param {jalv process} process The jalv process to write into. (plugin.process)
+ * @param {string} msg The Jalv prompt supports several commands for interactive control.
  * @example <caption>JALV Commands</caption>
  *       help              Display help message
  *       controls          Print settable control values
@@ -97,3 +141,4 @@ function write(process, msg) {
 exports.spawn_plugin = spawn_plugin;
 exports.kill_plugin = kill_plugin;
 exports.write = write;
+exports.getControls = getControls;

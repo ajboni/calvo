@@ -1,3 +1,4 @@
+const Jalv = require("../jalv");
 const blessed = require("blessed");
 const contrib = require("blessed-contrib");
 const PubSub = require("pubsub-js");
@@ -35,10 +36,17 @@ function progressControl(value, top, pluginControl) {
   // 	"units": { "label": "decibels", "render": "%f dB", "symbol": "dB" }
   //   },
 
+  // TODO: COnvert to percent
+
+  const parsedValue = properties.includes("integer")
+    ? parseInt(value)
+    : parseFloat(value);
+
+  const valuePercent = (parsedValue / (ranges.minimum + ranges.maximum)) * 100;
+  Layout.wlogError(valuePercent);
+
   var box = blessed.box({
-    keys: true,
-    mouse: true,
-    focusable: true,
+    interactive: false,
     top: top,
   });
 
@@ -46,17 +54,13 @@ function progressControl(value, top, pluginControl) {
     content: shortName,
     left: 1,
     top: 1,
-    // focusable: true,
-    // keyable: true,
-    // input: true,
+    interactive: false,
   });
 
   var progress = blessed.progressbar({
     border: {
       type: "line",
       fg: "#512725",
-      //   underline: true,
-      //   ch: "",
     },
     style: {
       focus: {
@@ -73,19 +77,35 @@ function progressControl(value, top, pluginControl) {
     height: 3,
     top: 0,
     left: "35%",
-    right: "2",
-    filled: value,
+    right: "8",
+    filled: parseInt(valuePercent.toString()),
     width: "65%",
   });
 
   progress.key("right", function (a, b) {
-    Layout.wlogError(`TODO: INC plugin ${this.id}`);
-    Layout.renderScreen();
+    Jalv.getControls(store.rack[0]);
+  });
+
+  let valueLabelValue = parsedValue.toFixed(2);
+  if (Object.keys(units).length > 0) {
+    ///"units": { "label": "decibels", "render": "%f dB", "symbol": "dB" }
+    valueLabelValue = units.render.replace("%f", valueLabelValue);
+  }
+
+  if (properties.includes("toggled")) {
+    valueLabelValue = parsedValue === 1 ? "ON" : "OFF";
+  }
+
+  var valueLabel = blessed.text({
+    content: valueLabelValue,
+    right: 4,
+    top: 1,
+    interactive: false,
   });
 
   box.append(label);
   box.append(progress);
-
+  box.append(valueLabel);
   return box;
 }
 
@@ -112,11 +132,20 @@ function make(grid, x, y, xSpan, ySpan) {
   return pluginControls;
 }
 
-function update(msg, plugin) {
+async function update(msg, plugin) {
   pluginControls.children = [];
+  const values = await Jalv.getControls(plugin, "controls");
   if (plugin) {
-    pluginControls.append(progressControl(45, "param1", 3, "assaassasa"));
-    pluginControls.append(progressControl(45, "param2", 6));
+    let y = 0;
+    plugin.ports.control.input.forEach((control) => {
+      y += 2;
+      const value = 50;
+      pluginControls.append(
+        progressControl(values[control.symbol], y, control)
+      );
+    });
+
+    // pluginControls.append(progressControl(45, "param1", 3, "assaassasa"));
     // TODO clear Screen
     return;
   }
