@@ -10,7 +10,7 @@ var pluginControls = {};
 
 function make(grid, x, y, xSpan, ySpan) {
   pluginControls = grid.set(y, x, ySpan, xSpan, blessed.box, {
-    label: "Plugin Controls",
+    label: "Plugin Parameters",
     input: true,
     mouse: true,
     interactive: true,
@@ -145,7 +145,16 @@ function progressControl(value, top, pluginControl, pluginInstance) {
 
   //   Keyboard action
   progress.key(
-    ["right", "C-right", "S-right", "left", "C-left", "S-left"],
+    [
+      "right",
+      "C-right",
+      "S-right",
+      "left",
+      "C-left",
+      "S-left",
+      "pageup",
+      "pagedown",
+    ],
     function (e, keys) {
       let newValue = 0;
 
@@ -162,6 +171,8 @@ function progressControl(value, top, pluginControl, pluginInstance) {
           step = (ranges.maximum - ranges.minimum) / 10;
         }
 
+        // For big values make bigger steps.
+        // Need to test if could affect a 'sensible' knob that for example would blast the volume up.
         if (ranges.maximum - ranges.minimum > 100) {
           step = (ranges.maximum - ranges.minimum) / 10;
         }
@@ -181,6 +192,8 @@ function progressControl(value, top, pluginControl, pluginInstance) {
 
         if (keys.shift) step /= 10;
         if (keys.ctrl) step *= 5;
+        if (keys.name === "pageup") step = -ranges.maximum / 5;
+        if (keys.name === "pagedown") step = ranges.maximum / 5;
         if (keys.name === "left") step = -step;
         newValue = box.value + step;
 
@@ -192,6 +205,11 @@ function progressControl(value, top, pluginControl, pluginInstance) {
       box.updateValue(newValue);
     }
   );
+
+  //   progress.key(["home", "end"], function (e, key) {
+  //     if (key.name === "home") Layout.focusPrev();
+  //     else if (key.name === "end") Layout.focusNext();
+  //   });
 
   progress.key(["up", "down"], function (e, key) {
     if (key.name === "up") Layout.focusPrev();
