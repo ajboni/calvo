@@ -4,25 +4,35 @@ const contrib = require("blessed-contrib");
 const PubSub = require("pubsub-js");
 const Layout = require("../layout");
 const store = require("../store");
+const { settings } = require("../../settings");
 
 var pluginControls = {};
 
-function progressControl(value, top, pluginControl) {
-  const {
-    comment,
-    designation,
-    index,
-    name,
-    properties,
-    rangeSteps,
-    ranges,
-    scalePoints,
-    shortName,
-    symbolm,
-    units,
-  } = pluginControl;
+function make(grid, x, y, xSpan, ySpan) {
+  pluginControls = grid.set(y, x, ySpan, xSpan, blessed.box, {
+    label: "Plugin Controls",
+    input: true,
+    mouse: true,
+    interactive: true,
+    keys: true,
+    padding: { left: 1, right: 1 },
+    style: {
+      focus: {
+        border: { fg: "red" },
+        //   enabled: false,
+      },
+    },
+  });
 
-  // {
+  const plugin = store.getSelectedPlugin();
+
+  var token = PubSub.subscribe("selectedPlugin", update);
+  return pluginControls;
+}
+
+/**
+ *  Initializes a plugin control widget.
+ *   // {
   // 	"comment": null,
   // 	"designation": null,
   // 	"index": 6,
@@ -35,28 +45,47 @@ function progressControl(value, top, pluginControl) {
   // 	"symbol": "master",
   // 	"units": { "label": "decibels", "render": "%f dB", "symbol": "dB" }
   //   },
-
-  // TODO: COnvert to percent
-
-  const parsedValue = properties.includes("integer")
-    ? parseInt(value)
-    : parseFloat(value);
-
-  const valuePercent = (parsedValue / (ranges.minimum + ranges.maximum)) * 100;
-  Layout.wlogError(valuePercent);
+ *
+ * @param {number} value 
+ * @param {number} top
+ * @param {pluginControl} pluginControl 
+ * @param {pluginInstance} pluginInstance
+ * @returns
+ */
+function progressControl(value, top, pluginControl, pluginInstance) {
+  const {
+    comment,
+    designation,
+    index,
+    name,
+    properties,
+    rangeSteps,
+    ranges,
+    scalePoints,
+    shortName,
+    symbol,
+    units,
+  } = pluginControl;
 
   var box = blessed.box({
     interactive: false,
+    focusable: false,
     top: top,
   });
 
+  box.value = parseControlValue(pluginControl, value);
+  const valuePercent = getControlValuePercent(pluginControl, box.value);
+
+  //    Control Label
   var label = blessed.text({
     content: shortName,
     left: 1,
     top: 1,
     interactive: false,
+    focusable: false,
   });
 
+  //    Progress Widget
   var progress = blessed.progressbar({
     border: {
       type: "line",
@@ -82,73 +111,185 @@ function progressControl(value, top, pluginControl) {
     width: "65%",
   });
 
-  progress.key("right", function (a, b) {
-    Jalv.getControls(store.rack[0]);
-  });
-
-  let valueLabelValue = parsedValue.toFixed(2);
-  if (Object.keys(units).length > 0) {
-    ///"units": { "label": "decibels", "render": "%f dB", "symbol": "dB" }
-    valueLabelValue = units.render.replace("%f", valueLabelValue);
-  }
-
-  if (properties.includes("toggled")) {
-    valueLabelValue = parsedValue === 1 ? "ON" : "OFF";
-  }
+  const valueLabelValue = getControlValueLabel(
+    pluginControl,
+    box.value.toFixed(2)
+  );
 
   var valueLabel = blessed.text({
     content: valueLabelValue,
     right: 4,
     top: 1,
     interactive: false,
+    focusable: false,
   });
 
   box.append(label);
   box.append(progress);
   box.append(valueLabel);
+
+  box.updateValue = async function (val) {
+    const result = await Jalv.setControl(pluginInstance, pluginControl, val);
+    const newValue = parseControlValue(pluginControl, val);
+
+    box.value = newValue;
+    const _valuePercent = getControlValuePercent(pluginControl, newValue);
+    const _valueLabel = getControlValueLabel(
+      pluginControl,
+      newValue.toFixed(2)
+    );
+    progress.setProgress(_valuePercent);
+    valueLabel.setContent(_valueLabel);
+    Layout.wlogDebug(JSON.stringify(result));
+  };
+
+  //   Keyboard action
+  progress.key(
+    ["right", "C-right", "S-right", "left", "C-left", "S-left"],
+    function (e, keys) {
+      let newValue = 0;
+
+      // if it is a toggle button, just send 0 or 1
+      if (properties.includes("toggled")) {
+        if (keys.name === "right") {
+          newValue = 1;
+        }
+      } else {
+        let step = settings.DEFAULT_CONTROL_STEP;
+
+        // For small values, (less than 1, make the steps even smaller)
+        if (ranges.maximum - ranges.minimum < 1) {
+          step = (ranges.maximum - ranges.minimum) / 10;
+        }
+
+        if (ranges.maximum - ranges.minimum > 100) {
+          step = (ranges.maximum - ranges.minimum) / 10;
+        }
+
+        // TODO: Not working properly
+        if (properties.includes("logarithmic")) {
+          // This value indicates into how many evenly-divided points the (control) port range should be divided for step-wise control. This may be used for changing the value with step-based controllers like arrow keys, mouse wheel, rotary encoders, and so on.
+          // Note that when used with a logarithmic port, the steps are logarithmic too, and port value can be calculated as:
+          // value = lower * pow(upper / lower, step / (steps - 1))
+          // and the step from value is:
+          //   // step = (steps - 1) * log(value / lower) / log(upper / lower)
+          //   step =
+          //     (9 * Math.log(box.value / ranges.minimum)) /
+          //     Math.log(ranges.maximum / ranges.minimum);
+          //   Layout.wlogDebug("Log Scale");
+        }
+
+        if (keys.shift) step /= 10;
+        if (keys.ctrl) step *= 5;
+        if (keys.name === "left") step = -step;
+        newValue = box.value + step;
+
+        if (ranges) {
+          if (newValue < ranges.minimum) newValue = ranges.minimum;
+          if (newValue > ranges.maximum) newValue = ranges.maximum;
+        }
+      }
+      box.updateValue(newValue);
+    }
+  );
+
+  progress.key(["up", "down"], function (e, key) {
+    if (key.name === "up") Layout.focusPrev();
+    else if (key.name === "down") Layout.focusNext();
+  });
+
+  //   progress.key("S-right", function (a, b) {
+  //     box.updateValue(box.value + settings.DEFAULT_CONTROL_MEDIUM_STEP);
+  //   });
+
+  //   progress.key("left", function (a, b) {
+  //     box.updateValue(box.value - settings.DEFAULT_CONTROL_SMALL_STEP);
+  //   });
+
+  //   progress.key("S-right", function (a, b) {
+  //     box.updateValue(box.value + settings.DEFAULT_CONTROL_MEDIUM_STEP);
+  //   });
+
   return box;
 }
 
-function make(grid, x, y, xSpan, ySpan) {
-  pluginControls = grid.set(y, x, ySpan, xSpan, blessed.box, {
-    label: "Plugin Controls",
-    input: true,
-    mouse: true,
-    interactive: true,
-    keys: true,
-    padding: { left: 1, right: 1 },
-    style: {
-      focus: {
-        border: { fg: "red" },
-        //   enabled: false,
-      },
-    },
-  });
-
-  const plugin = store.getSelectedPlugin();
-
-  var token = PubSub.subscribe("selectedPlugin", update);
-
-  return pluginControls;
-}
-
+// TODO: subscribe to "JALV controls" and sync sliders. (need to store the controls somewhere to set data instead of redraw.)
+// Actually, set control returns the control modified. If we store controls by its symbol, we can update only our modified control, much faster.
+// Maybe store a reference to the widget in plugin.info ?
 async function update(msg, plugin) {
+  if (!plugin) return;
   pluginControls.children = [];
   const values = await Jalv.getControls(plugin, "controls");
-  if (plugin) {
-    let y = 0;
-    plugin.ports.control.input.forEach((control) => {
-      y += 2;
-      const value = 50;
-      pluginControls.append(
-        progressControl(values[control.symbol], y, control)
-      );
-    });
 
-    // pluginControls.append(progressControl(45, "param1", 3, "assaassasa"));
-    // TODO clear Screen
-    return;
+  let y = 0;
+  plugin.ports.control.input.forEach((control) => {
+    y += 2;
+    controlWidget = progressControl(values[control.symbol], y, control, plugin);
+
+    pluginControls.append(controlWidget);
+
+    // Store the control widget on the plugin instance:
+    if (!plugin.info.controlWidgets) plugin.info.controlWidgets = {};
+    plugin.info.controlWidgets[control.symbol] = controlWidget;
+  });
+
+  return;
+}
+
+/**
+ * Returns a relative percent of a value for a plugin control.
+ * Uses rangeMax and RangeMin
+ *
+ * @param {puglinControl} control plugin control.
+ * @param {number} value Value to calculate %
+ */
+function getControlValuePercent(control, value) {
+  const parsedValue = control.properties.includes("integer")
+    ? parseInt(value)
+    : parseFloat(value);
+  const valuePercent =
+    // (parsedValue / (control.ranges.minimum + control.ranges.maximum)) * 100;
+    ((parsedValue - control.ranges.minimum) /
+      (control.ranges.maximum - control.ranges.minimum)) *
+    100;
+
+  return valuePercent;
+}
+
+/**
+ * Creates a label for a specific control.
+ *
+ * @param {*} control Plugin control
+ * @param {*} value Value to append to the label
+ * @returns Returns a label with units if applicable and formatted according to the LV2 specification.
+ */
+function getControlValueLabel(control, value) {
+  let valueLabelValue = value;
+  const parsedValue = parseControlValue(control, value);
+  if (Object.keys(control.units).length > 0) {
+    valueLabelValue = control.units.render.replace("%f", valueLabelValue);
   }
+  ///"units": { "label": "decibels", "render": "%f dB", "symbol": "dB" }
+  if (control.properties.includes("toggled")) {
+    valueLabelValue = parsedValue === 1 ? "ON" : "OFF";
+  }
+
+  return valueLabelValue;
+}
+
+/**
+ * Parse a control value, usually a float except if defined in properties.
+ * TODO: Check other cases.
+ *
+ * @param {plugin control} control
+ * @param {string} value
+ * @returns a float or an int with the value
+ */
+function parseControlValue(control, value) {
+  const parsedValue = control.properties.includes("integer")
+    ? parseInt(value)
+    : parseFloat(value);
+  return parsedValue;
 }
 
 exports.make = make;

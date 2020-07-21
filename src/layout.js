@@ -150,6 +150,17 @@ function wlogError(msg) {
   }
 }
 
+function wlogDebug(msg) {
+  if (!settings.SHOW_DEBUG_MSG) {
+    return;
+  }
+  if (logWidget) {
+    logWidget.log(`{green-fg}${msg}{/}`);
+  } else {
+    console.log(msg);
+  }
+}
+
 /**
  * triggers a screen re-render
  *
@@ -166,3 +177,4 @@ exports.focusNext = focusNext;
 exports.wlog = wlog;
 exports.wlogError = wlogError;
 exports.renderScreen = renderScreen;
+exports.wlogDebug = wlogDebug;

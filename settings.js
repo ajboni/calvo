@@ -9,6 +9,10 @@ const settings = {
   UI_UPDATE_RATE: 100,
   /** @type {number}Time in ms in which we query JACK server for statistics. */
   JACK_POLLING_RATE: 10000,
+  /** @type {number} Time in ms that the monitoring widget will poll jalv for updates on the monitor ports*/
+  JALV_MONITORING_POLLING_RATE: 100,
+  /** @type {number} Time in ms that the plugin controls widget will poll jalv for updates on the control ports*/
+  JALV_CONTROLS_POLLING_RATE: 100,
   /** @type {string} Location where to scan folders. */
   LV2_PLUGINS_FOLDER: "/user/lib/lv2",
   /** @type {boolean} If false, it will not scan for plugins on startup (use with caution). */
@@ -31,6 +35,10 @@ const settings = {
   AUTO_CONNECT: true,
   /** @type {boolean} Whether to reconnect all plugins or not automatically after significant changes. If false, user will have to manually reconnect with the button */
   AUTO_RECONNECT: true,
+  /** @type {boolean} If true it will show several debug information on the Log widget. */
+  SHOW_DEBUG_MSG: true,
+  /** @type {number} The value the control will be incremented/decremented when using the standard key (left/right) */
+  DEFAULT_CONTROL_STEP: 1,
 };
 
 exports.settings = settings;

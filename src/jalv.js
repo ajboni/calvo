@@ -72,6 +72,8 @@ async function spawn_plugin(plugin, rackIndex) {
 async function getControls(plugin, type) {
   const sleep = require("util").promisify(setTimeout);
 
+  if (type === "controls") plugin.info.busy = true;
+  if (type === "monitor" && plugin.info.busy === true) return;
   let done = false;
   let result = "";
   const process = plugin.process;
@@ -85,6 +87,7 @@ async function getControls(plugin, type) {
   let retries = 0;
   while (!done && retries < 5) {
     await sleep(200);
+    retries++;
   }
 
   if (!done) {
@@ -93,16 +96,52 @@ async function getControls(plugin, type) {
   }
 
   //  Format result
-  const obj = {};
-  result = result.replace(">", "").trim();
+  const resultJSON = jalvStdoutToJSON(result, type);
+  plugin.info.busy = false;
+  return resultJSON;
+}
+
+async function setControl(plugin, control, value) {
+  const sleep = require("util").promisify(setTimeout);
+  let done = false;
+  let retries = 0;
+  let result = "";
+
+  write(plugin.process, `set ${control.symbol} ${value}`);
+  plugin.process.stdout.once("data", function (msg) {
+    result = msg;
+    done = true;
+  });
+
+  while (!done && retries < 5) {
+    retries++;
+    await sleep(200);
+  }
+
+  if (!done) {
+    Layout.wlogError(`Could set control ${control.symbol}`);
+    return;
+  }
+  resultJSON = jalvStdoutToJSON(result, "set");
+  return resultJSON;
+}
+
+/**
+ * Formats and convert a JALV kvp stdout (CONTROL = VALUE) into a json object.
+ *
+ * @param {*} str JALV stoud to format
+ * @param {*} command the command invoked which resulted in this output.
+ * @returns
+ */
+function jalvStdoutToJSON(str, command) {
+  const obj = { jalv_command: command };
+  let result = str.replace(">", "").trim();
   result.split("\n").forEach((line) => {
     const kvp = line.split("=");
     const k = kvp[0].toString().trim();
     const v = kvp[1];
     obj[k] = v;
   });
-
-  //   Layout.wlogError(JSON.stringify(obj));
   return obj;
 }
 
@@ -142,3 +181,4 @@ exports.spawn_plugin = spawn_plugin;
 exports.kill_plugin = kill_plugin;
 exports.write = write;
 exports.getControls = getControls;
+exports.setControl = setControl;

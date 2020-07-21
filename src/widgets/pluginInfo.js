@@ -33,12 +33,12 @@ function make(grid, x, y, xSpan, ySpan) {
 }
 
 async function jackUpdate() {
-  const plugin = store.getSelectedPlugin();
-  if (!plugin || Object.keys(plugin).length === 0) return;
-
-  const pluginMonitors = await Jalv.getControls(plugin, "monitors");
-  monitor = JSON.stringify(pluginMonitors);
-  pluginInfo.setMarkdown(monitor);
+  //TODO: this will fill stdout, and will be hard to process status.
+  //   const plugin = store.getSelectedPlugin();
+  //   if (!plugin || Object.keys(plugin).length === 0) return;
+  //   const pluginMonitors = await Jalv.getControls(plugin, "monitors");
+  //   monitor = JSON.stringify(pluginMonitors);
+  //   pluginInfo.setMarkdown(monitor);
 }
 
 function update(msg, plugin) {
