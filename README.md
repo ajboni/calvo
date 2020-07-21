@@ -22,20 +22,26 @@ JACK, Nodejs, lilv, jalv
 # Settings
 Modify `settings.js` with your settings, more info [in the docs](https://ajboni.github.io/calvo/module-settings.html).
 
-# Keys
+# Keyboard shortcuts
 
 ### Layout
 
 - `TAB | Shift + TAB` Cycle between each widget.
 - `1...9` Select menu option.
 
-### Rack
+### Rack widget
 
 - `enter` Select plugin for handling
 - `delete | backspace` Remove plugin
 - `CTRL + up/down` Swap plugins up/down
 
-
+### Plugin parameters widget
+- `up/down / TAB` Cycle through each parameter.
+- `left/right` Change parameter value by default step.
+- `SHIFT + left/right` Change parameter value by small step.
+- `CTRL + left/right` Change parameter value by big step.
+- `page_up/page_down` Change parameter value by 1/5 of the maximum allowed
+  
 # DEV
 
 ### Initialize repo
