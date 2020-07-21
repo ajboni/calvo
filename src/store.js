@@ -171,21 +171,17 @@ function connectAll() {
   }
 
   rack.forEach((plugin, index, arr) => {
-    switch (index) {
-      case 0:
-        Jack.connectPlugins("input", plugin);
-        if (index < rack.length - 1) {
-          Jack.connectPlugins(plugin, rack[index + 1]);
-        }
-        break;
+    Layout.wlogDebug(`${index} => ${rack.length}`);
 
-      case rack.length - 1:
-        Jack.connectPlugins(plugin, "output");
-        break;
+    if (index === 0) {
+      Jack.connectPlugins("input", plugin);
+    }
 
-      default:
-        Jack.connectPlugins(plugin, rack[index + 1]);
-        break;
+    if (index === rack.length - 1) {
+      Layout.wlogDebug("Connect to output");
+      Jack.connectPlugins(plugin, "output");
+    } else {
+      Jack.connectPlugins(plugin, rack[index + 1]);
     }
   });
 }
@@ -314,13 +310,14 @@ function removePluginAt(index) {
   Jalv.kill_plugin(plugin.process, index);
 
   //   plugin.info.process.disconnect();
-  if (selectedPlugin.uri === plugin.uri) {
+  if (selectedPlugin && selectedPlugin.uri === plugin.uri) {
     selectedPlugin = null;
     notifySubscribers("selectedPlugin", selectedPlugin);
   }
 
-  if (settings.AUTO_RECONNECT) reconectAll();
   notifySubscribers("rack", rack);
+
+  if (settings.AUTO_RECONNECT) reconectAll();
 }
 
 /**
