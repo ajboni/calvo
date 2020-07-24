@@ -2,10 +2,9 @@ const blessed = require("blessed");
 const store = require("../store");
 const { settings } = require("../../settings");
 const PubSub = require("pubsub-js");
-let pluginListWidget = {};
 
-function make(grid, x, y, xSpan, ySpan) {
-  pluginListWidget = grid.set(y, x, ySpan, xSpan, blessed.list, {
+const PluginListWidget = function (grid, x, y, xSpan, ySpan) {
+  const pluginListWidget = grid.set(y, x, ySpan, xSpan, blessed.list, {
     label: "Available Plugins",
     mouse: true,
     scrollbar: {
@@ -53,12 +52,12 @@ function make(grid, x, y, xSpan, ySpan) {
   });
 
   var token = PubSub.subscribe("filteredPluginCatalog", update);
+  function update(msg, data) {
+    const list = data.map((plugin) => plugin.name);
+    pluginListWidget.setItems(list);
+  }
 
   return pluginListWidget;
-}
+};
 
-function update(msg, data) {
-  const list = data.map((plugin) => plugin.name);
-  pluginListWidget.setItems(list);
-}
-exports.make = make;
+module.exports = PluginListWidget;

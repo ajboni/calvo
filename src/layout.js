@@ -6,7 +6,7 @@
 const blessed = require("blessed");
 const contrib = require("blessed-contrib");
 const { settings } = require("../settings");
-const { app } = require("./store");
+const store = require("./store");
 const CategoriesWidget = require("./widgets/categories");
 const PluginListWidget = require("./widgets/pluginList");
 const StatusWidget = require("./widgets/status");
@@ -17,96 +17,109 @@ const RackWidget = require("./widgets/rack");
 const MainMenuWidget = require("./widgets/mainMenu");
 const AudioIO = require("./widgets/audioIO");
 const PubSub = require("pubsub-js");
+const PluginInfo = require("./widgets/pluginInfo");
+const gridCols = 18;
+const gridRows = 28;
 
 let focusIndex = 0;
 var mainScreen;
-var statusWidget,
-  logWidget,
-  categoryWidget,
-  pluginListWidget,
-  pluginInfoWidget,
-  pluginControlWidget,
-  rackWidget,
-  inputWidget,
-  outputWidget,
-  mainMenu,
-  carousel;
 
 /**
  * Sets up the layout in a given screen.
  *
  * @param {*} screen Blessed screen where the layout will be appended to.
- * @returns Returns a blessed grid.
+ * @returns Returns an array of grids.
  */
 function setUpLayout(screen) {
-  var grid = new contrib.grid({ rows: 28, cols: 18, screen: screen });
+  mainScreen = screen;
+
+  var grid = new contrib.grid({ rows: 28, cols: 18, screen: mainScreen });
+  this.mainMenu = MainMenuWidget.make(grid, 0, 0, 18, 2, 0);
+  this.logWidget = LogWidget.make(grid, 13, 8, 5, 20);
+  this.statusWidget = StatusWidget.make(grid, 13, 2, 5, 6);
+
+  const Page = function (...widgets) {
+    this.widgets = widgets;
+    this.show = function () {
+      this.widgets.forEach((widget) => {
+        widget.show();
+      });
+      mainScreen.focusPush(this.widgets[0]);
+    };
+    this.hide = () => {
+      this.widgets.forEach((widget) => {
+        widget.hide();
+      });
+    };
+    this.hide();
+  };
 
   /**
    *
    * Main Page
    * @param {*} screen
    */
-  function page0(screen) {
-    mainMenu = MainMenuWidget.make(grid, 0, 0, 18, 2, 0);
-    categoryWidget = CategoriesWidget.make(grid, 0, 2, 2, 26);
-    pluginListWidget = PluginListWidget.make(grid, 2, 2, 5, 26);
-    rackWidget = RackWidget.make(grid, 7, 2, 6, 12);
-    pluginInfoWidget = PluginInfoWidget.make(grid, 7, 14, 6, 7);
-    statusWidget = StatusWidget.make(grid, 7, 21, 6, 7);
-    logWidget = LogWidget.make(grid, 13, 2, 5, 26);
-
-    mainScreen = screen;
-    mainScreen.focusPush(categoryWidget);
-  }
+  const page0 = new Page(
+    new CategoriesWidget(grid, 0, 2, 2, 26),
+    new PluginListWidget(grid, 2, 2, 5, 26),
+    new RackWidget(grid, 7, 2, 6, 12),
+    new PluginInfo(grid, 7, 14, 6, 7)
+  );
 
   /**
    *
    * Perform Page
-   * @param {*} screen
    */
-  function page2(screen) {
-    mainMenu = MainMenuWidget.make(grid, 0, 0, 18, 2, 2);
-    rackWidget = RackWidget.make(grid, 0, 2, 6, 12);
-    pluginInfoWidget = PluginInfoWidget.make(grid, 0, 14, 6, 7);
-    statusWidget = StatusWidget.make(grid, 0, 21, 6, 7);
-    pluginControlWidget = PluginControlWidget.make(grid, 6, 2, 7, 26);
-    logWidget = LogWidget.make(grid, 13, 2, 5, 26);
-
-    mainScreen = screen;
-    mainScreen.focusPush(rackWidget);
-  }
+  const page2 = new Page(
+    new RackWidget(grid, 0, 2, 6, 12),
+    new PluginInfoWidget(grid, 0, 14, 6, 7),
+    PluginControlWidget.make(grid, 6, 2, 7, 26)
+  );
 
   /**
    * Input/Output page
    *
    * @param {*} screen
    */
-  function page4(screen) {
-    mainMenu = MainMenuWidget.make(grid, 0, 0, 18, 2, 4);
-    inputWidget = AudioIO.make(grid, 0, 2, 7, 11, "input");
-    outputWidget = AudioIO.make(grid, 7, 2, 7, 11, "output");
-    logWidget = LogWidget.make(grid, 14, 2, 4, 16);
-    statusWidget = StatusWidget.make(grid, 7, 13, 7, 5);
-    mainScreen = screen;
-    mainScreen.focusPush(inputWidget);
-  }
+  const page4 = new Page(
+    new AudioIO(grid, 0, 2, 6, 26, "input"),
+    new AudioIO(grid, 7, 2, 6, 26, "output")
+  );
 
-  carousel = new contrib.carousel([page0, page0, page2, page0, page4, page0], {
-    screen: screen,
-    interval: 0, //how often to switch views (set 0 to never swicth automatically)
-    controlKeys: false, //should right and left keyboard arrows control view rotation
-  });
+  const pageSwitcher = new PageSwitcher(mainScreen, [
+    page0,
+    page0,
+    page2,
+    page0,
+    page4,
+    page0,
+    // page4,
+  ]);
 
   PubSub.subscribe("app", function (msg, app) {
     const page = app.CURRENT_PAGE;
-    if (page != carousel.currPage) {
-      carousel.currPage = page;
-      carousel.move();
-    }
+    pageSwitcher.setPage(page);
   });
 
-  carousel.start();
-  return grid;
+  function PageSwitcher(screen, pages) {
+    this.currentPage = pages[0];
+    this.currentPage.show();
+    this.pages = pages;
+    this.init = function () {};
+    this.setPage = (pageIndex) => {
+      // Hide previous page
+      if (pages[pageIndex]) {
+        this.currentPage.hide();
+        this.currentPage = pages[pageIndex];
+        this.currentPage.show();
+      } else {
+        store.wlogError(`Page ${pageIndex} does not exist.`);
+      }
+    };
+  }
+
+  //   pageSwitcher.init();
+  //   return grid;
 }
 
 /**
@@ -115,6 +128,8 @@ function setUpLayout(screen) {
  */
 function focusNext() {
   mainScreen.focusNext();
+
+  store.wlogDebug(`Focused Control: ${mainScreen.focused.type}`);
 }
 
 /**
@@ -123,42 +138,6 @@ function focusNext() {
  */
 function focusPrev() {
   mainScreen.focusPrevious();
-}
-
-/**
- * Logs a message in the log-widget
- * @todo Move to the widget module.
- * @param {*} msg message to log.
- */
-function wlog(msg) {
-  if (logWidget && app.INITIALIZED) {
-    logWidget.log(msg);
-  } else {
-    console.log(msg);
-  }
-}
-
-/**
- * Logs an error message in the log Widget
- * * @param {*} msg
- */
-function wlogError(msg) {
-  if (logWidget) {
-    logWidget.log(`{red-fg}${msg}{/}`);
-  } else {
-    console.log(msg);
-  }
-}
-
-function wlogDebug(msg) {
-  if (!settings.SHOW_DEBUG_MSG) {
-    return;
-  }
-  if (logWidget) {
-    logWidget.log(`{green-fg}${msg}{/}`);
-  } else {
-    console.log(msg);
-  }
 }
 
 /**
@@ -174,7 +153,5 @@ function renderScreen() {
 exports.setUpLayout = setUpLayout;
 exports.focusPrev = focusPrev;
 exports.focusNext = focusNext;
-exports.wlog = wlog;
-exports.wlogError = wlogError;
+
 exports.renderScreen = renderScreen;
-exports.wlogDebug = wlogDebug;

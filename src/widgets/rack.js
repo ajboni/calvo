@@ -4,11 +4,10 @@ const Layout = require("../layout");
 const store = require("../store");
 const PubSub = require("pubsub-js");
 const settings = require("../../settings");
-var rack = {};
 
-function make(grid, x, y, xSpan, ySpan) {
+const RackWidget = function (grid, x, y, xSpan, ySpan) {
   const rackItems = store.rack.map((p) => p.name);
-  rack = grid.set(y, x, ySpan, xSpan, blessed.list, {
+  const rack = grid.set(y, x, ySpan, xSpan, blessed.list, {
     label: "RACK",
     mouse: true,
     interactive: true,
@@ -85,13 +84,14 @@ function make(grid, x, y, xSpan, ySpan) {
 
   // Subscribe to 'rack' updates
   var token = PubSub.subscribe("rack", update);
+
+  function update(msg, data) {
+    const names = data.map((p) => p.name);
+    rack.setItems(names);
+    Layout.renderScreen();
+  }
+
   return rack;
-}
+};
 
-function update(msg, data) {
-  const names = data.map((p) => p.name);
-  rack.setItems(names);
-  Layout.renderScreen();
-}
-
-exports.make = make;
+module.exports = RackWidget;

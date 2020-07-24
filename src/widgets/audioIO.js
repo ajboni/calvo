@@ -18,7 +18,7 @@ const store = require("../store");
  * @param {*} mode Mode should be input or output
  * @returns Returns the newly generated widget.
  */
-function make(grid, x, y, xSpan, ySpan, mode) {
+const IOWidget = function (grid, x, y, xSpan, ySpan, mode) {
   const ioWidget = grid.set(y, x, ySpan, xSpan, blessed.box, {
     label: mode.toUpperCase(),
     mouse: true,
@@ -113,12 +113,13 @@ function make(grid, x, y, xSpan, ySpan, mode) {
     ? (monoCheckbox.checked = true)
     : (monoCheckbox.checked = false);
 
+  function update(msg, jackStatus, mode, rightChannelBox) {
+    if (jackStatus.CONNECTIONS[mode + "Mode"] === "mono")
+      rightChannelBox.hide();
+    else rightChannelBox.show();
+  }
+
   return ioWidget;
-}
+};
 
-function update(msg, jackStatus, mode, rightChannelBox) {
-  if (jackStatus.CONNECTIONS[mode + "Mode"] === "mono") rightChannelBox.hide();
-  else rightChannelBox.show();
-}
-
-exports.make = make;
+module.exports = IOWidget;
