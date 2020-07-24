@@ -10,7 +10,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "document": "node_modules/.bin/jsdoc -c ./jsdoc.json",
     "doc-status": "TODO",
-    "debug": "node --nolazy --inspect-brk=9229 src/app.js"
+    "debug": "node --inspect ./src/app.js"
   },
   "author": "",
   "license": "AGPL-3.0-or-later",
@@ -24,6 +24,7 @@
     "blessed": "^0.1.81",
     "blessed-contrib": "^4.8.20",
     "nanoid": "^3.1.10",
+    "neo-blessed": "^0.2.0",
     "pubsub-js": "^1.8.0"
   }
 }
