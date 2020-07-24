@@ -4,7 +4,6 @@
  */
 
 const blessed = require("blessed");
-const contrib = require("blessed-contrib");
 const Layout = require("./layout");
 const Keyboard = require("./keyboard");
 const Jack = require("./jack_client");
@@ -21,8 +20,8 @@ try {
   Jack.init();
 
   // Create a screen object.
-  const mainGrid = Layout.setUpLayout(screen);
-  Keyboard.registerKeyboardShortcuts(screen, mainGrid);
+  Layout.setUpLayout(screen);
+  Keyboard.registerKeyboardShortcuts(screen);
 } catch (error) {
   console.trace("ERROR: " + error);
   console.log("Aborting...");
