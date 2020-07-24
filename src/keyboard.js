@@ -10,9 +10,8 @@ const App = require("./app");
  * Register keyboard shorcuts for a screen
  *
  * @param {*} screen The blessed screen which will receive the shortcuts.
- * @param {*} mainGrid (not used)
  */
-function registerKeyboardShortcuts(screen, mainGrid) {
+function registerKeyboardShortcuts(screen) {
   screen.key(["escape", "q", "C-c"], function (ch, key) {
     App.exit();
   });

@@ -1,5 +1,5 @@
 const blessed = require("blessed");
-
+const PubSub = require("pubsub-js");
 var log = {};
 
 function make(grid, x, y, xSpan, ySpan) {
@@ -22,11 +22,31 @@ function make(grid, x, y, xSpan, ySpan) {
   //     screen.copyToClipboard("ssss");
   //     wlog("Log copied to clipboard.");
   //   });
+  var token = PubSub.subscribe("wlog", update);
+  var token = PubSub.subscribe("wlogError", update);
+  var token = PubSub.subscribe("wlogDebug", update);
 
   return log;
 }
 
-function update() {}
+/**
+ * Fired whenever a new log message arrives
+ *
+ * @param {string} type Type of messsage (wlog, wlogError, wlogDebug)
+ * @param {string} content Message to loh
+ */
+function update(type, content) {
+  let color = "";
+  if (type === "wlogError") {
+    color = "{red-fg}";
+  } else if (type === "wlogDebug") {
+    color = "{green-fg}";
+  } else {
+    color = "{white-fg}";
+  }
+
+  log.log(`${color} ${content}`);
+}
 
 exports.make = make;
 exports.update = update;

@@ -100,7 +100,7 @@ async function connectPorts(src, dst, disconnect = false, quiet = true) {
       { encoding: "utf8" }
     );
   } catch (error) {
-    Layout.wlogError(error);
+    store.wlogError(error);
   }
 }
 
@@ -122,7 +122,7 @@ function connectPlugins(src, dst, disconnect = false) {
 
   //   Direct Monitor not supported right now (It may conflict on multi instance mode.)
   if (src === "input" && dst === "output") {
-    Layout.wlogError(
+    store.wlogError(
       "Direct Monitor not supported right now (It may conflict on multi instance mode.)"
     );
     return;
@@ -131,7 +131,7 @@ function connectPlugins(src, dst, disconnect = false) {
   //  Input => Plugin
   if (src === "input") {
     if (!dst.ports.audio.input || dst.ports.audio.input.length === 0) {
-      Layout.wlog(
+      store.wlog(
         "Dst plugin does not have correct number of ports or does not exist."
       );
       return;
@@ -161,7 +161,7 @@ function connectPlugins(src, dst, disconnect = false) {
   //   Plugin => Output
   else if (dst === "output") {
     if (!src.ports.audio.output || src.ports.audio.output.length === 0) {
-      Layout.wlog(
+      store.wlog(
         "src plugin does not have correct number of ports or does not exist."
       );
       return;
@@ -189,14 +189,14 @@ function connectPlugins(src, dst, disconnect = false) {
   //   Plugin => Plugin
   else {
     if (!src.ports.audio.output || src.ports.audio.output.length === 0) {
-      Layout.wlog(
+      store.wlog(
         "src plugin does not have correct number of ports or does not exist."
       );
       return;
     }
 
     if (!dst.ports.audio.input || dst.ports.audio.input.length === 0) {
-      Layout.wlog(
+      store.wlog(
         "dst plugin does not have correct number of ports or does not exist."
       );
       return;
@@ -268,7 +268,7 @@ function clearPluginPorts(plugin, direction = "all") {
         `${instanceName}_${plugin.info.instanceNumber}_${plugin.info.safeName}:${port.symbol}`
     )
     .join(",");
-  //   Layout.wlog(ports);
+  //   store.wlog(ports);
 
   try {
     const status = cp.execSync(
@@ -276,7 +276,7 @@ function clearPluginPorts(plugin, direction = "all") {
       { encoding: "utf8" }
     );
   } catch (error) {
-    Layout.wlogError(error.toString());
+    store.wlogError(error.toString());
   }
 }
 

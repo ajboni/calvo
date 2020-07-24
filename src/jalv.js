@@ -40,14 +40,14 @@ async function spawn_plugin(plugin, rackIndex) {
     processSpawned = true;
   });
   //   process.stdout.on("data", function (msg) {
-  //     Layout.wlog(`[#${rackIndex}] ${msg}`);
+  //     store.wlog(`[#${rackIndex}] ${msg}`);
   //   });
   //   process.stderr.on("data", function (msg) {
-  //     Layout.wlogError(`[#${rackIndex}] ${msg}`);
+  //     store.wlogError(`[#${rackIndex}] ${msg}`);
   //   });
 
   //   process.on("message", function (msg) {
-  //     Layout.wlog(`[#${rackIndex}] ${msg}`);
+  //     store.wlog(`[#${rackIndex}] ${msg}`);
   //   });
 
   let retries = 0;
@@ -56,7 +56,7 @@ async function spawn_plugin(plugin, rackIndex) {
   }
 
   if (!processSpawned) {
-    Layout.wlogError("Could not load plugin");
+    store.wlogError("Could not load plugin");
     return null;
   }
   return process;
@@ -91,7 +91,7 @@ async function getControls(plugin, type) {
   }
 
   if (!done) {
-    Layout.wlogError("Could not load plugin");
+    store.wlogError("Could not load plugin");
     return null;
   }
 
@@ -119,7 +119,7 @@ async function setControl(plugin, control, value) {
   }
 
   if (!done) {
-    Layout.wlogError(`Could set control ${control.symbol}`);
+    store.wlogError(`Could set control ${control.symbol}`);
     return;
   }
   resultJSON = jalvStdoutToJSON(result, "set");
@@ -155,7 +155,7 @@ function kill_plugin(process, rackIndex) {
   try {
     process.kill();
   } catch (error) {
-    Layout.wlogError(`[#${rackIndex}] ${error}`);
+    store.wlogError(`[#${rackIndex}] ${error}`);
   }
 }
 

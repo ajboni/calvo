@@ -171,14 +171,14 @@ function connectAll() {
   }
 
   rack.forEach((plugin, index, arr) => {
-    Layout.wlogDebug(`${index} => ${rack.length}`);
+    wlogDebug(`${index} => ${rack.length}`);
 
     if (index === 0) {
       Jack.connectPlugins("input", plugin);
     }
 
     if (index === rack.length - 1) {
-      Layout.wlogDebug("Connect to output");
+      wlogDebug("Connect to output");
       Jack.connectPlugins(plugin, "output");
     } else {
       Jack.connectPlugins(plugin, rack[index + 1]);
@@ -205,8 +205,8 @@ function setAudioSource(mode, channel, name) {
     if (channel === "right") jack.CONNECTIONS.outputRight = name;
   }
   notifySubscribers("jack", jack);
-  Layout.wlog(jack.CONNECTIONS.inputLeft);
-  Layout.wlog(jack.CONNECTIONS.inputRight);
+  wlog(jack.CONNECTIONS.inputLeft);
+  wlog(jack.CONNECTIONS.inputRight);
 }
 
 /**
@@ -280,9 +280,9 @@ async function addPluginToRack(pluginName) {
       Jack.connectPlugins(plugin, "output");
     }
     notifySubscribers("rack", rack);
-    Layout.wlog(`Added ${plugin.name} to rack. (#${rack.length - 1})`);
+    wlog(`Added ${plugin.name} to rack. (#${rack.length - 1})`);
   } catch (error) {
-    Layout.wlogError(`Error adding plugin to rack: ${error}`);
+    wlogError(`Error adding plugin to rack: ${error}`);
     console.trace(error);
   }
 }
@@ -305,7 +305,7 @@ function clearRack() {
 function removePluginAt(index) {
   const plugin = rack[index];
   rack.splice(index, 1);
-  Layout.wlog(`Remove plugin #${index} - ${plugin.name}`);
+  wlog(`Remove plugin #${index} - ${plugin.name}`);
 
   Jalv.kill_plugin(plugin.process, index);
 
@@ -355,7 +355,7 @@ function moveRackItem(rackIndex, direction, max = false) {
   //   if (prev_plugin) Jack.disconnectPlugins(prev_plugin, plugin, true);
   //   if (next_plugin) Jack.disconnectPlugins(plugin, next_plugin, true);
 
-  //   Layout.wlogError(`${rackIndex} => ${direction} => ${max}`);
+  //   store.wlogError(`${rackIndex} => ${direction} => ${max}`);
   // TODO: This could be better but for now we will disconnect and reconnect everything.
 
   if (settings.AUTO_RECONNECT) reconectAll();
@@ -402,7 +402,7 @@ function setCategoryFilter(filter = "") {
 }
 
 function saveCache(directoryPath = __dirname) {
-  Layout.wlog("Saving cache...");
+  wlog("Saving cache...");
   try {
     if (fs.existsSync(path.join(directoryPath, `pluginCatalog.json`))) {
       fs.unlinkSync(path.join(directoryPath, `pluginCatalog.json`));
@@ -434,9 +434,9 @@ function saveCache(directoryPath = __dirname) {
       JSON.stringify(categories.sort())
     );
 
-    Layout.wlog("Cache Saved.");
+    wlog("Cache Saved.");
   } catch (error) {
-    Layout.wlog(error);
+    wlog(error);
   }
 }
 
@@ -454,6 +454,43 @@ function loadCache(directoryPath = __dirname) {
     const catData = fs.readFileSync(catPath, "utf8");
     pluginCategories.length = 0;
     pluginCategories.push(...JSON.parse(catData));
+  }
+}
+
+/**
+ * Logs a message in the log-widget
+ * @todo Move to the widget module.
+ * @param {*} msg message to log.
+ */
+function wlog(msg) {
+  if (app.INITIALIZED) {
+    notifySubscribers("wlog", msg);
+  } else {
+    console.log(msg);
+  }
+}
+
+/**
+ * Logs an error message in the log Widget
+ * * @param {*} msg
+ */
+function wlogError(msg) {
+  if (app.INITIALIZED) {
+    notifySubscribers("wlogError", msg);
+  } else {
+    console.trace(msg);
+  }
+}
+
+function wlogDebug(msg) {
+  if (!settings.SHOW_DEBUG_MSG) {
+    return;
+  }
+  if (app.INITIALIZED) {
+    notifySubscribers("wlogDebug", msg);
+    // logWidget.log(`{green-fg}${msg}{/}`);
+  } else {
+    console.log(msg);
   }
 }
 
@@ -478,3 +515,6 @@ exports.setAudioSourceMode = setAudioSourceMode;
 exports.reconectAll = reconectAll;
 exports.clearRack = clearRack;
 exports.moveRackItem = moveRackItem;
+exports.wlog = wlog;
+exports.wlogError = wlogError;
+exports.wlogDebug = wlogDebug;

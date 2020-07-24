@@ -31,9 +31,7 @@ function init() {
  * Scans the system for installed plugins, and save a database in memory and disk.
  */
 function buildPluginCache() {
-  Layout.wlog(
-    "Building plugins cache, this might take a while, please wait..."
-  );
+  store.wlog("Building plugins cache, this might take a while, please wait...");
   try {
     //  const names = lv2ls(true);
     const plugins = grep();
@@ -48,7 +46,7 @@ function buildPluginCache() {
     });
     store.saveCache();
   } catch (error) {
-    Layout.wlog(error);
+    store.wlog(error);
   }
 }
 
@@ -69,7 +67,7 @@ function grep(regex = ".") {
     );
     return JSON.parse(result);
   } catch (error) {
-    Layout.wlog(error);
+    store.wlog(error);
     return error;
   }
 }
@@ -105,7 +103,7 @@ function pluginInfo(uri) {
     );
     return JSON.parse(result);
   } catch (error) {
-    Layout.wlogError(`Plugin ${uri} could not be loaded.`);
+    store.wlogError(`Plugin ${uri} could not be loaded.`);
     throw error;
   }
 }
