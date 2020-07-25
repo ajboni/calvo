@@ -73,7 +73,7 @@ function setUpLayout(screen) {
   const page2 = new Page(
     new RackWidget(grid, 0, 2, 6, 12),
     new PluginInfoWidget(grid, 0, 14, 6, 7),
-    PluginControlWidget.make(grid, 6, 2, 7, 26)
+    new PluginControlWidget(grid, 6, 2, 7, 26)
   );
 
   /**

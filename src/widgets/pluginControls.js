@@ -6,10 +6,8 @@ const Layout = require("../layout");
 const store = require("../store");
 const { settings } = require("../../settings");
 
-var pluginControls = {};
-
-function make(grid, x, y, xSpan, ySpan) {
-  pluginControls = grid.set(y, x, ySpan, xSpan, blessed.box, {
+const PluginControls = function (grid, x, y, xSpan, ySpan) {
+  const pluginControls = grid.set(y, x, ySpan, xSpan, blessed.box, {
     label: "Plugin Parameters",
     input: true,
     mouse: true,
@@ -27,8 +25,47 @@ function make(grid, x, y, xSpan, ySpan) {
   const plugin = store.getSelectedPlugin();
 
   var token = PubSub.subscribe("selectedPlugin", update);
+
+  // TODO: subscribe to "JALV controls" and sync sliders. (need to store the controls somewhere to set data instead of redraw.)
+  // Actually, set control returns the control modified. If we store controls by its symbol, we can update only our modified control, much faster.
+  // Maybe store a reference to the widget in plugin.info ?
+  async function update(msg, plugin) {
+    pluginControls.children.forEach((ctrl) => {
+      ctrl.hide;
+      Layout.renderScreen();
+    });
+
+    if (!plugin) return;
+
+    // Store the control widget on the plugin instance:
+    if (!plugin.info.controlWidgets) plugin.info.controlWidgets = {};
+
+    const values = await Jalv.getControls(plugin, "controls");
+
+    let y = 0;
+    plugin.ports.control.input.forEach((control) => {
+      y += 2;
+
+      if (!plugin.info.controlWidgets[control.symbol]) {
+        controlWidget = progressControl(
+          values[control.symbol],
+          y,
+          control,
+          plugin
+        );
+        pluginControls.append(controlWidget);
+        plugin.info.controlWidgets[control.symbol] = controlWidget;
+      } else {
+        // FIXME
+        // plugin.info.controlWidgets[control.symbol].setContent(
+        //   values[control.symbol]
+        // );
+      }
+    });
+  }
+
   return pluginControls;
-}
+};
 
 /**
  *  Initializes a plugin control widget.
@@ -140,7 +177,7 @@ function progressControl(value, top, pluginControl, pluginInstance) {
     );
     progress.setProgress(_valuePercent);
     valueLabel.setContent(_valueLabel);
-    Layout.wlogDebug(JSON.stringify(result));
+    store.wlogDebug(JSON.stringify(result));
   };
 
   //   Keyboard action
@@ -187,7 +224,7 @@ function progressControl(value, top, pluginControl, pluginInstance) {
           //   step =
           //     (9 * Math.log(box.value / ranges.minimum)) /
           //     Math.log(ranges.maximum / ranges.minimum);
-          //   Layout.wlogDebug("Log Scale");
+          //   store.wlogDebug("Log Scale");
         }
 
         if (keys.shift) step /= 10;
@@ -229,29 +266,6 @@ function progressControl(value, top, pluginControl, pluginInstance) {
   //   });
 
   return box;
-}
-
-// TODO: subscribe to "JALV controls" and sync sliders. (need to store the controls somewhere to set data instead of redraw.)
-// Actually, set control returns the control modified. If we store controls by its symbol, we can update only our modified control, much faster.
-// Maybe store a reference to the widget in plugin.info ?
-async function update(msg, plugin) {
-  if (!plugin) return;
-  pluginControls.children = [];
-  const values = await Jalv.getControls(plugin, "controls");
-
-  let y = 0;
-  plugin.ports.control.input.forEach((control) => {
-    y += 2;
-    controlWidget = progressControl(values[control.symbol], y, control, plugin);
-
-    pluginControls.append(controlWidget);
-
-    // Store the control widget on the plugin instance:
-    if (!plugin.info.controlWidgets) plugin.info.controlWidgets = {};
-    plugin.info.controlWidgets[control.symbol] = controlWidget;
-  });
-
-  return;
 }
 
 /**
@@ -310,4 +324,4 @@ function parseControlValue(control, value) {
   return parsedValue;
 }
 
-exports.make = make;
+module.exports = PluginControls;
