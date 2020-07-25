@@ -119,7 +119,7 @@ async function setControl(plugin, control, value) {
   }
 
   if (!done) {
-    store.wlogError(`Could set control ${control.symbol}`);
+    store.wlogError(`Could not set control ${plugin.name} 	${control.symbol}`);
     return;
   }
   resultJSON = jalvStdoutToJSON(result, "set");

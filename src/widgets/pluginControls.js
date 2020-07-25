@@ -14,7 +14,11 @@ const PluginControls = function (grid, x, y, xSpan, ySpan) {
     interactive: true,
     keys: true,
     padding: { left: 1, right: 1 },
+    mouse: true,
+    scrollable: true,
+
     style: {
+      scrollbar: true,
       focus: {
         border: { fg: "red" },
         //   enabled: false,
@@ -22,18 +26,21 @@ const PluginControls = function (grid, x, y, xSpan, ySpan) {
     },
   });
 
+  pluginControls.key(["down"], (e, x) => {
+    Layout.focusNext();
+  });
+
   const plugin = store.getSelectedPlugin();
 
   var token = PubSub.subscribe("selectedPlugin", update);
 
-  // TODO: subscribe to "JALV controls" and sync sliders. (need to store the controls somewhere to set data instead of redraw.)
-  // Actually, set control returns the control modified. If we store controls by its symbol, we can update only our modified control, much faster.
-  // Maybe store a reference to the widget in plugin.info ?
+  //  Update all controls for a given plugin (queryin jalv)
   async function update(msg, plugin) {
-    pluginControls.children.forEach((ctrl) => {
-      ctrl.hide;
-      Layout.renderScreen();
-    });
+    const length = JSON.parse(JSON.stringify(pluginControls.children.length));
+    for (let index = length - 1; index > 0; index--) {
+      const element = pluginControls.children[index];
+      element.hide();
+    }
 
     if (!plugin) return;
 
@@ -56,10 +63,10 @@ const PluginControls = function (grid, x, y, xSpan, ySpan) {
         pluginControls.append(controlWidget);
         plugin.info.controlWidgets[control.symbol] = controlWidget;
       } else {
-        // FIXME
-        // plugin.info.controlWidgets[control.symbol].setContent(
-        //   values[control.symbol]
-        // );
+        plugin.info.controlWidgets[control.symbol].setValue(
+          values[control.symbol]
+        );
+        plugin.info.controlWidgets[control.symbol].show();
       }
     });
   }
@@ -83,7 +90,7 @@ const PluginControls = function (grid, x, y, xSpan, ySpan) {
   // 	"units": { "label": "decibels", "render": "%f dB", "symbol": "dB" }
   //   },
  *
- * @param {number} value 
+ * @param {number} value focused
  * @param {number} top
  * @param {pluginControl} pluginControl 
  * @param {pluginInstance} pluginInstance
@@ -125,16 +132,19 @@ function progressControl(value, top, pluginControl, pluginInstance) {
   //    Progress Widget
   var progress = blessed.progressbar({
     border: {
-      type: "line",
-      fg: "#512725",
+      type: "bg",
+      //   fg: "#882822",
+      //   bg: "#512725",
     },
     style: {
+      bg: "#282828",
       focus: {
+        bg: "#1e1e1e",
         border: {
           fg: "#637373",
         },
         bar: {
-          fg: "#5faf5f",
+          bg: "#68955d",
         },
       },
     },
@@ -178,6 +188,19 @@ function progressControl(value, top, pluginControl, pluginInstance) {
     progress.setProgress(_valuePercent);
     valueLabel.setContent(_valueLabel);
     store.wlogDebug(JSON.stringify(result));
+  };
+
+  box.setValue = function (val) {
+    const newValue = parseControlValue(pluginControl, val);
+
+    box.value = newValue;
+    const _valuePercent = getControlValuePercent(pluginControl, newValue);
+    const _valueLabel = getControlValueLabel(
+      pluginControl,
+      newValue.toFixed(2)
+    );
+    progress.setProgress(_valuePercent);
+    valueLabel.setContent(_valueLabel);
   };
 
   //   Keyboard action
@@ -264,7 +287,6 @@ function progressControl(value, top, pluginControl, pluginInstance) {
   //   progress.key("S-right", function (a, b) {
   //     box.updateValue(box.value + settings.DEFAULT_CONTROL_MEDIUM_STEP);
   //   });
-
   return box;
 }
 
@@ -304,6 +326,13 @@ function getControlValueLabel(control, value) {
   ///"units": { "label": "decibels", "render": "%f dB", "symbol": "dB" }
   if (control.properties.includes("toggled")) {
     valueLabelValue = parsedValue === 1 ? "ON" : "OFF";
+  }
+  if (control.properties.includes("enumeration")) {
+    const options = control.scalePoints.length;
+
+    const option = control.scalePoints.filter((x) => x.value === parsedValue);
+
+    if (option[0]) valueLabelValue = option[0].label;
   }
 
   return valueLabelValue;

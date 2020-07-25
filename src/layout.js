@@ -128,8 +128,7 @@ function setUpLayout(screen) {
  */
 function focusNext() {
   mainScreen.focusNext();
-
-  store.wlogDebug(`Focused Control: ${mainScreen.focused.type}`);
+  //   store.wlogDebug(`Focused Control: ${mainScreen.focused.type}`);
 }
 
 /**
