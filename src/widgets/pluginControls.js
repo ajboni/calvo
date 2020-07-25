@@ -87,7 +87,7 @@ const PluginControls = function (grid, x, y, xSpan, ySpan) {
  * @param {number} top
  * @param {pluginControl} pluginControl 
  * @param {pluginInstance} pluginInstance
- * @returns
+ * @returns Returns the progress control blessed widget.
  */
 function progressControl(value, top, pluginControl, pluginInstance) {
   const {
@@ -313,7 +313,7 @@ function getControlValueLabel(control, value) {
  * Parse a control value, usually a float except if defined in properties.
  * TODO: Check other cases.
  *
- * @param {plugin control} control
+ * @param {pluginControl} control
  * @param {string} value
  * @returns a float or an int with the value
  */

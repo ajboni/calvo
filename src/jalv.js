@@ -67,7 +67,7 @@ async function spawn_plugin(plugin, rackIndex) {
  *
  * @param {plugin} plugin Plugin instance (from rack)
  * @param {string} type Type of control to get('controls'|'monitor' )
- * @returns
+ * @returns the control value as json: ctrlName: ctrlValue
  */
 async function getControls(plugin, type) {
   const sleep = require("util").promisify(setTimeout);
@@ -129,9 +129,9 @@ async function setControl(plugin, control, value) {
 /**
  * Formats and convert a JALV kvp stdout (CONTROL = VALUE) into a json object.
  *
- * @param {*} str JALV stoud to format
- * @param {*} command the command invoked which resulted in this output.
- * @returns
+ * @param {string} str JALV stoud to format
+ * @param {string} command the command invoked which resulted in this output.
+ * @returns a JSON object. key: value
  */
 function jalvStdoutToJSON(str, command) {
   const obj = { jalv_command: command };
@@ -148,8 +148,8 @@ function jalvStdoutToJSON(str, command) {
 /**
  * Kills the plugin process.
  *
- * @param {*} process
- * @param {*} rackIndex
+ * @param {pluginProcess} process
+ * @param {number} rackIndex
  */
 function kill_plugin(process, rackIndex) {
   try {
@@ -161,7 +161,7 @@ function kill_plugin(process, rackIndex) {
 
 /**
  * Writes a message to a plugin process.
- * @param {jalv process} process The jalv process to write into. (plugin.process)
+ * @param {jalvProcess} process The jalv process to write into. (plugin.process)
  * @param {string} msg The Jalv prompt supports several commands for interactive control.
  * @example <caption>JALV Commands</caption>
  *       help              Display help message
