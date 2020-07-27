@@ -146,7 +146,7 @@ async function processQueue(plugin) {
  * @param {string} command The command to execute on JALV
  * @param {number} [maxRetries=10] How many time retry before giving up.
  * @param {number} [retriesWait=5] How many ms to wait before each retry.
- * @returns
+ * @returns A JSON file with the (parsed) output for the given command.
  */
 async function writeWait(process, command, maxRetries = 10, retriesWait = 5) {
   const sleep = require("util").promisify(setTimeout);
@@ -182,7 +182,7 @@ async function writeWait(process, command, maxRetries = 10, retriesWait = 5) {
  * @param {plugin} plugin The plugin instance.
  * @param {string} type Can be 'set, controls, monitors'
  * @param {string} command command to execute.
- * @returns
+ * @returns null if no plugin is specified
  */
 function addToQueue(plugin, type, command) {
   if (!plugin) return;
@@ -195,7 +195,7 @@ function addToQueue(plugin, type, command) {
  * @param {plugin} plugin Plugin
  * @param {string} control Control name. Uses `symbol` property of LV2 spec.
  * @param {number} value Value to assign.
- * @returns
+ * @returns null if no plugin is specified
  */
 function setControl(plugin, control, value) {
   if (!plugin) return;
