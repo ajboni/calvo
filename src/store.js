@@ -257,7 +257,7 @@ async function addPluginToRack(pluginName) {
       safeName: string_utils.safe(pluginName),
     };
 
-    plugin.process = await Jalv.spawn_plugin(plugin, rack.length);
+    await Jalv.spawn_plugin(plugin, rack.length);
 
     instanceNumber++;
     rack.push(plugin);
@@ -307,7 +307,7 @@ function removePluginAt(index) {
   rack.splice(index, 1);
   wlog(`Remove plugin #${index} - ${plugin.name}`);
 
-  Jalv.kill_plugin(plugin.process, index);
+  Jalv.kill_plugin(plugin, index);
 
   //   plugin.info.process.disconnect();
   if (selectedPlugin && selectedPlugin.uri === plugin.uri) {

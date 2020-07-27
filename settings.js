@@ -9,10 +9,10 @@ const settings = {
   UI_UPDATE_RATE: 100,
   /** @type {number}Time in ms in which we query JACK server for statistics. */
   JACK_POLLING_RATE: 10000,
-  /** @type {number} Time in ms that the monitoring widget will poll jalv for updates on the monitor ports*/
-  JALV_MONITORING_POLLING_RATE: 100,
-  /** @type {number} Time in ms that the plugin controls widget will poll jalv for updates on the control ports*/
-  JALV_CONTROLS_POLLING_RATE: 100,
+  /** @type {number} Time in ms that the app will poll jalv for updates on the monitor and control ports. Lower values means more responsive UI, but more prone to errors.*/
+  JALV_POLLING_RATE: 35,
+  /** @type {boolean} @experimental Enable monitoring for selected plugin. */
+  JALV_MONITORING: true,
   /** @type {string} Location where to scan folders. */
   LV2_PLUGINS_FOLDER: "/user/lib/lv2",
   /** @type {boolean} If false, it will not scan for plugins on startup (use with caution). */
@@ -23,6 +23,7 @@ const settings = {
   DEFAULT_INPUT_MODE: "mono",
   /** @type {string} Define what the default left input port mode will be. (jack port name: ex: system:capture_1*/
   DEFAULT_INPUT_L: "PulseAudio JACK Sink:front-left",
+  //   DEFAULT_INPUT_L: "system:capture_1",
   /** @type {string} Define what the default right input port mode will be. (jack port name: ex: system:capture_1*/
   DEFAULT_INPUT_R: "system:capture_2",
   /** @type {"mono"|"stereo"} Define what the default output mode will be.*/

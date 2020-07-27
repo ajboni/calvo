@@ -32,8 +32,12 @@ const PluginControls = function (grid, x, y, xSpan, ySpan) {
 
   const plugin = store.getSelectedPlugin();
 
-  var token = PubSub.subscribe("selectedPlugin", update);
-
+  PubSub.subscribe("pluginControlsChanged", update);
+  PubSub.subscribe("selectedPlugin", (msg, plugin) => {
+    if (!plugin) {
+      update("", null);
+    }
+  });
   //  Update all controls for a given plugin (queryin jalv)
   async function update(msg, plugin) {
     const length = JSON.parse(JSON.stringify(pluginControls.children.length));
@@ -47,12 +51,11 @@ const PluginControls = function (grid, x, y, xSpan, ySpan) {
     // Store the control widget on the plugin instance:
     if (!plugin.info.controlWidgets) plugin.info.controlWidgets = {};
 
-    const values = await Jalv.getControls(plugin, "controls");
+    // const values = await Jalv.getControls(plugin, "controls");
+    const values = plugin.info.controls;
 
     let y = 0;
     plugin.ports.control.input.forEach((control) => {
-      y += 2;
-
       if (!plugin.info.controlWidgets[control.symbol]) {
         controlWidget = progressControl(
           values[control.symbol],
@@ -68,6 +71,7 @@ const PluginControls = function (grid, x, y, xSpan, ySpan) {
         );
         plugin.info.controlWidgets[control.symbol].show();
       }
+      y += 2;
     });
   }
 
@@ -175,8 +179,8 @@ function progressControl(value, top, pluginControl, pluginInstance) {
   box.append(progress);
   box.append(valueLabel);
 
-  box.updateValue = async function (val) {
-    const result = await Jalv.setControl(pluginInstance, pluginControl, val);
+  box.updateValue = function (val) {
+    Jalv.setControl(pluginInstance, pluginControl, val);
     const newValue = parseControlValue(pluginControl, val);
 
     box.value = newValue;
@@ -187,7 +191,6 @@ function progressControl(value, top, pluginControl, pluginInstance) {
     );
     progress.setProgress(_valuePercent);
     valueLabel.setContent(_valueLabel);
-    store.wlogDebug(JSON.stringify(result));
   };
 
   box.setValue = function (val) {
@@ -353,4 +356,7 @@ function parseControlValue(control, value) {
   return parsedValue;
 }
 
-module.exports = PluginControls;
+exports.parseControlValue = parseControlValue;
+exports.getControlValueLabel = getControlValueLabel;
+exports.getControlValuePercent = getControlValuePercent;
+exports.PluginControls = PluginControls;

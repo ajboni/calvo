@@ -4,7 +4,6 @@ const Jalv = require("../jalv");
 const store = require("../store");
 
 var monitor = "";
-var monitorPoll = setInterval(jackUpdate, 100);
 
 const PluginInfo = function (grid, x, y, xSpan, ySpan) {
   const pluginInfo = grid.set(y, x, ySpan, xSpan, contrib.markdown, {
@@ -30,7 +29,6 @@ const PluginInfo = function (grid, x, y, xSpan, ySpan) {
 
   function update(msg, plugin) {
     if (!plugin) {
-      clearInterval(monitorPoll);
       pluginInfo.setLabel("No Plugin Info");
       pluginInfo.setMarkdown(" ");
     } else {
@@ -57,14 +55,5 @@ const PluginInfo = function (grid, x, y, xSpan, ySpan) {
 
   return pluginInfo;
 };
-
-async function jackUpdate() {
-  //TODO: this will fill stdout, and will be hard to process status.
-  //   const plugin = store.getSelectedPlugin();
-  //   if (!plugin || Object.keys(plugin).length === 0) return;
-  //   const pluginMonitors = await Jalv.getControls(plugin, "monitors");
-  //   monitor = JSON.stringify(pluginMonitors);
-  //   pluginInfo.setMarkdown(monitor);
-}
 
 module.exports = PluginInfo;

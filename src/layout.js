@@ -12,7 +12,8 @@ const PluginListWidget = require("./widgets/pluginList");
 const StatusWidget = require("./widgets/status");
 const LogWidget = require("./widgets/log");
 const PluginInfoWidget = require("./widgets/pluginInfo");
-const PluginControlWidget = require("./widgets/pluginControls");
+const PluginMonitor = require("./widgets/pluginMonitor");
+const PluginControlWidget = require("./widgets/pluginControls").PluginControls;
 const RackWidget = require("./widgets/rack");
 const MainMenuWidget = require("./widgets/mainMenu");
 const AudioIO = require("./widgets/audioIO");
@@ -72,7 +73,8 @@ function setUpLayout(screen) {
    */
   const page2 = new Page(
     new RackWidget(grid, 0, 2, 6, 12),
-    new PluginInfoWidget(grid, 0, 14, 6, 7),
+    // new PluginInfoWidget(grid, 0, 14, 6, 7),
+    new PluginMonitor(grid, 0, 14, 6, 14),
     new PluginControlWidget(grid, 6, 2, 7, 26)
   );
 

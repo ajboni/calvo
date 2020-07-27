@@ -8,6 +8,14 @@
 const Layout = require("./layout");
 const { spawn } = require("child_process");
 const store = require("./store");
+const PubSub = require("pubsub-js");
+const { settings } = require("../settings");
+
+// Each time a new plugin is seclected query jalv for controls info.
+PubSub.subscribe("selectedPlugin", (msg, plugin) => {
+  addToQueue(plugin, "controls", "controls");
+});
+
 /**
  * Spawns a plugin. It will execute jalv and load the plugin. ALl communcations can be reachead via the process now at plugin.process
  *
@@ -17,6 +25,7 @@ const store = require("./store");
  */
 async function spawn_plugin(plugin, rackIndex) {
   const sleep = require("util").promisify(setTimeout);
+
   let processSpawned = false;
   // We need to loose the buffer to get a fast response:
   // https://gitlab.com/drobilla/jalv/-/issues/7
@@ -52,13 +61,24 @@ async function spawn_plugin(plugin, rackIndex) {
 
   let retries = 0;
   while (!processSpawned && retries < 5) {
-    await sleep(200);
+    await sleep(100);
   }
 
   if (!processSpawned) {
     store.wlogError("Could not load plugin");
     return null;
   }
+
+  plugin.info.queue = {
+    set: [],
+    controls: [],
+  };
+
+  plugin.process = process;
+  plugin.info.processQueueInterval = setInterval(
+    () => processQueue(plugin),
+    settings.JALV_POLLING_RATE
+  );
   return process;
 }
 
@@ -70,60 +90,117 @@ async function spawn_plugin(plugin, rackIndex) {
  * @returns the control value as json: ctrlName: ctrlValue
  */
 async function getControls(plugin, type) {
+  addToQueue(plugin, type, type);
+}
+
+/**
+ * On calvo, Jalv host is spawned as a child process and we take the values from stdout.
+ * To provide at least, a very basic monitoring, a queue system is necesary.
+ * The queue will 'tick' every x ms according to JALV_POLLING_RATE setting. each tick will process a command and wait for the response.
+ * Different commands have different priorities:
+ * SET = HIGH, controls = MID, monitors = LOW
+ * As monitors spams the stdout buffer it was neeeded to only call it when nothing else is needing the buffer.
+ * @see settings
+ *
+ * @param {plugin} plugin
+ * @returns null if no Selected plugin or the process is busy (wating for a response)
+ */
+async function processQueue(plugin) {
+  // If this plugin is not the selected. Do not do anything.
+  if (store.getSelectedPlugin() !== plugin) return;
+  if (!plugin) return;
+
+  // If still we havent got a stdout from last command, skip this tick.
+  if (plugin.process.busy) return;
+
+  // Top priority for SET commands
+  if (plugin.info.queue.set.length > 0) {
+    const result = await writeWait(plugin.process, plugin.info.queue.set[0]);
+    plugin.info.queue.set.shift();
+    store.wlogDebug(JSON.stringify(result));
+    // Mid priority for GET controls
+  } else if (plugin.info.queue.controls.length > 0) {
+    const result = await writeWait(plugin.process, "controls");
+    plugin.info.queue.controls.shift();
+    plugin.info.controls = result;
+    store.wlogDebug(JSON.stringify(result));
+    store.notifySubscribers("pluginControlsChanged", plugin);
+  } else {
+    // At last, if nothing else is printing output, we can now get some monitor info.
+    if (settings.JALV_MONITORING && plugin.ports.control.output.length > 0) {
+      const result = await writeWait(plugin.process, "monitors");
+      // Sometimes we cannot get info and we get corrupted result, lets use the previous value for now.
+      if (result) {
+        plugin.info.monitors = result;
+        store.notifySubscribers("pluginMonitorsChanged", plugin);
+      }
+    }
+  }
+}
+
+/**
+ * Write to a process stdin and wait for a response on stdout.
+ * While waiting, it will set the process.busy flag, so the queue will not advance until this function is finished.
+ * *
+ * @param {pluginJalvProcess} process The plugin instance JALV process.
+ * @param {string} command The command to execute on JALV
+ * @param {number} [maxRetries=10] How many time retry before giving up.
+ * @param {number} [retriesWait=5] How many ms to wait before each retry.
+ * @returns
+ */
+async function writeWait(process, command, maxRetries = 10, retriesWait = 5) {
   const sleep = require("util").promisify(setTimeout);
+  process.busy = true;
 
-  if (type === "controls") plugin.info.busy = true;
-  if (type === "monitor" && plugin.info.busy === true) return;
   let done = false;
+  let retries = 0;
   let result = "";
-  const process = plugin.process;
-
-  write(plugin.process, type);
+  process.stdin.write(command + "\n");
   process.stdout.once("data", function (msg) {
     result = msg;
     done = true;
   });
 
-  let retries = 0;
-  while (!done && retries < 5) {
-    await sleep(200);
+  while (!done && retries < maxRetries) {
     retries++;
+    await sleep(retriesWait);
   }
 
   if (!done) {
-    store.wlogError("Could not load plugin");
+    store.wlogError("Error in write wait, for " + command);
+    process.busy = false;
     return null;
   }
-
-  //  Format result
-  const resultJSON = jalvStdoutToJSON(result, type);
-  plugin.info.busy = false;
+  resultJSON = jalvStdoutToJSON(result, command);
+  process.busy = false;
   return resultJSON;
 }
 
-async function setControl(plugin, control, value) {
-  const sleep = require("util").promisify(setTimeout);
-  let done = false;
-  let retries = 0;
-  let result = "";
+/**
+ * Add a command to the plugin instance queue
+ *
+ * @param {plugin} plugin The plugin instance.
+ * @param {string} type Can be 'set, controls, monitors'
+ * @param {string} command command to execute.
+ * @returns
+ */
+function addToQueue(plugin, type, command) {
+  if (!plugin) return;
+  plugin.info.queue[type].push(command);
+}
 
-  write(plugin.process, `set ${control.symbol} ${value}`);
-  plugin.process.stdout.once("data", function (msg) {
-    result = msg;
-    done = true;
-  });
-
-  while (!done && retries < 5) {
-    retries++;
-    await sleep(200);
-  }
-
-  if (!done) {
-    store.wlogError(`Could not set control ${plugin.name} 	${control.symbol}`);
-    return;
-  }
-  resultJSON = jalvStdoutToJSON(result, "set");
-  return resultJSON;
+/**
+ * Set a value on a control  (in queue)
+ *
+ * @param {plugin} plugin Plugin
+ * @param {string} control Control name. Uses `symbol` property of LV2 spec.
+ * @param {number} value Value to assign.
+ * @returns
+ */
+function setControl(plugin, control, value) {
+  if (!plugin) return;
+  const command = `set ${control.symbol} ${value}`;
+  addToQueue(plugin, "set", command);
 }
 
 /**
@@ -138,8 +215,8 @@ function jalvStdoutToJSON(str, command) {
   let result = str.replace(">", "").trim();
   result.split("\n").forEach((line) => {
     const kvp = line.split("=");
-    const k = kvp[0].toString().trim();
-    const v = kvp[1];
+    const k = kvp[0].toString().replace(">", "").trim();
+    const v = kvp[1].replace(">", "");
     obj[k] = v;
   });
   return obj;
@@ -151,9 +228,10 @@ function jalvStdoutToJSON(str, command) {
  * @param {pluginProcess} process
  * @param {number} rackIndex
  */
-function kill_plugin(process, rackIndex) {
+function kill_plugin(plugin, rackIndex) {
   try {
-    process.kill();
+    clearInterval(plugin.info.processQueueInterval);
+    plugin.process.kill();
   } catch (error) {
     store.wlogError(`[#${rackIndex}] ${error}`);
   }
