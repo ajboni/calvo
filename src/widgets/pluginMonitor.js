@@ -42,13 +42,13 @@ const PluginMonitor = function (grid, x, y, xSpan, ySpan) {
       element.hide();
     }
 
+    if (!plugin) return;
+
     if (plugin.ports.control.output.length === 0) {
       pluginMonitor.append(
         blessed.text({ content: "No monitor ports on selected plugin." })
       );
     }
-
-    if (!plugin) return;
 
     // Store the control widget on the plugin instance:
     if (!plugin.info.monitorWidgets) plugin.info.monitorWidgets = {};
