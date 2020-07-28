@@ -19,8 +19,7 @@ const MainMenuWidget = require("./widgets/mainMenu");
 const AudioIO = require("./widgets/audioIO");
 const PubSub = require("pubsub-js");
 const PluginInfo = require("./widgets/pluginInfo");
-const gridCols = 18;
-const gridRows = 28;
+const PluginPresetsWidget = require("./widgets/pluginPresets");
 
 let focusIndex = 0;
 var mainScreen;

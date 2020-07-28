@@ -34,7 +34,7 @@ var CategoriesWidget = function make(grid, x, y, xSpan, ySpan) {
     },
   });
 
-  //  It might be a bug in blessed.contrib, but, if I set the items on the constructor, the items duplicate when changing screens.
+  //  It might be a bug in blessed, but, if I set the items on the constructor, the items duplicate when changing screens.
   categoriesWidget.setItems(store.pluginCategories);
 
   categoriesWidget.key("home", function (ch, key) {

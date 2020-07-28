@@ -29,18 +29,35 @@ async function spawn_plugin(plugin, rackIndex) {
   let processSpawned = false;
   // We need to loose the buffer to get a fast response:
   // https://gitlab.com/drobilla/jalv/-/issues/7
-  const process = spawn("stdbuf", [
-    "-oL",
-    "-eL",
-    "jalv",
-    "-p",
-    "-t",
-    "-n",
-    `calvo_${store.app.APP_ID}_${plugin.info.instanceNumber}_${plugin.info.safeName}`,
-    plugin.uri,
+  //   const process = spawn("stdbuf", [
+  //     "-oL",
+  //     "-eL",
+  //     "jalv",
+  //     "-p",
+  //     "-t",
+  //     "-n",
+  //     `calvo_${store.app.APP_ID}_${plugin.info.instanceNumber}_${plugin.info.safeName}`,
+  //     plugin.uri,
+  //   ]);
+  const process = spawn("script", [
+    "-q",
+    "-c",
+    `jalv -p -t -n calvo_${store.app.APP_ID}_${plugin.info.instanceNumber}_${plugin.info.safeName} ${plugin.uri}`,
+    "/dev/null",
   ]);
+
+  //   const process = spawn("unbuffer", [
+  //     "jalv",
+  //     "-p",
+  //     "-t",
+  //     "-n",
+  //     `calvo_${store.app.APP_ID}_${plugin.info.instanceNumber}_${plugin.info.safeName}`,
+  //     plugin.uri,
+  //   ]);
+
   process.stdout.setEncoding("utf8");
   process.stdin.setEncoding("utf8");
+
   process.stderr.once("data", function (msg) {
     processSpawned = true;
   });
@@ -51,6 +68,7 @@ async function spawn_plugin(plugin, rackIndex) {
   //   process.stdout.on("data", function (msg) {
   //     store.wlog(`[#${rackIndex}] ${msg}`);
   //   });
+
   //   process.stderr.on("data", function (msg) {
   //     store.wlogError(`[#${rackIndex}] ${msg}`);
   //   });
@@ -148,16 +166,18 @@ async function processQueue(plugin) {
  * @param {number} [retriesWait=5] How many ms to wait before each retry.
  * @returns A JSON file with the (parsed) output for the given command.
  */
-async function writeWait(process, command, maxRetries = 10, retriesWait = 5) {
+async function writeWait(process, command, maxRetries = 40, retriesWait = 5) {
   const sleep = require("util").promisify(setTimeout);
   process.busy = true;
 
   let done = false;
   let retries = 0;
   let result = "";
+
   process.stdin.write(command + "\n");
-  process.stdout.once("data", function (msg) {
-    result = msg;
+
+  process.stdout.on("data", function (msg) {
+    result += msg;
     done = true;
   });
 
@@ -169,8 +189,12 @@ async function writeWait(process, command, maxRetries = 10, retriesWait = 5) {
   if (!done) {
     store.wlogError("Error in write wait, for " + command);
     process.busy = false;
+    process.stdout.removeAllListeners(["data"]);
     return null;
   }
+
+  // TODO: Recheck this. 'Once' event is giving truncated output
+  process.stdout.removeAllListeners(["data"]);
   resultJSON = jalvStdoutToJSON(result, command);
   process.busy = false;
   return resultJSON;
@@ -204,6 +228,27 @@ function setControl(plugin, control, value) {
 }
 
 /**
+ * Set a preset on a plugin process (add to queue)
+ *
+ * @param {plugin} plugin Plugin instance
+ * @param {number} index of preset as appears on the widget
+ * @returns null if fails.
+ */
+function setPreset(plugin, index) {
+  if (!plugin) return;
+  if (!plugin.presets[index]) return;
+
+  const uri = plugin.presets[index].uri;
+
+  if (!uri) {
+    store.wlogError(`No preset ${index} found`);
+    return;
+  }
+  const command = `preset ${uri}`;
+  addToQueue(plugin, "set", command);
+}
+
+/**
  * Formats and convert a JALV kvp stdout (CONTROL = VALUE) into a json object.
  *
  * @param {string} str JALV stoud to format
@@ -213,7 +258,11 @@ function setControl(plugin, control, value) {
 function jalvStdoutToJSON(str, command) {
   const obj = { jalv_command: command };
   let result = str.replace(">", "").trim();
-  result.split("\n").forEach((line) => {
+  result.split(/\r?\n/).forEach((line, index) => {
+    if (index === 0) {
+      return;
+    }
+
     const kvp = line.split("=");
     const k = kvp[0].toString().replace(">", "").trim();
     const v = kvp[1].replace(">", "");
