@@ -18,10 +18,10 @@ const PluginMonitor = function (grid, x, y, xSpan, ySpan) {
     input: false,
     interactive: false,
     keys: false,
+    focusable: false,
     padding: { left: 1, right: 1 },
     mouse: true,
     scrollable: true,
-
     style: {
       scrollbar: true,
       focus: {
@@ -148,10 +148,10 @@ function progressControl(value, top, pluginControl, pluginInstance) {
         },
         bar: {
           bg: "#68955d",
+          focusable: false,
         },
       },
     },
-    input: true,
     ch: "░",
     height: 3,
     top: 0,
