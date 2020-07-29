@@ -71,10 +71,11 @@ function setUpLayout(screen) {
    * Perform Page
    */
   const page2 = new Page(
-    new RackWidget(grid, 0, 2, 6, 12),
+    new RackWidget(grid, 0, 2, 5, 9),
     // new PluginInfoWidget(grid, 0, 14, 6, 7),
-    new PluginMonitor(grid, 0, 14, 6, 14),
-    new PluginControlWidget(grid, 6, 2, 7, 26)
+    new PluginPresetsWidget(grid, 0, 11, 5, 6),
+    new PluginMonitor(grid, 0, 17, 5, 11),
+    new PluginControlWidget(grid, 5, 2, 8, 26)
   );
 
   /**

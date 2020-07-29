@@ -58,6 +58,9 @@ async function spawn_plugin(plugin, rackIndex) {
   process.stdout.setEncoding("utf8");
   process.stdin.setEncoding("utf8");
 
+  //  https://github.com/drobilla/jalv/issues/37
+  process.stdin.write("presets\n");
+
   process.stderr.once("data", function (msg) {
     processSpawned = true;
   });
@@ -107,7 +110,7 @@ async function spawn_plugin(plugin, rackIndex) {
  * @param {string} type Type of control to get('controls'|'monitor' )
  * @returns the control value as json: ctrlName: ctrlValue
  */
-async function getControls(plugin, type) {
+function getControls(plugin, type) {
   addToQueue(plugin, type, type);
 }
 
@@ -135,7 +138,8 @@ async function processQueue(plugin) {
   if (plugin.info.queue.set.length > 0) {
     const result = await writeWait(plugin.process, plugin.info.queue.set[0]);
     plugin.info.queue.set.shift();
-    store.wlogDebug(JSON.stringify(result));
+    // store.wlogDebug(JSON.stringify(result));
+
     // Mid priority for GET controls
   } else if (plugin.info.queue.controls.length > 0) {
     const result = await writeWait(plugin.process, "controls");
@@ -246,6 +250,7 @@ function setPreset(plugin, index) {
   }
   const command = `preset ${uri}`;
   addToQueue(plugin, "set", command);
+  getControls(plugin, "controls");
 }
 
 /**
@@ -309,3 +314,4 @@ exports.kill_plugin = kill_plugin;
 exports.write = write;
 exports.getControls = getControls;
 exports.setControl = setControl;
+exports.setPreset = setPreset;

@@ -8,8 +8,8 @@ const PluginPresets = function (grid, x, y, xSpan, ySpan) {
     label: "Plugin Presets",
     mouse: true,
     scrollbar: {
-      // ch: " ",
-      // inverse: true,
+      ch: " ",
+      inverse: true,
     },
 
     interactive: true,
@@ -39,9 +39,14 @@ const PluginPresets = function (grid, x, y, xSpan, ySpan) {
     if (!plugin) {
       pluginPresets.setItems([]);
     } else {
-      pluginPresets.setItems("ss");
+      const presetNames = plugin.presets.map((p) => p.label);
+      pluginPresets.setItems(presetNames);
     }
   }
+
+  pluginPresets.on("select", (item, index) => {
+    Jalv.setPreset(store.getSelectedPlugin(), index);
+  });
 
   return pluginPresets;
 };
