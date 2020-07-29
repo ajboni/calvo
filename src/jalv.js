@@ -58,16 +58,17 @@ async function spawn_plugin(plugin, rackIndex) {
   process.stdout.setEncoding("utf8");
   process.stdin.setEncoding("utf8");
 
-  //  https://github.com/drobilla/jalv/issues/37
-  process.stdin.write("presets\n");
+  //   process.stdout.once("data", function (msg) {
+  //     //  https://github.com/drobilla/jalv/issues/37
+  //     process.stdin.write("presets\n");
+  //     processSpawned = true;
+  //   });
+  var result = "";
 
-  process.stderr.once("data", function (msg) {
-    processSpawned = true;
+  process.stdout.on("data", function (msg) {
+    result += msg;
   });
 
-  process.stdout.once("data", function (msg) {
-    processSpawned = true;
-  });
   //   process.stdout.on("data", function (msg) {
   //     store.wlog(`[#${rackIndex}] ${msg}`);
   //   });
@@ -81,8 +82,11 @@ async function spawn_plugin(plugin, rackIndex) {
   //   });
 
   let retries = 0;
-  while (!processSpawned && retries < 5) {
-    await sleep(100);
+  while (!processSpawned && retries < 20) {
+    if (result.includes(">")) {
+      processSpawned = true;
+    }
+    await sleep(10);
   }
 
   if (!processSpawned) {
@@ -100,6 +104,7 @@ async function spawn_plugin(plugin, rackIndex) {
     () => processQueue(plugin),
     settings.JALV_POLLING_RATE
   );
+
   return process;
 }
 
