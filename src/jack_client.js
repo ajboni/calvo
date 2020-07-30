@@ -84,34 +84,73 @@ function getAvailableJackPorts() {
   return JSON.parse(info);
 }
 
+const queue = {
+  connectPorts: [],
+};
+
+function addCommandToQueue(prop, command) {
+  if (!queue[prop]) {
+    queue[prop] = [];
+  }
+  queue[prop].push(command);
+}
+
+function processQueue(prop) {
+  if (!queue[prop]) {
+    store.wlogError(`JACK: Queue ${prop} does not exist.`);
+    return;
+  }
+
+  const items = queue[prop];
+  const command = items.join(" && ");
+  const cp = require("child_process");
+  try {
+    const status = cp.execSync(command, { encoding: "utf8" });
+    queue[prop] = [];
+  } catch (error) {
+    store.wlogError(error);
+  }
+  //   items.slice().forEach((element) => {});
+}
+
 /**
  * connect <origin_port> to <destination_port>
  * connect two jack ports together. Both ports must be same type.
  * @param {string} src Origin port: Must be an output port.
  * @param {string} dst Destination port: Must be an Input port
  */
-async function connectPorts(src, dst, disconnect = false, quiet = true) {
+async function connectPorts(
+  src,
+  dst,
+  disconnect = false,
+  quiet = true,
+  addToQueue = false
+) {
   const cp = require("child_process");
   const rm = disconnect ? "--disconnect" : "";
   const q = quiet ? "--quiet" : "";
   try {
-    const status = cp.execSync(
-      `python3 ./py/calvo_cli_tools/jack_tools/port_tools.py connect "${src}" "${dst}" ${rm} ${q}`,
-      { encoding: "utf8" }
-    );
+    const command = `python3 ./py/calvo_cli_tools/jack_tools/port_tools.py connect "${src}" "${dst}" ${rm} ${q}`;
+    if (addToQueue) {
+      addCommandToQueue("connectPorts", command);
+    } else {
+      const status = cp.execSync(command, { encoding: "utf8" });
+    }
   } catch (error) {
     store.wlogError(error);
   }
 }
 
 /**
+ *
  * It will (dis) connect two plugins, dealing with mono/stereo conversions.
  * Use 'input|output' to use a mono/stero I/O ports as src/dst.
  * @param {plugin} src Source plugin instance. It should exist on the RACK. It will use the plugin's output ports.
  * @param {plugin} dst Destination plugin.It should exist on the RACK. It will use the plugin's input ports.
  * @param {boolean} [disconnect=false] Disconnect plugins
+ * @param {boolean} [addToQueue=false] If true, add it to the 'connectPlugins' queue instead of inmediately firing. Queue should be processed manually after.
  */
-function connectPlugins(src, dst, disconnect = false) {
+function connectPlugins(src, dst, disconnect = false, addToQueue = false) {
   const il = store.getJackStatus().CONNECTIONS.inputLeft;
   const ir = store.getJackStatus().CONNECTIONS.inputRight;
   const im = store.getJackStatus().CONNECTIONS.inputMode;
@@ -145,16 +184,16 @@ function connectPlugins(src, dst, disconnect = false) {
         : "";
 
     if (im === "mono" && dstMode === "mono") {
-      connectPorts(il, dl, disconnect);
+      connectPorts(il, dl, disconnect, true, addToQueue);
     } else if (im === "mono" && dstMode === "stereo") {
-      connectPorts(il, dl, disconnect);
-      connectPorts(il, dr, disconnect);
+      connectPorts(il, dl, disconnect, true, addToQueue);
+      connectPorts(il, dr, disconnect, true, addToQueue);
     } else if (im === "stereo" && dstMode === "mono") {
-      connectPorts(il, dl, disconnect);
-      connectPorts(ir, dl, disconnect);
+      connectPorts(il, dl, disconnect, true, addToQueue);
+      connectPorts(ir, dl, disconnect, true, addToQueue);
     } else if (im === "stereo" && dstMode === "stereo") {
-      connectPorts(il, dl, disconnect);
-      connectPorts(ir, dr, disconnect);
+      connectPorts(il, dl, disconnect, true, addToQueue);
+      connectPorts(ir, dr, disconnect, true, addToQueue);
     }
   }
 
@@ -174,30 +213,30 @@ function connectPlugins(src, dst, disconnect = false) {
         : "";
 
     if (srcMode === "mono" && om === "mono") {
-      connectPorts(sl, ol, disconnect);
+      connectPorts(sl, ol, disconnect, true, addToQueue);
     } else if (srcMode === "mono" && om === "stereo") {
-      connectPorts(sl, ol, disconnect);
-      connectPorts(sl, or, disconnect);
+      connectPorts(sl, ol, disconnect, true, addToQueue);
+      connectPorts(sl, or, disconnect, true, addToQueue);
     } else if (srcMode === "stereo" && om === "mono") {
-      connectPorts(sl, ol, disconnect);
-      connectPorts(sr, ol, disconnect);
+      connectPorts(sl, ol, disconnect, true, addToQueue);
+      connectPorts(sr, ol, disconnect, true, addToQueue);
     } else if (srcMode === "stereo" && om === "stereo") {
-      connectPorts(sl, ol, disconnect);
-      connectPorts(sr, or, disconnect);
+      connectPorts(sl, ol, disconnect, true, addToQueue);
+      connectPorts(sr, or, disconnect, true, addToQueue);
     }
   }
   //   Plugin => Plugin
   else {
     if (!src.ports.audio.output || src.ports.audio.output.length === 0) {
       store.wlog(
-        "src plugin does not have correct number of ports or does not exist."
+        `src plugin (${src.name}) does not have correct number of ports or does not exist.`
       );
       return;
     }
 
     if (!dst.ports.audio.input || dst.ports.audio.input.length === 0) {
       store.wlog(
-        "dst plugin does not have correct number of ports or does not exist."
+        `dst plugin (${dst.name}) does not have correct number of ports or does not exist.`
       );
       return;
     }
@@ -217,16 +256,16 @@ function connectPlugins(src, dst, disconnect = false) {
         : "";
 
     if (srcMode === "mono" && dstMode === "mono") {
-      connectPorts(sl, dl, disconnect);
+      connectPorts(sl, dl, disconnect, true, addToQueue);
     } else if (srcMode === "mono" && dstMode === "stereo") {
-      connectPorts(sl, dl, disconnect);
-      connectPorts(sl, dr, disconnect);
+      connectPorts(sl, dl, disconnect, true, addToQueue);
+      connectPorts(sl, dr, disconnect, true, addToQueue);
     } else if (srcMode === "stereo" && dstMode === "mono") {
-      connectPorts(sl, dl, disconnect);
-      connectPorts(sr, dl, disconnect);
+      connectPorts(sl, dl, disconnect, true, addToQueue);
+      connectPorts(sr, dl, disconnect, true, addToQueue);
     } else if (srcMode === "stereo" && dstMode === "stereo") {
-      connectPorts(sl, dl, disconnect);
-      connectPorts(sr, dr, disconnect);
+      connectPorts(sl, dl, disconnect, true, addToQueue);
+      connectPorts(sr, dr, disconnect, true, addToQueue);
     }
   }
 }
@@ -239,8 +278,8 @@ function connectPlugins(src, dst, disconnect = false) {
  * @param {plugin} dst Destination plugin.It should exist on the RACK. It will use the plugin's input ports.
  * @param {boolean} [disconnect=true]
  */
-function disconnectPlugins(src, dst, disconnect = true) {
-  connectPlugins(src, dst, disconnect);
+function disconnectPlugins(src, dst, addToQueue = false) {
+  connectPlugins(src, dst, true, addToQueue);
 }
 
 /**
@@ -250,7 +289,7 @@ function disconnectPlugins(src, dst, disconnect = true) {
  * @param {string} direction [all|input|output] What ports to disconnect.
  *
  */
-function clearPluginPorts(plugin, direction = "all") {
+function clearPluginPorts(plugin, direction = "all", addToQueue = false) {
   const cp = require("child_process");
   const arr = [];
 
@@ -271,10 +310,13 @@ function clearPluginPorts(plugin, direction = "all") {
   //   store.wlog(ports);
 
   try {
-    const status = cp.execSync(
-      `python3 ./py/calvo_cli_tools/jack_tools/port_tools.py clear ${ports}`,
-      { encoding: "utf8" }
-    );
+    command = `python3 ./py/calvo_cli_tools/jack_tools/port_tools.py clear ${ports}`;
+
+    if (addToQueue) {
+      addCommandToQueue("clearPluginPorts", command);
+    } else {
+      const status = cp.execSync(command, { encoding: "utf8" });
+    }
   } catch (error) {
     store.wlogError(error.toString());
   }
@@ -286,3 +328,4 @@ exports.queryTransport = queryTransport;
 exports.connectPlugins = connectPlugins;
 exports.disconnectPlugins = disconnectPlugins;
 exports.clearPluginPorts = clearPluginPorts;
+exports.processQueue = processQueue;

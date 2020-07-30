@@ -156,8 +156,9 @@ function disconnectAll() {
   }
 
   rack.forEach((plugin, index, arr) => {
-    Jack.clearPluginPorts(plugin);
+    Jack.clearPluginPorts(plugin, undefined, true);
   });
+  Jack.processQueue("clearPluginPorts");
 }
 
 /**
@@ -174,16 +175,18 @@ function connectAll() {
     wlogDebug(`${index} => ${rack.length}`);
 
     if (index === 0) {
-      Jack.connectPlugins("input", plugin);
+      Jack.connectPlugins("input", plugin, false, true);
     }
 
     if (index === rack.length - 1) {
       wlogDebug("Connect to output");
-      Jack.connectPlugins(plugin, "output");
+      Jack.connectPlugins(plugin, "output", false, true);
     } else {
-      Jack.connectPlugins(plugin, rack[index + 1]);
+      Jack.connectPlugins(plugin, rack[index + 1], false, true);
     }
   });
+
+  Jack.processQueue("connectPorts");
 }
 
 /**
@@ -264,21 +267,23 @@ async function addPluginToRack(pluginName) {
 
     // Autoconnect if applicable
     if (settings.AUTO_CONNECT) {
+      // First, connect this plugin to main output
+      Jack.connectPlugins(plugin, "output", false, true);
+
       // This is the first plugin in the rack, connect it to Input.
       if (rack.length === 1) {
-        Jack.connectPlugins("input", plugin);
+        Jack.connectPlugins("input", plugin, false, true);
       } else {
         if (settings.AUTO_CONNECT) {
           // Disconnect previously last plugin from output.
-          Jack.disconnectPlugins(rack[rack.length - 2], "output");
+          Jack.disconnectPlugins(rack[rack.length - 2], "output", true);
           // Connect this plugin to the previous
-          Jack.connectPlugins(rack[rack.length - 2], plugin);
+          Jack.connectPlugins(rack[rack.length - 2], plugin, false, true);
         }
       }
-
-      // Finnally, connect this plugin to main output
-      Jack.connectPlugins(plugin, "output");
     }
+
+    Jack.processQueue("connectPorts");
     notifySubscribers("rack", rack);
     wlog(`Added ${plugin.name} to rack. (#${rack.length - 1})`);
   } catch (error) {
@@ -293,7 +298,7 @@ async function addPluginToRack(pluginName) {
  */
 function clearRack() {
   for (let index = 0; index < rack.length; index++) {
-    removePluginAt(index);
+    removePluginAt(index, true);
   }
 }
 
@@ -302,7 +307,7 @@ function clearRack() {
  *
  * @param {*} index Rack Index
  */
-function removePluginAt(index) {
+function removePluginAt(index, skipReconnect = false) {
   const plugin = rack[index];
   rack.splice(index, 1);
   wlog(`Remove plugin #${index} - ${plugin.name}`);
@@ -317,7 +322,7 @@ function removePluginAt(index) {
 
   notifySubscribers("rack", rack);
 
-  if (settings.AUTO_RECONNECT) reconectAll();
+  if (settings.AUTO_RECONNECT && !skipReconnect) reconectAll();
 }
 
 /**
