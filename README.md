@@ -9,8 +9,7 @@ Calvo is a [jalv](http://drobilla.net/software/jalv) based LV2 plugin browser an
 
 # Features 
 - Runs entirely on the terminal.
-- Suports launching multiple instances of jalv and interconnect them automatically.
-- Suports launching multiple instances of calvo.
+- Suports launching multiple instances of jalv and eventually calvo.
 - Category based plugin browser.
 - Autoconnect inputs of system, and every plugin, linearly until reaching configured output. Dealing with mono/stereo conversion along the way.
 - Load plugin presets.
@@ -18,6 +17,7 @@ Calvo is a [jalv](http://drobilla.net/software/jalv) based LV2 plugin browser an
 # Limitations
 - No GUI customization is loaded, any plugin which has a UI based workflow won't work properly.
 - Only works with mono or stereo inputs/outputs.
+- Monitoring is best effort and should not be taken too seriously.
 
 ### Roadmap to 1.0: [https://github.com/ajboni/calvo/milestone/1](Milestone)
 

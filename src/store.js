@@ -297,7 +297,7 @@ async function addPluginToRack(pluginName) {
  */
 function clearRack() {
   for (let index = 0; index < rack.length; index++) {
-    removePluginAt(index, true);
+    Jalv.kill_plugin(rack[index], index);
   }
 }
 

@@ -13,12 +13,17 @@ const PluginControls = function (grid, x, y, xSpan, ySpan) {
     mouse: true,
     interactive: true,
     keys: true,
+
     padding: { left: 1, right: 1 },
     mouse: true,
+    scrollbar: {
+      ch: " ",
+      inverse: true,
+    },
     scrollable: true,
+    focusable: true,
 
     style: {
-      scrollbar: true,
       focus: {
         border: { fg: "red" },
         //   enabled: false,
@@ -64,6 +69,7 @@ const PluginControls = function (grid, x, y, xSpan, ySpan) {
           plugin
         );
         pluginControls.append(controlWidget);
+        pluginControls.scrollable = true;
         plugin.info.controlWidgets[control.symbol] = controlWidget;
       } else {
         plugin.info.controlWidgets[control.symbol].setValue(

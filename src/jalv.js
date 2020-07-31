@@ -290,7 +290,10 @@ function jalvStdoutToJSON(str, command) {
 function kill_plugin(plugin, rackIndex) {
   try {
     clearInterval(plugin.info.processQueueInterval);
-    plugin.process.kill();
+
+    // plugin.process.kill();
+    // Killing the process leaves JACK hanging, is better to send the key combination of Jalv to gracefully remove the plugin.
+    write(plugin.process, "\x04");
   } catch (error) {
     store.wlogError(`[#${rackIndex}] ${error}`);
   }
