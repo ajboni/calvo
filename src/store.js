@@ -144,7 +144,6 @@ async function reconectAll() {
   disconnectAll();
   connectAll();
 }
-
 /**
  * Disconnects all plugin outputs
  *
@@ -322,7 +321,30 @@ function removePluginAt(index, skipReconnect = false) {
 
   notifySubscribers("rack", rack);
 
-  if (settings.AUTO_RECONNECT && !skipReconnect) reconectAll();
+  //   if (settings.AUTO_RECONNECT && !skipReconnect) reconectAll();
+  if (settings.AUTO_RECONNECT && !skipReconnect) {
+    if (rack.length === 0) {
+      return;
+    }
+
+    let previous = "";
+    let next = "";
+    let previousLength = rack.length + 1;
+
+    // If we deleted first item
+    if (index === 0) {
+      previous = "input";
+      next = rack[0];
+    } // If we deleted last item
+    else if (index === previousLength - 1) {
+      previous = rack[rack.length - 1];
+      next = "output";
+    } else {
+      previous = rack[index - 1];
+      next = rack[index];
+    }
+    Jack.connectPlugins(previous, next, false, false);
+  }
 }
 
 /**
@@ -363,14 +385,11 @@ function moveRackItem(rackIndex, direction, max = false) {
   //   store.wlogError(`${rackIndex} => ${direction} => ${max}`);
   // TODO: This could be better but for now we will disconnect and reconnect everything.
 
-  if (settings.AUTO_RECONNECT) reconectAll();
-}
+  //   if (settings.AUTO_RECONNECT) reconectAll();
 
-/**
- * This function will process
- *
- */
-function processConnections() {}
+  const oldPrevious = "";
+  const oldNext = "";
+}
 
 /**
  * This function will force connection between 2 plugins. If one of them is mono, adjust as necesary

@@ -102,7 +102,7 @@ function processQueue(prop) {
   }
 
   const items = queue[prop];
-  const command = items.join(" && ");
+  const command = items.join(" & ");
   const cp = require("child_process");
   try {
     const status = cp.execSync(command, { encoding: "utf8" });
