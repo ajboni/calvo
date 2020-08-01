@@ -1,3 +1,4 @@
 # Add here the settings you wish to override
 INPUT_L: "PulseAudio JACK Sink:front-left"
+INPUT_R: "PulseAudio JACK Sink:front-right"
 INPUT_MODE: "stereo"

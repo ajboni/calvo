@@ -6,7 +6,11 @@ const store = require("../store");
 var mainMenu = {};
 
 function make(grid, x, y, xSpan, ySpan, page = -1) {
-  mainMenu = grid.set(y, x, ySpan, xSpan, blessed.listbar, {
+  mainMenu = blessed.listbar({
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 1,
     items: {
       Choose: () => {
         store.setCurrentPage(0);
@@ -41,10 +45,14 @@ function make(grid, x, y, xSpan, ySpan, page = -1) {
     autoCommandKeys: true,
     tags: true,
     style: {
+      bg: "#28492a",
       selected: {
         bg: "#689d6a",
         fg: "#f0f0f0",
         bold: true,
+      },
+      item: {
+        bg: "#28492a",
       },
       focus: {
         border: { fg: "red" },
@@ -52,7 +60,6 @@ function make(grid, x, y, xSpan, ySpan, page = -1) {
         selected: {
           bg: "#689d6a",
           fg: "#f0f0f0",
-
           bold: true,
         },
       },
@@ -63,6 +70,7 @@ function make(grid, x, y, xSpan, ySpan, page = -1) {
     mainMenu.select(page);
   }
 
+  grid.append(mainMenu);
   return mainMenu;
 }
 

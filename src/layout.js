@@ -34,9 +34,9 @@ function setUpLayout(screen) {
   mainScreen = screen;
 
   var grid = new contrib.grid({ rows: 28, cols: 18, screen: mainScreen });
-  this.mainMenu = MainMenuWidget.make(grid, 0, 0, 18, 2, 0);
-  this.logWidget = LogWidget.make(grid, 13, 8, 5, 20);
-  this.statusWidget = StatusWidget.make(grid, 13, 2, 5, 6);
+  this.mainMenu = MainMenuWidget.make(screen, 0, 0, 18, 2, 0);
+  this.logWidget = LogWidget.make(grid, 13, 7, 5, 21);
+  this.statusWidget = StatusWidget.make(grid, 13, 1, 5, 6);
 
   const Page = function (...widgets) {
     this.widgets = widgets;
@@ -60,10 +60,10 @@ function setUpLayout(screen) {
    * @param {*} screen
    */
   const page0 = new Page(
-    new CategoriesWidget(grid, 0, 2, 2, 26),
-    new PluginListWidget(grid, 2, 2, 5, 26),
-    new RackWidget(grid, 7, 2, 6, 12),
-    new PluginInfo(grid, 7, 14, 6, 7)
+    new CategoriesWidget(grid, 0, 1, 2, 27),
+    new PluginListWidget(grid, 2, 1, 5, 27),
+    new RackWidget(grid, 7, 1, 6, 12),
+    new PluginInfo(grid, 7, 13, 6, 7)
   );
 
   /**
@@ -71,11 +71,11 @@ function setUpLayout(screen) {
    * Perform Page
    */
   const page2 = new Page(
-    new RackWidget(grid, 0, 2, 5, 9),
+    new RackWidget(grid, 0, 1, 5, 9),
     // new PluginInfoWidget(grid, 0, 14, 6, 7),
-    new PluginPresetsWidget(grid, 0, 11, 5, 6),
+    new PluginPresetsWidget(grid, 0, 10, 5, 7),
     new PluginMonitor(grid, 0, 17, 5, 11),
-    new PluginControlWidget(grid, 5, 2, 8, 26)
+    new PluginControlWidget(grid, 5, 1, 8, 27)
   );
 
   /**
@@ -84,8 +84,8 @@ function setUpLayout(screen) {
    * @param {*} screen
    */
   const page4 = new Page(
-    new AudioIO(grid, 0, 2, 6, 26, "input"),
-    new AudioIO(grid, 7, 2, 6, 26, "output")
+    new AudioIO(grid, 0, 1, 13, 14, "input"),
+    new AudioIO(grid, 0, 15, 13, 13, "output")
   );
 
   const pageSwitcher = new PageSwitcher(mainScreen, [
