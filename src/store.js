@@ -358,6 +358,16 @@ function setSelectedPluginIndex(index) {
 }
 
 /**
+ * Get the rack including input and output.
+ *
+ * @returns Rack + input and outputs.
+ */
+function getFullRack() {
+  const fullRack = rack.slice().unshift("input").push("output");
+  return fullRack;
+}
+
+/**
  * Moves a plugin in the rack. It will trigger a reconnection among (max 3) affected plugins
  *
  * @param {number} rackIndex Rack Index of plugin to move.
@@ -374,11 +384,77 @@ function moveRackItem(rackIndex, direction, max = false) {
   if (direction === "up" && !prev_plugin) return;
   if (direction === "down" && !next_plugin) return;
 
+  // Before moving disconnect affected plugins
+
+  let pluginsToDisconnect = [];
+  let start = rackIndex;
+  let end = rackIndex;
+  if (direction === "down") {
+    start = rackIndex - 1;
+    end = rackIndex + 3;
+
+    if (rackIndex === 0) {
+      start = 0;
+      pluginsToDisconnect.push("input");
+    }
+    pluginsToDisconnect.push(...rack.slice(start, end));
+
+    if (rackIndex === rack.length - 2) {
+      pluginsToDisconnect.push("output");
+    }
+  } else if (direction === "up") {
+    start = rackIndex - 2;
+    end = rackIndex + 2;
+    if (rackIndex === 1) {
+      start = 0;
+      pluginsToDisconnect.push("input");
+    }
+    if (rackIndex === rack.length - 1) {
+      end = rackIndex + 1;
+    }
+
+    pluginsToDisconnect.push(...rack.slice(start, end));
+    if (rackIndex === rack.length - 1) {
+      pluginsToDisconnect.push("output");
+    }
+  }
+
+  for (let index = 0; index < pluginsToDisconnect.length - 1; index++) {
+    Jack.disconnectPlugins(
+      pluginsToDisconnect[index],
+      pluginsToDisconnect[index + 1],
+      true
+    );
+  }
+
+  Jack.processQueue("connectPorts");
+
+  // Move on rack
   rack[rackIndex] = rack[rackIndex + offset];
   rack[rackIndex + offset] = plugin;
 
   notifySubscribers("rack", rack);
 
+  Jack.connectPlugins(
+    pluginsToDisconnect[0],
+    pluginsToDisconnect[2],
+    false,
+    true
+  );
+  Jack.connectPlugins(
+    pluginsToDisconnect[2],
+    pluginsToDisconnect[1],
+    false,
+    true
+  );
+  Jack.connectPlugins(
+    pluginsToDisconnect[1],
+    pluginsToDisconnect[3],
+    false,
+    true
+  );
+
+  Jack.processQueue("connectPorts");
   //   if (prev_plugin) Jack.disconnectPlugins(prev_plugin, plugin, true);
   //   if (next_plugin) Jack.disconnectPlugins(plugin, next_plugin, true);
 
@@ -518,6 +594,14 @@ function wlogDebug(msg) {
   }
 }
 
+function wlogWarning(msg) {
+  if (app.INITIALIZED) {
+    notifySubscribers("wlogDebugWarning", msg);
+  } else {
+    console.log(msg);
+  }
+}
+
 exports.pluginCatalog = pluginCatalog;
 exports.pluginCategories = pluginCategories;
 exports.setJackStatus = setJackStatus;
@@ -542,3 +626,4 @@ exports.moveRackItem = moveRackItem;
 exports.wlog = wlog;
 exports.wlogError = wlogError;
 exports.wlogDebug = wlogDebug;
+exports.wlogWarning = wlogWarning;
