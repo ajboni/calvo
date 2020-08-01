@@ -94,6 +94,8 @@ async function spawn_plugin(plugin, rackIndex) {
     return null;
   }
 
+  process.stdin.write("presets\n");
+  1;
   plugin.info.queue = {
     set: [],
     controls: [],
