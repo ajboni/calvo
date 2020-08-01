@@ -25,6 +25,7 @@ function make(grid, x, y, xSpan, ySpan) {
   var token = PubSub.subscribe("wlog", update);
   var token = PubSub.subscribe("wlogError", update);
   var token = PubSub.subscribe("wlogDebug", update);
+  var token = PubSub.subscribe("wlogWarning", update);
 
   return log;
 }
@@ -41,6 +42,8 @@ function update(type, content) {
     color = "{red-fg}";
   } else if (type === "wlogDebug") {
     color = "{green-fg}";
+  } else if (type === "wlogWarning") {
+    color = "{yellow-fg}";
   } else {
     color = "{white-fg}";
   }
