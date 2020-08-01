@@ -23,6 +23,7 @@ const PluginControls = function (grid, x, y, xSpan, ySpan) {
     focusable: true,
 
     style: {
+      border: { fg: "#7ea87f" },
       focus: {
         border: { fg: "red" },
         //   enabled: false,

@@ -15,6 +15,7 @@ function make(grid, x, y, xSpan, ySpan) {
     keys: false,
     padding: 1,
     style: {
+      border: { fg: "#7ea87f" },
       focus: {
         border: { fg: "red" },
         //   enabled: false,

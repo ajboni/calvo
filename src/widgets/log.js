@@ -11,6 +11,7 @@ function make(grid, x, y, xSpan, ySpan) {
     interactive: true,
     keys: false,
     style: {
+      border: { fg: "#7ea87f" },
       focus: {
         border: { fg: "red" },
         //   enabled: false,

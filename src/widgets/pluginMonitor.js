@@ -23,6 +23,7 @@ const PluginMonitor = function (grid, x, y, xSpan, ySpan) {
     mouse: true,
     scrollable: true,
     style: {
+      border: { fg: "#7ea87f" },
       scrollbar: true,
       focus: {
         border: { fg: "red" },

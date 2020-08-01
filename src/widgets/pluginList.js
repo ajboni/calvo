@@ -16,6 +16,7 @@ const PluginListWidget = function (grid, x, y, xSpan, ySpan) {
     keys: true,
     padding: { left: 1, right: 1 },
     style: {
+      border: { fg: "#7ea87f" },
       selected: {
         bg: "#4d5e4d",
         fg: "#f0f0f0",

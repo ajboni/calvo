@@ -45,15 +45,15 @@ function make(grid, x, y, xSpan, ySpan, page = -1) {
     autoCommandKeys: true,
     tags: true,
     style: {
-      bg: "#28492a",
+      //   bg: "#28492a",
       selected: {
         bg: "#689d6a",
         fg: "#f0f0f0",
         bold: true,
       },
-      item: {
-        bg: "#28492a",
-      },
+      //   item: {
+      //     bg: "#28492a",
+      //   },
       focus: {
         border: { fg: "red" },
         enabled: false,

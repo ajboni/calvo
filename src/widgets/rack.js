@@ -15,6 +15,7 @@ const RackWidget = function (grid, x, y, xSpan, ySpan) {
     padding: { left: 1, right: 1 },
     items: rackItems,
     style: {
+      border: { fg: "#7ea87f" },
       selected: {
         bg: "#4d5e4d",
         fg: "#f0f0f0",

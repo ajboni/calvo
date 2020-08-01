@@ -14,6 +14,7 @@ const PluginInfo = function (grid, x, y, xSpan, ySpan) {
     keys: false,
     padding: { left: 1, right: 1 },
     style: {
+      border: { fg: "#7ea87f" },
       focus: {
         border: { fg: "red" },
         //   enabled: false,

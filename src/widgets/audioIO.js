@@ -27,6 +27,7 @@ const IOWidget = function (grid, x, y, xSpan, ySpan, mode) {
     padding: { left: 1, right: 1 },
     scrollable: true,
     style: {
+      border: { fg: "#7ea87f" },
       selected: {
         bg: "#4d5e4d",
         fg: "#f0f0f0",
