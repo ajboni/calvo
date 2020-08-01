@@ -40,10 +40,10 @@ const RackWidget = function (grid, x, y, xSpan, ySpan) {
     rack.select(rack.items.length - 1);
   });
   rack.key("pageup", function (ch, key) {
-    rack.move(settings.SCROLL_AMMOUNT);
+    rack.move(store.app.SETTINGS.SCROLL_AMMOUNT);
   });
   rack.key("pagedown", function (ch, key) {
-    rack.move(settings.SCROLL_AMMOUNT);
+    rack.move(store.app.SETTINGS.SCROLL_AMMOUNT);
   });
   //   rack.on("select", function (e, index) {
   //     console.log("ss");

@@ -104,7 +104,7 @@ async function spawn_plugin(plugin, rackIndex) {
   plugin.process = process;
   plugin.info.processQueueInterval = setInterval(
     () => processQueue(plugin),
-    settings.JALV_POLLING_RATE
+    store.app.SETTINGS.JALV_POLLING_RATE
   );
 
   return process;
@@ -156,7 +156,10 @@ async function processQueue(plugin) {
     store.notifySubscribers("pluginControlsChanged", plugin);
   } else {
     // At last, if nothing else is printing output, we can now get some monitor info.
-    if (settings.JALV_MONITORING && plugin.ports.control.output.length > 0) {
+    if (
+      store.app.SETTINGS.JALV_MONITORING &&
+      plugin.ports.control.output.length > 0
+    ) {
       const result = await writeWait(plugin.process, "monitors");
       // Sometimes we cannot get info and we get corrupted result, lets use the previous value for now.
       if (result) {

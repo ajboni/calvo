@@ -12,6 +12,7 @@ const PubSub = require("pubsub-js");
 const { settings } = require("../settings");
 const Jalv = require("./jalv");
 const Jack = require("./jack_client");
+const yaml = require("js-yaml");
 const Nanoid = require("nanoid");
 const string_utils = require("./string_utils");
 const nanoid = Nanoid.customAlphabet(
@@ -45,6 +46,7 @@ const app = {
   APP_ID: nanoid(),
   /** What page the layout is currently showing. @see layout */
   CURRENT_PAGE: 0,
+  SETTINGS: settings,
 };
 
 /** Tracks several Jack Statuses
@@ -87,15 +89,6 @@ const jack = {
       capture: [],
     },
   },
-  /** Tracks the connection settings @see settings */
-  CONNECTIONS: {
-    inputMode: settings.DEFAULT_INPUT_MODE,
-    inputLeft: settings.DEFAULT_INPUT_L,
-    inputRight: settings.DEFAULT_INPUT_R,
-    outputMode: settings.DEFAULT_OUTPUT_MODE,
-    outputLeft: settings.DEFAULT_OUTPUT_L,
-    outputRight: settings.DEFAULT_OUTPUT_R,
-  },
 };
 
 /**
@@ -121,18 +114,15 @@ function setCurrentPage(pageNumber) {
  * @param {*} [jackStatus=jack.JACK_STATUS]
  * @param {*} [transport_status=jack.TRANSPORT_STATUS]
  * @param {*} [ports=jack.PORTS]
- * @param {*} [connections=jack.CONNECTIONS]
  */
 function setJackStatus(
   jackStatus = jack.JACK_STATUS,
   transport_status = jack.TRANSPORT_STATUS,
-  ports = jack.PORTS,
-  connections = jack.CONNECTIONS
+  ports = jack.PORTS
 ) {
   jack.JACK_STATUS = jackStatus;
   jack.TRANSPORT_STATUS = transport_status;
   jack.PORTS = ports;
-  jack.CONNECTIONS = connections;
   notifySubscribers("jack", jack);
 }
 
@@ -155,9 +145,9 @@ function disconnectAll() {
   }
 
   rack.forEach((plugin, index, arr) => {
-    Jack.clearPluginPorts(plugin, undefined, true);
+    Jack.clearPluginPorts(plugin, undefined, false);
   });
-  Jack.processQueue("clearPluginPorts");
+  //   Jack.processQueue("clearPluginPorts");
 }
 
 /**
@@ -198,24 +188,22 @@ function connectAll() {
  */
 function setAudioSource(mode, channel, name) {
   if (mode === "input") {
-    if (channel === "left") jack.CONNECTIONS.inputLeft = name;
-    if (channel === "right") jack.CONNECTIONS.inputRight = name;
+    if (channel === "left") app.SETTINGS.INPUT_L = name;
+    if (channel === "right") app.SETTINGS.INPUT_R = name;
   }
 
   if (mode === "output") {
-    if (channel === "left") jack.CONNECTIONS.outputLeft = name;
-    if (channel === "right") jack.CONNECTIONS.outputRight = name;
+    if (channel === "left") app.SETTINGS.OUTPUT_L = name;
+    if (channel === "right") app.SETTINGS.OUTPUT_R = name;
   }
-  notifySubscribers("jack", jack);
-  wlog(jack.CONNECTIONS.inputLeft);
-  wlog(jack.CONNECTIONS.inputRight);
+  notifySubscribers("settings", app);
 }
 
 /**
  * Set Input/Output mode to mono or stereo.
  * This will trigger a complete reconnection of all plugins
  * @fires notifySubscribers (jack)
- * @param {*} direction 'input | output
+ * @param {*} direction 'INPUT | OUTPUT
  * @param {*} mode mono | stereo
  */
 function setAudioSourceMode(direction, mode) {
@@ -223,8 +211,8 @@ function setAudioSourceMode(direction, mode) {
   // If its output disconnect last plugin with outputs.
   // After the modification reconnect.
 
-  jack.CONNECTIONS[direction + "Mode"] = mode;
-  notifySubscribers("jack", jack);
+  app.SETTINGS[direction.toUpperCase() + "_MODE"] = mode;
+  notifySubscribers("settings", app);
   //   connectAll();
 
   // TODO: RESET CONNECTIONS
@@ -265,7 +253,7 @@ async function addPluginToRack(pluginName) {
     rack.push(plugin);
 
     // Autoconnect if applicable
-    if (settings.AUTO_CONNECT) {
+    if (app.SETTINGS.AUTO_CONNECT) {
       // First, connect this plugin to main output
       Jack.connectPlugins(plugin, "output", false, true);
 
@@ -273,7 +261,7 @@ async function addPluginToRack(pluginName) {
       if (rack.length === 1) {
         Jack.connectPlugins("input", plugin, false, true);
       } else {
-        if (settings.AUTO_CONNECT) {
+        if (app.SETTINGS.AUTO_CONNECT) {
           // Disconnect previously last plugin from output.
           Jack.disconnectPlugins(rack[rack.length - 2], "output", true);
           // Connect this plugin to the previous
@@ -321,8 +309,8 @@ function removePluginAt(index, skipReconnect = false) {
 
   notifySubscribers("rack", rack);
 
-  //   if (settings.AUTO_RECONNECT && !skipReconnect) reconectAll();
-  if (settings.AUTO_RECONNECT && !skipReconnect) {
+  //   if (store.app.SETTINGS.AUTO_RECONNECT && !skipReconnect) reconectAll();
+  if (app.SETTINGS.AUTO_RECONNECT && !skipReconnect) {
     if (rack.length === 0) {
       return;
     }
@@ -461,7 +449,7 @@ function moveRackItem(rackIndex, direction, max = false) {
   //   store.wlogError(`${rackIndex} => ${direction} => ${max}`);
   // TODO: This could be better but for now we will disconnect and reconnect everything.
 
-  //   if (settings.AUTO_RECONNECT) reconectAll();
+  //   if (app.SETTINGS.AUTO_RECONNECT) reconectAll();
 
   const oldPrevious = "";
   const oldNext = "";
@@ -583,7 +571,7 @@ function wlogError(msg) {
 }
 
 function wlogDebug(msg) {
-  if (!settings.SHOW_DEBUG_MSG) {
+  if (!app.SETTINGS.SHOW_DEBUG_MSG) {
     return;
   }
   if (app.INITIALIZED) {
@@ -601,6 +589,34 @@ function wlogWarning(msg) {
     console.log(msg);
   }
 }
+
+/**
+ * Load default settings
+ *
+ */
+function loadUserSettings() {
+  // Get user settings, or throw exception on error
+  try {
+    const userSettings = yaml.safeLoad(fs.readFileSync(".config.yaml", "utf8"));
+    // console.log(userSettings);
+    for (const key in userSettings) {
+      if (userSettings.hasOwnProperty(key)) {
+        const setting = userSettings[key];
+        app.SETTINGS[key] = setting;
+        console.log(app.SETTINGS[key]);
+        notifySubscribers("settings", app);
+      }
+    }
+  } catch (e) {
+    console.log("=== Error reading config file. ===\n");
+    console.log(e);
+    process.exit(-1);
+  }
+}
+
+// function getUserSettings() {
+//   return app.SETTINGS;
+// }
 
 exports.pluginCatalog = pluginCatalog;
 exports.pluginCategories = pluginCategories;
@@ -627,3 +643,4 @@ exports.wlog = wlog;
 exports.wlogError = wlogError;
 exports.wlogDebug = wlogDebug;
 exports.wlogWarning = wlogWarning;
+exports.loadUserSettings = loadUserSettings;

@@ -151,12 +151,12 @@ async function connectPorts(
  * @param {boolean} [addToQueue=false] If true, add it to the 'connectPlugins' queue instead of inmediately firing. Queue should be processed manually after.
  */
 function connectPlugins(src, dst, disconnect = false, addToQueue = false) {
-  const il = store.getJackStatus().CONNECTIONS.inputLeft;
-  const ir = store.getJackStatus().CONNECTIONS.inputRight;
-  const im = store.getJackStatus().CONNECTIONS.inputMode;
-  const ol = store.getJackStatus().CONNECTIONS.outputLeft;
-  const or = store.getJackStatus().CONNECTIONS.outputRight;
-  const om = store.getJackStatus().CONNECTIONS.outputMode;
+  const il = store.app.SETTINGS.INPUT_L;
+  const ir = store.app.SETTINGS.INPUT_R;
+  const im = store.app.SETTINGS.INPUT_MODE;
+  const ol = store.app.SETTINGS.OUTPUT_L;
+  const or = store.app.SETTINGS.OUTPUT_R;
+  const om = store.app.SETTINGS.OUTPUT_MODE;
   const instanceName = `calvo_${store.app.APP_ID}`;
 
   //   Direct Monitor not supported right now (It may conflict on multi instance mode.)

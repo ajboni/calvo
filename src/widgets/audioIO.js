@@ -63,7 +63,7 @@ const IOWidget = function (grid, x, y, xSpan, ySpan, mode) {
   for (let index = 0; index < sources.length; index++) {
     const element = sources[index];
     const radio = blessed.radiobutton({ content: element, top: index + 2 });
-    if (element === store.getJackStatus().CONNECTIONS[mode + "Left"]) {
+    if (element === store.app.SETTINGS[mode.toUpperCase() + "_L"]) {
       radio.checked = true;
     }
     radio.on("check", () => {
@@ -85,7 +85,7 @@ const IOWidget = function (grid, x, y, xSpan, ySpan, mode) {
   for (let index = 0; index < sources.length; index++) {
     const element = sources[index];
     const radio = blessed.radiobutton({ content: element, top: index + 2 });
-    if (element === store.getJackStatus().CONNECTIONS[mode + "Right"]) {
+    if (element === store.app.SETTINGS[mode.toUpperCase() + "_R"]) {
       radio.checked = true;
     }
     radio.on("check", () => {
@@ -95,7 +95,7 @@ const IOWidget = function (grid, x, y, xSpan, ySpan, mode) {
   }
   rightChannelBox.append(rRadioSet);
   rightChannelBox.hidden =
-    store.getJackStatus().CONNECTIONS[mode + "Mode"] === "mono";
+    store.app.SETTINGS[mode.toUpperCase() + "_MODE"] === "mono";
 
   //  EVENTS
   monoCheckbox.on("check", () => store.setAudioSourceMode(mode, "mono"));
@@ -105,16 +105,16 @@ const IOWidget = function (grid, x, y, xSpan, ySpan, mode) {
   ioWidget.append(leftChannelBox);
   ioWidget.append(rightChannelBox);
 
-  var token = PubSub.subscribe("jack", (m, j) =>
+  var token = PubSub.subscribe("settings", (m, j) =>
     update(m, j, mode, rightChannelBox)
   );
 
-  store.getJackStatus().CONNECTIONS[mode + "Mode"] === "mono"
+  store.app.SETTINGS[mode.toUpperCase() + "_MODE"] === "mono"
     ? (monoCheckbox.checked = true)
     : (monoCheckbox.checked = false);
 
   function update(msg, jackStatus, mode, rightChannelBox) {
-    if (jackStatus.CONNECTIONS[mode + "Mode"] === "mono")
+    if (store.app.SETTINGS[mode.toUpperCase() + "_MODE"] === "mono")
       rightChannelBox.hide();
     else rightChannelBox.show();
   }

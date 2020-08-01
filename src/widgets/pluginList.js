@@ -39,10 +39,10 @@ const PluginListWidget = function (grid, x, y, xSpan, ySpan) {
     pluginListWidget.select(pluginListWidget.items.length - 1);
   });
   pluginListWidget.key("pageup", function (ch, key) {
-    pluginListWidget.move(-settings.SCROLL_AMMOUNT);
+    pluginListWidget.move(-store.app.SETTINGS.SCROLL_AMMOUNT);
   });
   pluginListWidget.key("pagedown", function (ch, key) {
-    pluginListWidget.move(settings.SCROLL_AMMOUNT);
+    pluginListWidget.move(store.app.SETTINGS.SCROLL_AMMOUNT);
   });
   pluginListWidget.on("select", function (e, index) {
     store.addPluginToRack(e.content);

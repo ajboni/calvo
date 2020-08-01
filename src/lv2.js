@@ -16,7 +16,7 @@ const Layout = require("./layout");
 function init() {
   if (
     existsSync(path.join(__dirname, "pluginCatalog.json")) &&
-    !settings.SCAN_PLUGINS
+    !store.app.SETTINGS.SCAN_PLUGINS
   ) {
     console.log("Loading plugins cache...");
     store.loadCache();

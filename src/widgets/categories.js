@@ -2,7 +2,6 @@ const blessed = require("blessed");
 const contrib = require("blessed-contrib");
 const Layout = require("../layout");
 const store = require("../store");
-const { settings } = require("../../settings");
 
 var CategoriesWidget = function make(grid, x, y, xSpan, ySpan) {
   const categoriesWidget = grid.set(y, x, ySpan, xSpan, blessed.list, {
@@ -45,11 +44,11 @@ var CategoriesWidget = function make(grid, x, y, xSpan, ySpan) {
     categoriesWidget.select(categoriesWidget.items.length - 1);
   });
   categoriesWidget.key("pageup", function (ch, key) {
-    categoriesWidget.move(-settings.SCROLL_AMMOUNT);
+    categoriesWidget.move(-store.app.SETTINGS.SCROLL_AMMOUNT);
   });
 
   categoriesWidget.key("pagedown", function (ch, key) {
-    categoriesWidget.move(settings.SCROLL_AMMOUNT);
+    categoriesWidget.move(store.app.SETTINGS.SCROLL_AMMOUNT);
   });
 
   categoriesWidget.on("select", function (cat, index) {

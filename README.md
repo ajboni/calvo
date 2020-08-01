@@ -5,7 +5,8 @@ Calvo is a [jalv](http://drobilla.net/software/jalv) based LV2 plugin browser an
 ![calvo](static/img/2020-07-27.png)
 ![connections](static/img/2020-07-27-connections.gif)
 
-# Features 
+# Features
+
 - Runs entirely on the terminal.
 - Suports launching multiple instances of jalv and eventually calvo.
 - Category based plugin browser.
@@ -15,16 +16,17 @@ Calvo is a [jalv](http://drobilla.net/software/jalv) based LV2 plugin browser an
 - Load plugin presets.
 - Move plugins order.
 - Alpha
-  
+
 # Limitations
+
 - No GUI customization is loaded, any plugin which has a UI based workflow won't work properly.
 - Only works with mono or stereo inputs/outputs.
 - Monitoring is best effort and should not be taken too seriously.
 
 ### Roadmap to 1.0: [Milestone](https://github.com/ajboni/calvo/milestone/1)
 
-
 # Dependencies
+
 It uses:
 
 - [jalv](http://drobilla.net/software/jalv) to host plugins
@@ -33,7 +35,8 @@ It uses:
 - nodejs to glue all together
 
 # Settings
-Modify `settings.js` with your settings, more info [in the docs](https://ajboni.github.io/calvo/module-settings.html).
+
+Modify `.config.yaml` with your settings, more info [in the docs](https://ajboni.github.io/calvo/module-settings.html).
 
 # Keyboard shortcuts
 
@@ -49,12 +52,13 @@ Modify `settings.js` with your settings, more info [in the docs](https://ajboni.
 - `CTRL + up/down` Swap plugins up/down
 
 ### Plugin parameters widget
+
 - `up/down / TAB` Cycle through each parameter.
 - `left/right` Change parameter value by default step.
 - `SHIFT + left/right` Change parameter value by small step.
 - `CTRL + left/right` Change parameter value by big step.
 - `page_up/page_down` Change parameter value by 1/5 of the maximum allowed
-  
+
 # DEV
 
 Still need to figure out a way to distribute this.
@@ -74,6 +78,7 @@ npm start
 Dev Documentation is available at: https://ajboni.github.io/calvo/
 
 To build doc locally:
+
 ```
 npm run document
 ```

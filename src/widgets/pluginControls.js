@@ -4,7 +4,6 @@ const contrib = require("blessed-contrib");
 const PubSub = require("pubsub-js");
 const Layout = require("../layout");
 const store = require("../store");
-const { settings } = require("../../settings");
 
 const PluginControls = function (grid, x, y, xSpan, ySpan) {
   const pluginControls = grid.set(y, x, ySpan, xSpan, blessed.box, {
@@ -233,7 +232,7 @@ function progressControl(value, top, pluginControl, pluginInstance) {
           newValue = 1;
         }
       } else {
-        let step = settings.DEFAULT_CONTROL_STEP;
+        let step = store.app.SETTINGS.DEFAULT_CONTROL_STEP;
 
         // For small values, (less than 1, make the steps even smaller)
         if (ranges.maximum - ranges.minimum < 1) {
@@ -286,15 +285,15 @@ function progressControl(value, top, pluginControl, pluginInstance) {
   });
 
   //   progress.key("S-right", function (a, b) {
-  //     box.updateValue(box.value + settings.DEFAULT_CONTROL_MEDIUM_STEP);
+  //     box.updateValue(box.value + store.app.SETTINGS.DEFAULT_CONTROL_MEDIUM_STEP);
   //   });
 
   //   progress.key("left", function (a, b) {
-  //     box.updateValue(box.value - settings.DEFAULT_CONTROL_SMALL_STEP);
+  //     box.updateValue(box.value - store.app.SETTINGS.DEFAULT_CONTROL_SMALL_STEP);
   //   });
 
   //   progress.key("S-right", function (a, b) {
-  //     box.updateValue(box.value + settings.DEFAULT_CONTROL_MEDIUM_STEP);
+  //     box.updateValue(box.value + store.app.SETTINGS.DEFAULT_CONTROL_MEDIUM_STEP);
   //   });
   return box;
 }

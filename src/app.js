@@ -16,6 +16,7 @@ const screen = blessed.screen({
 });
 
 try {
+  store.loadUserSettings();
   LV2.init();
   Jack.init();
 
@@ -36,12 +37,12 @@ Jack.poll();
 // Set up polling
 let jackPoll = setInterval(() => {
   Jack.poll();
-}, settings.JACK_POLLING_RATE);
+}, store.app.SETTINGS.JACK_POLLING_RATE);
 
 let uiPoll = setInterval(() => {
   store.notifySubscribers();
   screen.render();
-}, settings.UI_UPDATE_RATE);
+}, store.app.SETTINGS.UI_UPDATE_RATE);
 
 function exit() {
   store.clearRack();
