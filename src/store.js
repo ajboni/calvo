@@ -603,7 +603,7 @@ function loadUserSettings() {
       if (userSettings.hasOwnProperty(key)) {
         const setting = userSettings[key];
         app.SETTINGS[key] = setting;
-        console.log(app.SETTINGS[key]);
+        // console.log(app.SETTINGS[key]);
         notifySubscribers("settings", app);
       }
     }

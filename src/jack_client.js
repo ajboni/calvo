@@ -170,8 +170,8 @@ function connectPlugins(src, dst, disconnect = false, addToQueue = false) {
   //  Input => Plugin
   if (src === "input") {
     if (!dst.ports.audio.input || dst.ports.audio.input.length === 0) {
-      store.wlog(
-        "Dst plugin does not have correct number of ports or does not exist."
+      store.wlogWarning(
+        `${dst.name} is breaking the audio chain as it does not have any input audio port.`
       );
       return;
     }
@@ -200,8 +200,8 @@ function connectPlugins(src, dst, disconnect = false, addToQueue = false) {
   //   Plugin => Output
   else if (dst === "output") {
     if (!src.ports.audio.output || src.ports.audio.output.length === 0) {
-      store.wlog(
-        "src plugin does not have correct number of ports or does not exist."
+      store.wlogWarning(
+        `${src.name} is breaking the audio chain as it does not have any output audio port.`
       );
       return;
     }
@@ -228,15 +228,15 @@ function connectPlugins(src, dst, disconnect = false, addToQueue = false) {
   //   Plugin => Plugin
   else {
     if (!src.ports.audio.output || src.ports.audio.output.length === 0) {
-      store.wlog(
-        `src plugin (${src.name}) does not have correct number of ports or does not exist.`
+      store.wlogWarning(
+        `${src.name} [#`]is breaking the audio chain as it does not have any output audio port.`
       );
       return;
     }
 
     if (!dst.ports.audio.input || dst.ports.audio.input.length === 0) {
-      store.wlog(
-        `dst plugin (${dst.name}) does not have correct number of ports or does not exist.`
+      store.wlogWarning(
+        `${dst.name} is breaking the audio chain as it does not have any output audio port.`
       );
       return;
     }
