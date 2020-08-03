@@ -229,7 +229,7 @@ function connectPlugins(src, dst, disconnect = false, addToQueue = false) {
   else {
     if (!src.ports.audio.output || src.ports.audio.output.length === 0) {
       store.wlogWarning(
-        `${src.name} [#`]is breaking the audio chain as it does not have any output audio port.`
+        `${src.name} ]is breaking the audio chain as it does not have any output audio port.`
       );
       return;
     }
