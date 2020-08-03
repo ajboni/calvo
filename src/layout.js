@@ -20,6 +20,7 @@ const AudioIO = require("./widgets/audioIO");
 const PubSub = require("pubsub-js");
 const PluginInfo = require("./widgets/pluginInfo");
 const PluginPresetsWidget = require("./widgets/pluginPresets");
+const HelpWidget = require("./widgets/help");
 
 let focusIndex = 0;
 var mainScreen;
@@ -88,6 +89,8 @@ function setUpLayout(screen) {
     new AudioIO(grid, 0, 15, 13, 13, "output")
   );
 
+  const page6 = new Page(new HelpWidget(grid, 0, 1, 13, 27));
+
   const pageSwitcher = new PageSwitcher(mainScreen, [
     page0,
     page0,
@@ -95,7 +98,7 @@ function setUpLayout(screen) {
     page0,
     page4,
     page0,
-    // page4,
+    page6,
   ]);
 
   PubSub.subscribe("app", function (msg, app) {

@@ -33,7 +33,9 @@ function make(grid, x, y, xSpan, ySpan, page = -1) {
       "Reconnect All": () => {
         store.reconectAll();
       },
-      Help: () => {},
+      Help: () => {
+        store.setCurrentPage(6);
+      },
       Exit: () => {
         App.exit();
       },
