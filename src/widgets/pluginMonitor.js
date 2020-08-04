@@ -24,7 +24,6 @@ const PluginMonitor = function (grid, x, y, xSpan, ySpan) {
     scrollable: true,
     style: {
       border: { fg: "#7ea87f" },
-      scrollbar: true,
       focus: {
         border: { fg: "red" },
         //   enabled: false,
@@ -115,6 +114,8 @@ function progressControl(value, top, pluginControl, pluginInstance) {
     interactive: false,
     focusable: false,
     top: top,
+    alwaysScroll: true,
+    scrollable: true,
   });
 
   box.value = parseControlValue(pluginControl, value);
@@ -127,6 +128,8 @@ function progressControl(value, top, pluginControl, pluginInstance) {
     top: 1,
     interactive: false,
     focusable: false,
+    alwaysScroll: true,
+    scrollable: true,
   });
 
   //    Progress Widget
@@ -135,6 +138,8 @@ function progressControl(value, top, pluginControl, pluginInstance) {
     focusable: false,
     keyable: false,
     keys: false,
+    alwaysScroll: true,
+    scrollable: true,
     border: {
       type: "bg",
       //   fg: "#882822",
@@ -173,6 +178,8 @@ function progressControl(value, top, pluginControl, pluginInstance) {
     top: 1,
     interactive: false,
     focusable: false,
+    alwaysScroll: true,
+    scrollable: true,
   });
 
   box.append(label);

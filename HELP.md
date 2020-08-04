@@ -12,4 +12,5 @@
 | Plugin Parameters Widget | -        | LEFT / RIGHT        | Change parameter value by default step               |
 | Plugin Parameters Widget | SHIFT    | LEFT / RIGHT        | Change parameter value by small step.                |
 | Plugin Parameters Widget | CTRL     | LEFT / RIGHT        | Change parameter value by big step.                  |
-| Plugin Parameters Widget | -        | PAGE_UP / PAGE_DOWN | Change parameter value by 1/5 of the maximum allowed |
+| Plugin Parameters Widget | -        | TODO                | Change parameter value by 1/5 of the maximum allowed |
+| Plugin Parameters Widget | -        | PAGE UP / PAGE DOWN | Scroll properties                                    |

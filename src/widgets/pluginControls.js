@@ -12,16 +12,16 @@ const PluginControls = function (grid, x, y, xSpan, ySpan) {
     mouse: true,
     interactive: true,
     keys: true,
-
+    vi: true,
+    // alwaysScroll: true,
     padding: { left: 1, right: 1 },
-    mouse: true,
+
+    scrollable: true,
+    focusable: true,
     scrollbar: {
       ch: " ",
       inverse: true,
     },
-    scrollable: true,
-    focusable: true,
-
     style: {
       border: { fg: "#7ea87f" },
       focus: {
@@ -29,6 +29,14 @@ const PluginControls = function (grid, x, y, xSpan, ySpan) {
         //   enabled: false,
       },
     },
+  });
+
+  pluginControls.key(["pageup"], (c, x) => {
+    pluginControls.scroll(-pluginControls.height);
+  });
+
+  pluginControls.key(["pagedown"], (c, x) => {
+    pluginControls.scroll(pluginControls.height);
   });
 
   pluginControls.key(["down"], (e, x) => {
@@ -66,7 +74,8 @@ const PluginControls = function (grid, x, y, xSpan, ySpan) {
           values[control.symbol],
           y,
           control,
-          plugin
+          plugin,
+          pluginControls
         );
         pluginControls.append(controlWidget);
         pluginControls.scrollable = true;
@@ -106,7 +115,7 @@ const PluginControls = function (grid, x, y, xSpan, ySpan) {
  * @param {pluginInstance} pluginInstance
  * @returns Returns the progress control blessed widget.
  */
-function progressControl(value, top, pluginControl, pluginInstance) {
+function progressControl(value, top, pluginControl, pluginInstance, parent) {
   const {
     comment,
     designation,
@@ -121,23 +130,21 @@ function progressControl(value, top, pluginControl, pluginInstance) {
     units,
   } = pluginControl;
 
-  var box = blessed.box({
+  let box = blessed.box({
     interactive: false,
-    focusable: false,
+    focusable: true,
+
     top: top,
+    height: 3,
+    // bg: "green",
+    right: 2,
+    left: 2,
+    // alwaysScroll: true,
+    scrollable: true,
   });
 
   box.value = parseControlValue(pluginControl, value);
   const valuePercent = getControlValuePercent(pluginControl, box.value);
-
-  //    Control Label
-  var label = blessed.text({
-    content: shortName,
-    left: 1,
-    top: 1,
-    interactive: false,
-    focusable: false,
-  });
 
   //    Progress Widget
   var progress = blessed.progressbar({
@@ -166,6 +173,18 @@ function progressControl(value, top, pluginControl, pluginInstance) {
     right: "8",
     filled: parseInt(valuePercent.toString()),
     width: "65%",
+
+    // alwaysScroll: true,
+    scrollable: true,
+  });
+
+  //    Control Label
+  let label = blessed.text({
+    content: shortName,
+    left: 1,
+    top: 1,
+    // alwaysScroll: true,
+    scrollable: true,
   });
 
   const valueLabelValue = getControlValueLabel(
@@ -177,8 +196,8 @@ function progressControl(value, top, pluginControl, pluginInstance) {
     content: valueLabelValue,
     right: 4,
     top: 1,
-    interactive: false,
-    focusable: false,
+    // alwaysScroll: true,
+    scrollable: true,
   });
 
   box.append(label);
@@ -225,6 +244,15 @@ function progressControl(value, top, pluginControl, pluginInstance) {
       "pagedown",
     ],
     function (e, keys) {
+      if (keys.name === "pageup") {
+        parent.scroll(-25);
+        return;
+      }
+      if (keys.name === "pagedown") {
+        parent.scroll(25);
+        return;
+      }
+
       let newValue = 0;
 
       // if it is a toggle button, just send 0 or 1
@@ -261,8 +289,8 @@ function progressControl(value, top, pluginControl, pluginInstance) {
 
         if (keys.shift) step /= 10;
         if (keys.ctrl) step *= 5;
-        if (keys.name === "pageup") step = -ranges.maximum / 5;
-        if (keys.name === "pagedown") step = ranges.maximum / 5;
+        // if (keys.name === "pageup") step = -ranges.maximum / 5;
+        // if (keys.name === "pagedown") step = ranges.maximum / 5;
         if (keys.name === "left") step = -step;
         newValue = box.value + step;
 

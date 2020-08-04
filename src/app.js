@@ -12,7 +12,7 @@ const LV2 = require("./lv2");
 const store = require("./store");
 const program = blessed.program();
 const screen = blessed.screen({
-  smartCSR: true,
+  //   smartCSR: true,
 });
 
 try {
