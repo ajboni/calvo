@@ -2,6 +2,7 @@
   "name": "calvo",
   "version": "1.0.0",
   "description": "A jalv based lv2 plugin host for your terminal.",
+  "repository": "git@github.com:ajboni/calvo.git",
   "main": "index.js",
   "scripts": {
     "start": "node src/app.js",
@@ -16,9 +17,9 @@
   "license": "AGPL-3.0-or-later",
   "devDependencies": {
     "docdash": "^1.2.0",
-    "jsdoc": "^3.6.4",
+    "jsdoc": "^3.6.7",
     "nodemon": "^2.0.4",
-    "prettier": "^2.0.5"
+    "prettier": "^2.3.0"
   },
   "dependencies": {
     "blessed": "^0.1.81",
