@@ -1,3 +1,3 @@
 [submodule "py/calvo_cli_tools"]
 	path = py/calvo_cli_tools
-	url =  git@github.com:ajboni/calvo-cli-tools.git
+	url =  https://github.com/ajboni/calvo-cli-tools.git

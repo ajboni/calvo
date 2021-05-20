@@ -65,7 +65,7 @@ For the time being it can be build from source.
 Make sure to have the dependencies installed first.
 
 ```
-git clone repo
+git clone https://github.com/ajboni/calvo.git
 git submodule init
 git submodule update
 npm install
