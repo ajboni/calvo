@@ -3,7 +3,7 @@
 Calvo is a [jalv](http://drobilla.net/software/jalv) based LV2 plugin browser and host to stack plugins in a rack fashion.
 
 ![calvo](static/img/2020-07-27.png)
-![connections](static/img/calvo_overview.gif)
+[![connections](static/img/calvo_overview.gif)](https://www.youtube.com/watch?v=3TH-dt7sods "Watch in YouTube")
 
 # Features
 
