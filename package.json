@@ -25,7 +25,7 @@
     "blessed": "^0.1.81",
     "blessed-contrib": "^4.8.20",
     "js-yaml": "^3.14.0",
-    "nanoid": "^3.1.10",
+    "nanoid": "^3.1.31",
     "neo-blessed": "^0.2.0",
     "pubsub-js": "^1.8.0"
   }
