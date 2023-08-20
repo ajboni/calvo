@@ -95,7 +95,7 @@ function pluginInfo(uri) {
 
   try {
     const result = cp.execSync(
-      `python3 -m jackaudiotools.lv2.plugin_info ${uri}`,
+      `python3 -m calvo_cli_tools.lv2.plugin_info ${uri}`,
       {
         cwd: "./py",
         encoding: "utf8",
