@@ -31,12 +31,11 @@ It uses:
 
 - [jalv](http://drobilla.net/software/jalv) to host plugins
 - [lilv](http://drobilla.net/software/lilv) to get plugin data
-- JACK and jack-client  
+- JACK and jack-client
 - [blessed](https://github.com/chjj/blessed) for the UI.
 - nodejs to glue all together
 
-For arch linux: `sudo pacman -S python-jack-client lilv jalv`
-
+For arch linux: `sudo pacman -S python-jack-client lilv jalv python-lilv`
 
 # Settings
 
